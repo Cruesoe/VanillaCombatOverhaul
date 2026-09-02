@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Mechanics are exposed as ordinary stats so they appear on the pawn's Stats tab,
+       can be retuned in XML, and can be modified by apparel, hediffs, genes, traits and
+       other mods without anyone needing to patch our C#. -->
+
+  <StatDef>
+    <defName>VCO_ParryChance</defName>
+    <label>parry aptitude</label>
+    <description>How well this pawn can deflect an incoming melee attack with a held weapon.\n\nThis is aptitude, not the final chance. The attack is contested: a more skilled attacker is harder to parry. Attacks from behind cannot be parried at all, and a pawn can only parry a limited number of attacks in quick succession, so being swarmed remains dangerous.\n\nRequires a weapon in hand.</description>
+    <category>PawnCombat</category>
+    <defaultBaseValue>0</defaultBaseValue>
+    <minValue>0</minValue>
+    <maxValue>0.999</maxValue>
+    <toStringStyle>PercentZero</toStringStyle>
+    <showIfUndefined>false</showIfUndefined>
+    <displayPriorityInCategory>2100</displayPriorityInCategory>
+    <parts>
+      <!-- Order matters: aptitude is seeded from melee ability, then adjusted, then
+           zeroed outright if there is nothing in hand to parry with. -->
+      <li Class="VanillaCombatOverhaul.StatPart_ParryAptitudeFromMelee" />
+      <li Class="VanillaCombatOverhaul.StatPart_ParryDarkness" />
+      <li Class="VanillaCombatOverhaul.StatPart_ParryRequiresWeapon" />
+    </parts>
+  </StatDef>
+
+  <StatDef>
+    <defName>VCO_Evasion</defName>
+    <label>evasion</label>
+    <description>Reduction to an attacker's chance to hit this pawn while it is moving.\n\nA stationary pawn does not evade. Evasion is a consequence of movement, so it trades away the ability to shoot back.</description>
+    <category>PawnCombat</category>
+    <defaultBaseValue>0</defaultBaseValue>
+    <minValue>0</minValue>
+    <maxValue>0.75</maxValue>
+    <toStringStyle>PercentZero</toStringStyle>
+    <showIfUndefined>false</showIfUndefined>
+    <displayPriorityInCategory>2090</displayPriorityInCategory>
+  </StatDef>
+
+  <StatDef>
+    <defName>VCO_SuppressionResistance</defName>
+    <label>suppression resistance</label>
+    <description>How strongly this pawn resists suppression building up from incoming fire.\n\nHigher values mean the pawn keeps fighting under fire that would pin someone else down.</description>
+    <category>PawnCombat</category>
+    <defaultBaseValue>1.0</defaultBaseValue>
+    <minValue>0</minValue>
+    <maxValue>5</maxValue>
+    <toStringStyle>FloatTwo</toStringStyle>
+    <showIfUndefined>false</showIfUndefined>
+    <displayPriorityInCategory>2080</displayPriorityInCategory>
+  </StatDef>
+
+</Defs>

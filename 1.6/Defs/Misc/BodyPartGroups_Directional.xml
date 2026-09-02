@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Groups used to work out which parts an attack from a given side can reach.
+       These are additive: they are seeded onto existing BodyDefs by Patches/, and
+       nothing about vanilla's own groups is changed. -->
+
+  <BodyPartGroupDef>
+    <defName>VCO_Left</defName>
+    <label>left side</label>
+    <labelShort>left</labelShort>
+  </BodyPartGroupDef>
+
+  <BodyPartGroupDef>
+    <defName>VCO_Right</defName>
+    <label>right side</label>
+    <labelShort>right</labelShort>
+  </BodyPartGroupDef>
+
+  <BodyPartGroupDef>
+    <defName>VCO_Center</defName>
+    <label>midline</label>
+    <labelShort>midline</labelShort>
+  </BodyPartGroupDef>
+
+</Defs>

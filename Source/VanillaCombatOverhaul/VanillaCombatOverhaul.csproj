@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- RimWorld runs on Unity's Mono; net472 is required and not negotiable. -->
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>VanillaCombatOverhaul</AssemblyName>
+    <RootNamespace>VanillaCombatOverhaul</RootNamespace>
+    <Version>0.1.0</Version>
+
+    <!-- Build straight into the mod folder RimWorld loads. -->
+    <OutputPath>$(MSBuildProjectDirectory)\..\..\1.6\Assemblies\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+
+    <!-- A mod assembly ships alone; never rake dependencies into the output folder. -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference assemblies for the exact installed build (1.6.4871).
+         ExcludeAssets="runtime" keeps these out of the output folder. -->
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4871" ExcludeAssets="runtime" PrivateAssets="all" />
+
+    <!-- Harmony is provided at runtime by the Harmony mod; compile against it only.
+         Pinned to the version that mod actually ships (checked: 2.4.1). -->
+    <PackageReference Include="Lib.Harmony" Version="2.4.1" ExcludeAssets="runtime" PrivateAssets="all" />
+
+    <!-- Supplies net472 targeting packs so this builds without Visual Studio. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

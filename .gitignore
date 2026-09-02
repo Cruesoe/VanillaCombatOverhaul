@@ -1,0 +1,25 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+MigrationBackup/
+
+# The compiled mod assembly is a build artifact, not source.
+# Remove this line if you prefer to commit release binaries.
+1.6/Assemblies/*.dll
+1.6/Assemblies/*.pdb
+
+# Never ship editor or backup cruft inside a loadable mod folder.
+*.bak
+*.orig
+*.tmp
+
+# Steam upload staging, produced by Tools/package-steam.ps1
+Dist/
+
+# Local clone of Vanilla Combat Reloaded, kept for reference only. Not ours to redistribute.
+_vcr_ref/

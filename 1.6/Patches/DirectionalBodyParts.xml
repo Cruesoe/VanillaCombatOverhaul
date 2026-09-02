@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Patch>
+
+  <!-- Seeds directional groups onto every BodyDef, including modded races, without naming
+       any of them. Adapted from the approach in Vanilla Combat Reloaded by Donald (DonaldKar).
+
+       Rules:
+         a part labelled "left ..."  is reachable only from the left
+         a part labelled "right ..." is reachable only from the right
+         everything else is reachable from both, and is therefore also midline
+         the core part (torso) is reachable from every angle
+
+       Purely additive: vanilla's own groups are never removed or replaced. -->
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>DirectionalDamage</setting>
+    <match Class="PatchOperationSequence">
+      <operations>
+
+        <!-- 1. Guarantee every part has a groups list to add to. -->
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef//li[def and not(groups)]</xpath>
+          <value>
+            <groups />
+          </value>
+        </li>
+
+        <!-- 2. Not left-labelled, so reachable from the right.
+                translate() folds case, so "Left", "LEFT" and "left" all match. -->
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef//li[def][not(customLabel) or not(contains(translate(customLabel,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'left'))]/groups</xpath>
+          <value>
+            <li>VCO_Right</li>
+          </value>
+        </li>
+
+        <!-- 3. Not right-labelled, so reachable from the left. -->
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef//li[def][not(customLabel) or not(contains(translate(customLabel,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'right'))]/groups</xpath>
+          <value>
+            <li>VCO_Left</li>
+          </value>
+        </li>
+
+        <!-- 4. Reachable from both sides means it sits on the midline. -->
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef//groups[li[.='VCO_Left'] and li[.='VCO_Right']]</xpath>
+          <value>
+            <li>VCO_Center</li>
+          </value>
+        </li>
+
+        <!-- 5. The core part is not an <li> and so is missed by everything above. It is the
+                torso: the largest target on the body, and hittable from any angle. Vanilla
+                Combat Reloaded left it midline-only, which meant a flanking shot could never
+                hit the torso at all. -->
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef/corePart[not(groups)]</xpath>
+          <value>
+            <groups />
+          </value>
+        </li>
+        <li Class="PatchOperationAdd">
+          <success>Always</success>
+          <xpath>Defs/BodyDef/corePart/groups</xpath>
+          <value>
+            <li>VCO_Left</li>
+            <li>VCO_Right</li>
+            <li>VCO_Center</li>
+          </value>
+        </li>
+
+      </operations>
+    </match>
+  </Operation>
+
+</Patch>

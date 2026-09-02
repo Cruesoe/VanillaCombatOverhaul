@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <VCO_ModName>Vanilla Combat Overhaul</VCO_ModName>
+
+  <!-- Tabs -->
+  <VCO_Tab_Combat>Combat</VCO_Tab_Combat>
+  <VCO_Tab_Equipment>Equipment</VCO_Tab_Equipment>
+  <VCO_Tab_Diagnostics>Diagnostics</VCO_Tab_Diagnostics>
+
+  <!-- Section headers -->
+  <VCO_Section_Melee>Melee</VCO_Section_Melee>
+  <VCO_Section_Damage>Damage and hit location</VCO_Section_Damage>
+  <VCO_Section_Ranged>Ranged</VCO_Section_Ranged>
+  <VCO_Section_Ammo>Ammunition</VCO_Section_Ammo>
+  <VCO_Section_Carrying>Carrying weapons</VCO_Section_Carrying>
+  <VCO_Section_Logging>Logging</VCO_Section_Logging>
+  <VCO_Section_PatchStatus>Patch status</VCO_Section_PatchStatus>
+
+  <!-- Badges -->
+  <VCO_NotImplemented>(NOT YET BUILT)</VCO_NotImplemented>
+  <VCO_NotImplemented_Tip>This feature is on the roadmap but is not written yet, so the switch is locked off. It will unlock in a later version. Nothing in your game is affected by it today.</VCO_NotImplemented_Tip>
+  <VCO_RestartTag>[needs restart]</VCO_RestartTag>
+  <VCO_RestartTag_Tip>This one changes how the game loads its data, so it only takes effect after you close and reopen RimWorld.</VCO_RestartTag_Tip>
+  <VCO_RestartNeeded>Restart RimWorld for this setting to take effect.</VCO_RestartNeeded>
+
+  <!-- Melee -->
+  <VCO_Parry>Pawns can parry melee attacks</VCO_Parry>
+  <VCO_Parry_Tip>When someone swings at your pawn in melee, your pawn can turn the blow aside with the weapon they are holding and take no damage.\n\nThey must have a weapon in hand. Better melee fighters parry more often, and a strong attacker is harder to parry. Attacks from directly behind can never be parried.</VCO_Parry_Tip>
+
+  <VCO_ParryFrontFactor>Parrying attacks from the front: {0}</VCO_ParryFrontFactor>
+  <VCO_ParryFrontFactor_Tip>How easy it is to parry someone attacking you face to face.\n\nHigher means more parries. Lower means fewer.</VCO_ParryFrontFactor_Tip>
+
+  <VCO_ParrySideFactor>Parrying attacks from the side: {0}</VCO_ParrySideFactor>
+  <VCO_ParrySideFactor_Tip>How easy it is to parry someone attacking from your left or right.\n\nBy default this is the same as the front, so being flanked does not stop you parrying. Lower it if you want getting to someone's side to be a real advantage.</VCO_ParrySideFactor_Tip>
+
+  <VCO_ParryBudget>Most parries per second: {0}</VCO_ParryBudget>
+  <VCO_ParryBudget_Tip>The most attacks one pawn can parry in a single second, no matter how skilled they are.\n\nThis stops one great fighter from holding off a whole crowd forever. It only starts to matter at roughly five or more attackers at once.</VCO_ParryBudget_Tip>
+
+  <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
+  <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
+
+  <!-- Damage / hit location -->
+  <VCO_DirectionalDamage>Where you get hit depends on the angle</VCO_DirectionalDamage>
+  <VCO_DirectionalDamage_Tip>Normally a shot picks a random body part. With this on, the side an attack comes from decides what it can hit.\n\nShoot someone from their left and you can hit their left arm, left eye or left lung, but not their right ones. The torso can be hit from any angle.\n\nThis applies to guns and bows. Turn on the option below to include melee too.</VCO_DirectionalDamage_Tip>
+
+  <VCO_MeleeFlanking>Apply this to melee attacks too</VCO_MeleeFlanking>
+  <VCO_MeleeFlanking_Tip>Melee attacks also hit the side they come from, not just guns and bows.</VCO_MeleeFlanking_Tip>
+
+  <!-- Ranged -->
+  <VCO_Evasion>Moving pawns are harder to shoot</VCO_Evasion>
+  <VCO_Evasion_Tip>A pawn who is running is harder to hit than one standing still.\n\nStanding still gives no benefit, so this is a trade: move and be safer, or stand and shoot back.</VCO_Evasion_Tip>
+  <VCO_EvasionFactor>How much harder to hit: {0}</VCO_EvasionFactor>
+  <VCO_EvasionFactor_Tip>Higher means running pawns are harder to hit. Lower means movement helps less.</VCO_EvasionFactor_Tip>
+
+  <VCO_FiringArc>Missed shots spread out with distance</VCO_FiringArc>
+  <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
+  <VCO_FiringArcDegrees>Width of the spread: {0} degrees</VCO_FiringArcDegrees>
+  <VCO_FiringArcDegrees_Tip>How wide the cone of missed shots is. Bigger numbers mean misses land further from the target.</VCO_FiringArcDegrees_Tip>
+
+  <VCO_Suppression>Being shot at pins pawns down</VCO_Suppression>
+  <VCO_Suppression_Tip>Pawns under sustained fire get rattled and try to take cover instead of standing in the open trading shots.\n\nThis makes covering fire useful even when it does not hit anything.</VCO_Suppression_Tip>
+  <VCO_SuppressionRate>How quickly pawns get pinned: {0}</VCO_SuppressionRate>
+  <VCO_SuppressionRate_Tip>Higher means it takes less incoming fire to pin someone down.</VCO_SuppressionRate_Tip>
+
+  <!-- Ammo -->
+  <VCO_Ammo_Intro>Ammunition is grouped into a few simple types by tech level and damage, rather than a separate calibre for every gun. That means weapons from other mods work automatically, with no compatibility patch needed.</VCO_Ammo_Intro>
+  <VCO_Ammo>Guns and bows need ammunition</VCO_Ammo>
+  <VCO_Ammo_Tip>Ranged weapons use up ammunition when fired, and have to be reloaded.\n\nWhich ammunition a weapon needs is worked out from its tech level and damage type, so a flamethrower wants a different type than a rifle.</VCO_Ammo_Tip>
+  <VCO_AmmoYield>Ammunition made per craft: {0}</VCO_AmmoYield>
+  <VCO_AmmoYield_Tip>Multiplies how much ammunition you get from one crafting job. Raise it if making ammo feels too slow.</VCO_AmmoYield_Tip>
+
+  <!-- Carrying -->
+  <VCO_Sidearms>Pawns can carry a backup weapon</VCO_Sidearms>
+  <VCO_Sidearms_Tip>Pawns can carry extra weapons in their inventory and switch to them, so a sniper can pull out a knife when something reaches them.</VCO_Sidearms_Tip>
+  <VCO_Loadouts>Pawns keep themselves stocked</VCO_Loadouts>
+  <VCO_Loadouts_Tip>Set what each pawn should be carrying, and they will go and collect it themselves instead of you hauling things to them by hand.</VCO_Loadouts_Tip>
+
+  <!-- Diagnostics -->
+  <VCO_Section_Counters>Activity counters</VCO_Section_Counters>
+  <VCO_VerboseLogging>Verbose logging and activity counters</VCO_VerboseLogging>
+  <VCO_VerboseLogging_Tip>Confirms on startup that everything hooked in correctly, and counts how often each part of the mod actually fires.\n\nThis is here to help tune the mod while it is being built. It costs nothing noticeable, but there is no reason to leave it on once you are just playing.</VCO_VerboseLogging_Tip>
+  <VCO_DumpInterval>Write counters to the log every: {0} ticks</VCO_DumpInterval>
+  <VCO_DumpInterval_Tip>How often the counters below are also written to the debug log, so a session leaves a record behind.\n\n2500 ticks is about one in-game hour. Set to 0 to stop the automatic writing without losing the counters.</VCO_DumpInterval_Tip>
+  <VCO_Counters_Intro>How often each part of the mod has fired since the counters were last reset. Rejection reasons show why a parry did not happen, which is usually more informative than the success count on its own.</VCO_Counters_Intro>
+  <VCO_Counters_Disabled>Counters are off. Switch on verbose logging above to start collecting.</VCO_Counters_Disabled>
+  <VCO_Counters_Empty>Nothing recorded yet. Counters fill up once combat happens.</VCO_Counters_Empty>
+  <VCO_Counters_Write>Write to log now</VCO_Counters_Write>
+  <VCO_Counters_Reset>Reset counters</VCO_Counters_Reset>
+  <VCO_Counters_Written>Diagnostics written to the log.</VCO_Counters_Written>
+  <VCO_Diagnostics_Intro>This mod changes some of RimWorld's own code to work. If a game update or another mod changes that code first, a change can quietly stop applying. Anything listed as broken here means the feature behind it is not working.</VCO_Diagnostics_Intro>
+  <VCO_NoGuardedPatches>Nothing to report. This mod currently hooks into RimWorld only in ways that cannot silently fail, so there is nothing here that needs watching.</VCO_NoGuardedPatches>
+  <VCO_PatchOk>OK</VCO_PatchOk>
+  <VCO_PatchBroken>BROKEN - applied {0} of {1}</VCO_PatchBroken>
+
+  <!-- Stat explanations -->
+  <VCO_StatPart_NoWeapon>No weapon to parry with</VCO_StatPart_NoWeapon>
+  <VCO_StatPart_MeleeAbility>Melee ability</VCO_StatPart_MeleeAbility>
+  <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
+
+  <!-- In-world text -->
+  <VCO_Mote_Parried>Parried!</VCO_Mote_Parried>
+
+</LanguageData>
