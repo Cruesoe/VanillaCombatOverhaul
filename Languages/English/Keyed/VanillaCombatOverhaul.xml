@@ -10,6 +10,7 @@
 
   <!-- Section headers -->
   <VCO_Section_Melee>Melee</VCO_Section_Melee>
+  <VCO_Section_Armor>Armor</VCO_Section_Armor>
   <VCO_Section_Damage>Damage and hit location</VCO_Section_Damage>
   <VCO_Section_Ranged>Ranged</VCO_Section_Ranged>
   <VCO_Section_Ammo>Ammunition</VCO_Section_Ammo>
@@ -40,12 +41,39 @@
   <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
   <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
 
+  <!-- Armor -->
+  <VCO_AdvancedArmor>Good leftover armor stops hits</VCO_AdvancedArmor>
+  <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nThe gun's shown armor penetration is raised to keep weapons that already beat a plate beating it.</VCO_AdvancedArmor_Tip>
+
+  <VCO_ArmorThreshold>Hits always bounce when leftover armor is {0}%</VCO_ArmorThreshold>
+  <VCO_ArmorThreshold_Tip>Leftover is your armor percent minus the gun's armor penetration percent.\n\nVanilla always stops a hit at 200% leftover. Default 100% matches Vanilla Combat Reloaded: if the plate wins by that much, the shot does not go through.</VCO_ArmorThreshold_Tip>
+
+  <VCO_PenetrationScale>Weapon armor penetration: ×{0}</VCO_PenetrationScale>
+  <VCO_PenetrationScale_Tip>Because leftover now stops hits sooner, ordinary penetration would bounce off plates it used to threaten. This multiplier is applied to the armor penetration shown on weapons and used in the armor roll.\n\nDefault 2 matches Vanilla Combat Reloaded. Raise it if guns feel too weak; lower it if armor feels too weak.</VCO_PenetrationScale_Tip>
+
   <!-- Damage / hit location -->
   <VCO_DirectionalDamage>Where you get hit depends on the angle</VCO_DirectionalDamage>
   <VCO_DirectionalDamage_Tip>Normally a shot picks a random body part. With this on, the side an attack comes from decides what it can hit.\n\nShoot someone from their left and you can hit their left arm, left eye or left lung, but not their right ones. The torso can be hit from any angle.\n\nThis applies to guns and bows. Turn on the option below to include melee too.</VCO_DirectionalDamage_Tip>
 
   <VCO_MeleeFlanking>Apply this to melee attacks too</VCO_MeleeFlanking>
   <VCO_MeleeFlanking_Tip>Melee attacks also hit the side they come from, not just guns and bows.</VCO_MeleeFlanking_Tip>
+
+  <VCO_HeightTargeting>Drafted pawns can aim high or low</VCO_HeightTargeting>
+  <VCO_HeightTargeting_Tip>Drafted colonists get a gizmo to aim at the head, torso or legs. Skill raises the chance of actually landing there; a miss still hits that side of the body, just not the band you asked for.\n\nEnemies pick a random height when they spawn. Explosives ignore this.</VCO_HeightTargeting_Tip>
+  <VCO_Height_None>None</VCO_Height_None>
+  <VCO_Height_Bottom>Legs</VCO_Height_Bottom>
+  <VCO_Height_Middle>Torso</VCO_Height_Middle>
+  <VCO_Height_Top>Head</VCO_Height_Top>
+  <VCO_CommandSetHeight>Aim: {0}</VCO_CommandSetHeight>
+  <VCO_CommandSetHeight_Tip>Weight incoming hits toward this height band. None is vanilla, any height.</VCO_CommandSetHeight_Tip>
+
+  <VCO_Section_Wounds>Projectile wounds</VCO_Section_Wounds>
+  <VCO_BulletWorker>Bullets fragment, pass through or mushroom</VCO_BulletWorker>
+  <VCO_BulletWorker_Tip>Stopping power shapes the wound instead of only staggering small pawns.\n\nBelow 1 (pistols): the round fragments across nearby parts.\n1 to 1.5 (rifles): it passes through from the organ to the outer part covering it.\nAbove 1.5: it mushrooms, dumping extra damage into one part.\n\nA vest that already reduced the hit cancels all of this, so armor that catches the round also stops the extra trick.</VCO_BulletWorker_Tip>
+  <VCO_BulletStoppingPowerCap>Stopping power cap: {0}</VCO_BulletStoppingPowerCap>
+  <VCO_BulletStoppingPowerCap_Tip>Mushrooming multiplies damage by stopping power. This is the ceiling, so an outlier stat cannot one-shot everything. Default 10 matches Vanilla Combat Reloaded.</VCO_BulletStoppingPowerCap_Tip>
+  <VCO_ArrowWorker>Arrows stab through or slice across</VCO_ArrowWorker>
+  <VCO_ArrowWorker_Tip>Arrows get a stab's chance to force an internal hit. If they stay external they split most of the damage across two adjacent outer parts, so a graze is a slice rather than a single puncture.</VCO_ArrowWorker_Tip>
 
   <!-- Ranged -->
   <VCO_AdvancedAccuracy>Skilled shooters overcome bad weapons and weather</VCO_AdvancedAccuracy>
@@ -66,6 +94,15 @@
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
   <VCO_FiringArcDegrees>Width of the spread: {0} degrees</VCO_FiringArcDegrees>
   <VCO_FiringArcDegrees_Tip>How wide the cone of missed shots is. Bigger numbers mean misses land further from the target.</VCO_FiringArcDegrees_Tip>
+  <VCO_FiringArcType>Miss spread type: {0}</VCO_FiringArcType>
+  <VCO_FiringArcType_Tip>How the cone is applied. Type 0 (default) widens freely with distance, matching Vanilla Combat Reloaded's stock setting.\n\n1: same, but the miss radius never exceeds 10.\n2: stops growing once the cone is as wide as a vanilla miss.\n3–5: various caps on the near and far radius. Leave this at 0 unless you know you want a tighter long-range miss.</VCO_FiringArcType_Tip>
+
+  <VCO_VisibleTracers>Show glowing tracers on shots</VCO_VisibleTracers>
+  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells and grenades are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
+  <VCO_TracerLength>Tracer length: {0}</VCO_TracerLength>
+  <VCO_TracerLength_Tip>How long the streak behind the projectile is, in cells.</VCO_TracerLength_Tip>
+  <VCO_TracerWidth>Tracer width: {0}</VCO_TracerWidth>
+  <VCO_TracerWidth_Tip>How thick the streak is.</VCO_TracerWidth_Tip>
 
   <VCO_Suppression>Being shot at pins pawns down</VCO_Suppression>
   <VCO_Suppression_Tip>Pawns under sustained fire get rattled and try to take cover instead of standing in the open trading shots.\n\nThis makes covering fire useful even when it does not hit anything.</VCO_Suppression_Tip>
@@ -84,6 +121,38 @@
   <VCO_Sidearms_Tip>Pawns can carry extra weapons in their inventory and switch to them, so a sniper can pull out a knife when something reaches them.</VCO_Sidearms_Tip>
   <VCO_Loadouts>Pawns keep themselves stocked</VCO_Loadouts>
   <VCO_Loadouts_Tip>Set what each pawn should be carrying, and they will go and collect it themselves instead of you hauling things to them by hand.</VCO_Loadouts_Tip>
+
+  <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
+  <VCO_Apparel_Intro>These are Vanilla Combat Reloaded's coverage and layering patches. They change how vanilla and DLC apparel sits on the body. Each one needs a restart except improved headgear layering.</VCO_Apparel_Intro>
+  <VCO_HandFeetPatch>Armour on arms or legs also covers hands or feet</VCO_HandFeetPatch>
+  <VCO_HandFeetPatch_Tip>Arm and leg armour also covers hands and feet. Gloves and boots that only cover those parts move to a layer that can be worn with the armour. Needs a restart.</VCO_HandFeetPatch_Tip>
+  <VCO_AcidHeatPatch>Acid is Heat</VCO_AcidHeatPatch>
+  <VCO_AcidHeatPatch_Tip>Biotech acid damage is resisted by heat armour instead of sharp. Needs a restart.</VCO_AcidHeatPatch_Tip>
+  <VCO_ThumpBluntPatch>Thump is Blunt</VCO_ThumpBluntPatch>
+  <VCO_ThumpBluntPatch_Tip>Vanilla thump damage is resisted by blunt armour instead of sharp. Needs a restart.</VCO_ThumpBluntPatch_Tip>
+  <VCO_GlassesHelmetPatch>Glasses are not helmets</VCO_GlassesHelmetPatch>
+  <VCO_GlassesHelmetPatch_Tip>Glasses can be worn with helmets that only cover the upper head. Needs a restart.</VCO_GlassesHelmetPatch_Tip>
+  <VCO_NoseMouthPatch>Mouth covers the nose</VCO_NoseMouthPatch>
+  <VCO_NoseMouthPatch_Tip>The nose is protected by anything that covers the mouth. Needs a restart.</VCO_NoseMouthPatch_Tip>
+  <VCO_MaskPatch>Masks cover what they look like they cover</VCO_MaskPatch>
+  <VCO_MaskPatch_Tip>Gas masks, visage masks, war masks and similar pick up the face coverage their graphics imply. Needs a restart.</VCO_MaskPatch_Tip>
+  <VCO_HeadsetPatch>Headsets are not helmets</VCO_HeadsetPatch>
+  <VCO_HeadsetPatch_Tip>Gunlink, airwire and integrator headsets can be worn with a helmet. Needs a restart.</VCO_HeadsetPatch_Tip>
+  <VCO_ArrayHeadsetPatch>Array headset is glasses</VCO_ArrayHeadsetPatch>
+  <VCO_ArrayHeadsetPatch_Tip>The array headset sits on the eyes, and the mech commander helmet is treated as upper head, so they can be worn together. Needs a restart.</VCO_ArrayHeadsetPatch_Tip>
+  <VCO_ApparelTweaks>Improved headgear layering</VCO_ApparelTweaks>
+  <VCO_ApparelTweaks_Tip>Treats eye and mouth apparel as headgear for pawn generation, so pawns can spawn wearing glasses or masks with a helmet. Does not need a restart.</VCO_ApparelTweaks_Tip>
+
+  <VCO_AdjWeapon>Weapon w/ skill</VCO_AdjWeapon>
+  <VCO_AdjWeather>Weather w/ skill</VCO_AdjWeather>
+  <VCO_EvasionRead>Evasion</VCO_EvasionRead>
+  <VCO_AdjEvasionRead>Evasion w/ skill</VCO_AdjEvasionRead>
+  <VCO_TargetSide>Target side</VCO_TargetSide>
+  <VCO_HeightChance>Chance to hit </VCO_HeightChance>
+  <VCO_MeleeHitTotal>Final melee hit chance: {0}</VCO_MeleeHitTotal>
+  <VCO_MeleeHitChance>Melee hit chance: {0}</VCO_MeleeHitChance>
+  <VCO_TargetDodgeChance>Target dodge chance: {0}</VCO_TargetDodgeChance>
+  <VCO_TargetParryChance>Enemy parry chance: {0}</VCO_TargetParryChance>
 
   <!-- Diagnostics -->
   <VCO_Section_Counters>Activity counters</VCO_Section_Counters>

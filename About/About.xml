@@ -32,8 +32,9 @@
   </incompatibleWith>
   <description>Depth for vanilla combat, without replacing it.
 
-Every feature is off by default and toggled individually in mod settings. Nothing is rewritten that another mod might also want to rewrite: no weapon defs are replaced, no core verbs are swapped, and mechanics are exposed as ordinary stats so apparel, hediffs, genes and other mods can influence them.
+Every feature is toggled individually in mod settings. Mechanics that can be stats are stats, so apparel, hediffs, genes and other mods can influence them.
 
-Planned systems: melee parry and counter, directional damage and flanking, advanced accuracy,
-evasion, firing arc, target suppression, ammo, sidearms, and loadouts.</description>
+Shipped: melee parry and counter, directional damage and height targeting, leftover armor, advanced accuracy, evasion, firing arc, bullet and arrow wound shapes, visible tracers, and Vanilla Combat Reloaded's apparel coverage patches.
+
+Still on the roadmap: suppression, ammo, sidearms, and loadouts.</description>
 </ModMetaData>

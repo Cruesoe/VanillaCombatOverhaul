@@ -157,12 +157,25 @@ namespace VanillaCombatOverhaul
 
             try
             {
-                var near = FiringArcUtility.AdjustMissRadius(5f, new IntVec3(10, 0, 0), IntVec3.Zero, 45f);
-                var far = FiringArcUtility.AdjustMissRadius(5f, new IntVec3(40, 0, 0), IntVec3.Zero, 45f);
+                var near = FiringArcUtility.AdjustMissRadius(5f, new IntVec3(10, 0, 0), IntVec3.Zero, 45f, 0);
+                var far = FiringArcUtility.AdjustMissRadius(5f, new IntVec3(40, 0, 0), IntVec3.Zero, 45f, 0);
                 yield return Check(
-                    "firing arc widens with distance",
+                    "firing arc type 0 widens with distance",
                     far > near,
                     $"near {near:F2}, far {far:F2}");
+
+                var type1Far = FiringArcUtility.RadiusFor(5f, new IntVec3(200, 0, 0), IntVec3.Zero, 45f, 1);
+                yield return Check(
+                    "firing arc type 1 caps radius at 10",
+                    type1Far <= 10.001f,
+                    type1Far.ToString("F2"));
+
+                var type5 = FiringArcUtility.RadiusFor(5f, new IntVec3(40, 0, 0), IntVec3.Zero, 45f, 5);
+                var type0 = FiringArcUtility.RadiusFor(5f, new IntVec3(40, 0, 0), IntVec3.Zero, 45f, 0);
+                yield return Check(
+                    "firing arc type 5 is at most vanilla or cone",
+                    type5 <= 5.001f && type5 <= type0 + 0.001f,
+                    $"type5 {type5:F2}, type0 {type0:F2}");
             }
             finally
             {

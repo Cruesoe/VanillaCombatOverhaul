@@ -48,6 +48,12 @@ namespace VanillaCombatOverhaul
         // ---- Damage ------------------------------------------------------------
         public bool enableDirectionalDamage = Shipped;
         public bool enableMeleeFlanking = Shipped;
+        public bool enableHeightTargeting = Shipped;
+
+        // ---- Projectile wounds (VCR damage workers, without swapping workerClass) ----
+        public bool enableBulletWorker = Shipped;
+        public float bulletStoppingPowerCap = 10f;
+        public bool enableArrowWorker = Shipped;
 
         // ---- Ranged ------------------------------------------------------------
         public bool enableAdvancedAccuracy = Shipped;
@@ -59,6 +65,18 @@ namespace VanillaCombatOverhaul
         public bool evasionSkillContest = true;
         public bool enableFiringArc = Shipped;
         public float firingArcDegrees = 45f;
+        // Vanilla Combat Reloaded ships six miss-spread distributions; 0 is the default.
+        public int firingArcType = 0;
+        public bool enableVisibleTracers = Shipped;
+        public float tracerLength = 2.2f;
+        public float tracerWidth = 0.14f;
+
+        // ---- Armor -------------------------------------------------------------
+        // Leftover stretch and AP compensation. Defaults match Vanilla Combat Reloaded:
+        // always-block at 100% leftover (armorScale 2), weapons show 2x AP.
+        public bool enableAdvancedArmor = Shipped;
+        public float armorScale = 2f;
+        public float penetrationScale = 2f;
 
         // ---- Suppression -------------------------------------------------------
         public bool enableSuppression = Unbuilt;
@@ -71,6 +89,17 @@ namespace VanillaCombatOverhaul
         // ---- Loadout / sidearms ------------------------------------------------
         public bool enableSidearms = Unbuilt;
         public bool enableLoadouts = Unbuilt;
+
+        // ---- Apparel / coverage (VCR XML pack) ---------------------------------
+        public bool enableHandFeetPatch = Shipped;
+        public bool enableAcidHeatPatch = Shipped;
+        public bool enableThumpBluntPatch = Shipped;
+        public bool enableGlassesHelmetPatch = Shipped;
+        public bool enableNoseMouthPatch = Shipped;
+        public bool enableMaskPatch = Shipped;
+        public bool enableHeadsetPatch = Shipped;
+        public bool enableArrayHeadsetPatch = Shipped;
+        public bool enableApparelTweaks = Shipped;
 
         // ---- Diagnostics -------------------------------------------------------
         public bool verboseLogging = true;
@@ -91,6 +120,11 @@ namespace VanillaCombatOverhaul
 
             Scribe_Values.Look(ref enableDirectionalDamage, nameof(enableDirectionalDamage), Shipped);
             Scribe_Values.Look(ref enableMeleeFlanking, nameof(enableMeleeFlanking), Shipped);
+            Scribe_Values.Look(ref enableHeightTargeting, nameof(enableHeightTargeting), Shipped);
+
+            Scribe_Values.Look(ref enableBulletWorker, nameof(enableBulletWorker), Shipped);
+            Scribe_Values.Look(ref bulletStoppingPowerCap, nameof(bulletStoppingPowerCap), 10f);
+            Scribe_Values.Look(ref enableArrowWorker, nameof(enableArrowWorker), Shipped);
 
             Scribe_Values.Look(ref enableAdvancedAccuracy, nameof(enableAdvancedAccuracy), Shipped);
             Scribe_Values.Look(ref accuracyScale, nameof(accuracyScale), 5f);
@@ -100,6 +134,14 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref evasionSkillContest, nameof(evasionSkillContest), true);
             Scribe_Values.Look(ref enableFiringArc, nameof(enableFiringArc), Shipped);
             Scribe_Values.Look(ref firingArcDegrees, nameof(firingArcDegrees), 45f);
+            Scribe_Values.Look(ref firingArcType, nameof(firingArcType), 0);
+            Scribe_Values.Look(ref enableVisibleTracers, nameof(enableVisibleTracers), Shipped);
+            Scribe_Values.Look(ref tracerLength, nameof(tracerLength), 2.2f);
+            Scribe_Values.Look(ref tracerWidth, nameof(tracerWidth), 0.14f);
+
+            Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
+            Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
+            Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
 
             Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Unbuilt);
             Scribe_Values.Look(ref suppressionBuildRate, nameof(suppressionBuildRate), 1f);
@@ -109,6 +151,16 @@ namespace VanillaCombatOverhaul
 
             Scribe_Values.Look(ref enableSidearms, nameof(enableSidearms), Unbuilt);
             Scribe_Values.Look(ref enableLoadouts, nameof(enableLoadouts), Unbuilt);
+
+            Scribe_Values.Look(ref enableHandFeetPatch, nameof(enableHandFeetPatch), Shipped);
+            Scribe_Values.Look(ref enableAcidHeatPatch, nameof(enableAcidHeatPatch), Shipped);
+            Scribe_Values.Look(ref enableThumpBluntPatch, nameof(enableThumpBluntPatch), Shipped);
+            Scribe_Values.Look(ref enableGlassesHelmetPatch, nameof(enableGlassesHelmetPatch), Shipped);
+            Scribe_Values.Look(ref enableNoseMouthPatch, nameof(enableNoseMouthPatch), Shipped);
+            Scribe_Values.Look(ref enableMaskPatch, nameof(enableMaskPatch), Shipped);
+            Scribe_Values.Look(ref enableHeadsetPatch, nameof(enableHeadsetPatch), Shipped);
+            Scribe_Values.Look(ref enableArrayHeadsetPatch, nameof(enableArrayHeadsetPatch), Shipped);
+            Scribe_Values.Look(ref enableApparelTweaks, nameof(enableApparelTweaks), Shipped);
 
             Scribe_Values.Look(ref verboseLogging, nameof(verboseLogging), true);
             Scribe_Values.Look(ref diagnosticDumpIntervalTicks, nameof(diagnosticDumpIntervalTicks), 2500);
@@ -148,6 +200,38 @@ namespace VanillaCombatOverhaul
             if (enableAmmo)
             {
                 yield return "Ammo";
+            }
+            if (enableHandFeetPatch)
+            {
+                yield return "HandFeetPatch";
+            }
+            if (enableAcidHeatPatch)
+            {
+                yield return "AcidHeatPatch";
+            }
+            if (enableThumpBluntPatch)
+            {
+                yield return "ThumpBluntPatch";
+            }
+            if (enableGlassesHelmetPatch)
+            {
+                yield return "GlassesHelmetPatch";
+            }
+            if (enableNoseMouthPatch)
+            {
+                yield return "NoseMouthPatch";
+            }
+            if (enableMaskPatch)
+            {
+                yield return "MaskPatch";
+            }
+            if (enableHeadsetPatch)
+            {
+                yield return "HeadsetPatch";
+            }
+            if (enableArrayHeadsetPatch)
+            {
+                yield return "ArrayHeadsetPatch";
             }
         }
     }

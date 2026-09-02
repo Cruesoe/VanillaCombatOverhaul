@@ -196,6 +196,12 @@ namespace VanillaCombatOverhaul
             {
                 sb.AppendLine($"    -> evasion applied: {evasionApplied:N0} aim checks");
             }
+            var armorApplied = Get("armor.applied");
+            if (armorApplied > 0)
+            {
+                sb.AppendLine($"    -> armor leftover stretch: {armorApplied:N0} layers, " +
+                              $"always-block {Get("armor.alwaysBlock"):N0}");
+            }
             return sb.ToString().TrimEnd();
         }
 

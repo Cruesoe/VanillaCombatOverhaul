@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Patch>
+  <!-- Vanilla Combat Reloaded's coverage and layering pack, settings-gated.
+       WorkerClass swaps and the flanking seeder are omitted: VCO already seeds
+       directional groups and intercepts wounds in C#. -->
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>ThumpBluntPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/DamageDef[defName="Thump"]/armorCategory</xpath>
+      <value>
+        <armorCategory>Blunt</armorCategory>
+      </value>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>AcidHeatPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/DamageDef[defName="AcidBurn"]/armorCategory</xpath>
+        <value>
+          <armorCategory>Heat</armorCategory>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>HeadsetPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="Apparel_IntegratorHeadset"]/apparel</xpath>
+        <value>
+          <layers Inherit="False">
+            <li>EyeCover</li>
+          </layers>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>HeadsetPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="Apparel_AirwireHeadset"]/apparel/layers</xpath>
+        <value>
+          <layers Inherit="False">
+            <li>EyeCover</li>
+          </layers>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Royalty</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>HeadsetPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="Apparel_Gunlink"]/apparel</xpath>
+        <value>
+          <layers Inherit="False">
+            <li>EyeCover</li>
+          </layers>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="Apparel_GasMask"]/apparel/bodyPartGroups</xpath>
+        <value>
+          <bodyPartGroups Inherit="False">
+            <li>Eyes</li>
+            <li>Mouth</li>
+          </bodyPartGroups>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Ideology</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="Apparel_VisageMask"]/apparel/bodyPartGroups</xpath>
+        <value>
+          <bodyPartGroups Inherit="False">
+            <li>Eyes</li>
+            <li>Mouth</li>
+          </bodyPartGroups>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Ideology</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_VisageMask"]/bodyPartGroupsMatchAny</xpath>
+        <value>
+          <li>Eyes</li>
+          <li>Mouth</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef[defName="Apparel_WarMask"]/apparel/bodyPartGroups</xpath>
+      <value>
+        <bodyPartGroups Inherit="False">
+          <li>UpperHead</li>
+          <li>Mouth</li>
+        </bodyPartGroups>
+      </value>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Ideology</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarMask"]/bodyPartGroupsMatchAny</xpath>
+        <value>
+          <li>UpperHead</li>
+          <li>Mouth</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef[defName="Apparel_WarVeil"]/apparel/bodyPartGroups</xpath>
+      <value>
+        <bodyPartGroups Inherit="False">
+          <li>Mouth</li>
+        </bodyPartGroups>
+      </value>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Ideology</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarVeil"]/bodyPartGroupsMatchAny</xpath>
+        <value>
+          <li>Mouth</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Ideology</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>MaskPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="Apparel_Broadwrap"]/apparel/bodyPartGroups</xpath>
+        <value>
+          <bodyPartGroups Inherit="False">
+            <li>UpperHead</li>
+            <li>Neck</li>
+            <li>Shoulders</li>
+          </bodyPartGroups>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>ArrayHeadsetPatch</setting>
+      <match Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="Apparel_ArrayHeadset"]/apparel/bodyPartGroups</xpath>
+        <value>
+          <bodyPartGroups Inherit="False">
+            <li>Eyes</li>
+          </bodyPartGroups>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Biotech</li>
+    </mods>
+    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+      <setting>ArrayHeadsetPatch</setting>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="Apparel_ArmorHelmetMechCommander"]/apparel</xpath>
+        <value>
+          <bodyPartGroups Inherit="False">
+            <li>UpperHead</li>
+          </bodyPartGroups>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>NoseMouthPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/BodyDef//li[(def="Nose" or def="SmellSensor")]/groups</xpath>
+      <match Class="PatchOperationAdd">
+        <xpath>Defs/BodyDef//li[(def="Nose" or def="SmellSensor")]/groups</xpath>
+        <value>
+          <li>Mouth</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <success>Always</success>
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef/apparel[not(wornGraphicPath)]/bodyPartGroups[./li[contains(.,'Hands') or contains(.,'LeftHand') or contains(.,'RightHand') or contains(.,'MiddleFingers')] and not(./li[contains(.,'Arms') or contains(.,'Shoulders') or contains(.,'Torso')])]/../layers/li[contains(.,'OnSkin')]</xpath>
+      <value>
+        <li>Overhead</li>
+      </value>
+    </match>
+  </Operation>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <success>Always</success>
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef/apparel[not(wornGraphicPath)]/bodyPartGroups[./li[contains(.,'Hands') or contains(.,'LeftHand') or contains(.,'RightHand') or contains(.,'MiddleFingers')] and not(./li[contains(.,'Arms') or contains(.,'Shoulders') or contains(.,'Torso')])]/../layers/li[contains(.,'Middle') or contains(.,'Shell')]</xpath>
+      <value>
+        <li>EyeCover</li>
+      </value>
+    </match>
+  </Operation>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <success>Always</success>
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef/apparel[not(wornGraphicPath)]/bodyPartGroups[./li[contains(.,'Feet')] and not(./li[contains(.,'Legs') or contains(.,'Torso')])]/../layers/li[contains(.,'OnSkin')]</xpath>
+      <value>
+        <li>Overhead</li>
+      </value>
+    </match>
+  </Operation>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <success>Always</success>
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef/apparel[not(wornGraphicPath)]/bodyPartGroups[./li[contains(.,'Feet')] and not(./li[contains(.,'Legs') or contains(.,'Torso')])]/../layers/li[contains(.,'Middle') or contains(.,'Shell')]</xpath>
+      <value>
+        <li>EyeCover</li>
+      </value>
+    </match>
+  </Operation>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/BodyDef//groups/li[.="Hands"]</xpath>
+      <match Class="PatchOperationInsert">
+        <xpath>Defs/BodyDef//groups/li[.="Hands"]</xpath>
+        <value>
+          <li>Arms</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>HandFeetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/BodyDef//groups/li[.="Feet"]</xpath>
+      <match Class="PatchOperationInsert">
+        <xpath>Defs/BodyDef//groups/li[.="Feet"]</xpath>
+        <value>
+          <li>Legs</li>
+        </value>
+      </match>
+    </match>
+  </Operation>
+
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>GlassesHelmetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/BodyDef//li[groups/li="Eyes" and not(def=/Defs/BodyPartDef[tags/li="SightSource"]/defName)]</xpath>
+      <match Class="PatchOperationRemove">
+        <xpath>Defs/BodyDef//li[groups/li="Eyes" and not(def=/Defs/BodyPartDef[tags/li="SightSource"]/defName)]/groups/li[.="Eyes"]</xpath>
+      </match>
+    </match>
+  </Operation>
+
+</Patch>

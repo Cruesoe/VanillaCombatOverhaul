@@ -47,7 +47,7 @@ namespace VanillaCombatOverhaul
             }
 
             return FiringArcUtility.AdjustMissRadius(
-                vanillaRadius, dest, source, settings.firingArcDegrees);
+                vanillaRadius, dest, source, settings.firingArcDegrees, settings.firingArcType);
         }
     }
 }

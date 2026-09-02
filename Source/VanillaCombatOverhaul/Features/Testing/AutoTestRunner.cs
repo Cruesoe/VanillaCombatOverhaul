@@ -98,14 +98,24 @@ namespace VanillaCombatOverhaul
             try
             {
                 var facing = ArenaAssertions.FacingSelfTest();
+                var armor = ArmorAssertions.SelfTests();
+                var wounds = WoundAssertions.SelfTests();
+                var height = HeightAssertions.SelfTests();
                 var results = TestSuite.RunMatrix(map, Seed);
                 var rangedSelf = RangedAssertions.SelfTests();
                 var rangedResults = TestSuite.RunRangedMatrix(map, Seed);
-                report = TestSuite.FormatReport(results, facing)
+                report = TestSuite.FormatReport(results, facing, armor)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("wound formula checks", wounds)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("height formula checks", height)
                          + Environment.NewLine
                          + TestSuite.FormatRangedReport(rangedResults, rangedSelf);
 
                 allPassed = !facing.Exists(a => !a.Passed)
+                            && !armor.Exists(a => !a.Passed)
+                            && !wounds.Exists(a => !a.Passed)
+                            && !height.Exists(a => !a.Passed)
                             && results.TrueForAll(r => r.AllAssertionsPassed)
                             && !rangedSelf.Exists(a => !a.Passed)
                             && rangedResults.TrueForAll(r => r.AllAssertionsPassed);

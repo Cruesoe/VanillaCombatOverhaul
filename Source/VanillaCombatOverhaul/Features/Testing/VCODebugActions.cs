@@ -15,8 +15,11 @@ namespace VanillaCombatOverhaul
         private static void RunFullSuite()
         {
             var facing = ArenaAssertions.FacingSelfTest();
+            var armor = ArmorAssertions.SelfTests();
             var results = TestSuite.RunMatrix(Find.CurrentMap);
-            Log.Message(TestSuite.FormatReport(results, facing));
+            Log.Message(TestSuite.FormatReport(results, facing, armor)
+                        + "\n" + TestSuite.FormatChecks("wound formula checks", WoundAssertions.SelfTests())
+                        + "\n" + TestSuite.FormatChecks("height formula checks", HeightAssertions.SelfTests()));
         }
 
         [DebugAction(Category, "Run one quick arena", allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -36,12 +39,28 @@ namespace VanillaCombatOverhaul
                 new System.Collections.Generic.List<ArenaResult>(), ArenaAssertions.FacingSelfTest()));
         }
 
+        [DebugAction(Category, "Armor formula checks", allowedGameStates = AllowedGameStates.Entry
+                                                                          | AllowedGameStates.PlayingOnMap)]
+        private static void RunArmorChecks()
+        {
+            Log.Message(TestSuite.FormatReport(
+                new System.Collections.Generic.List<ArenaResult>(), null, ArmorAssertions.SelfTests()));
+        }
+
         [DebugAction(Category, "Run ranged accuracy test", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunRangedSuite()
         {
             var self = RangedAssertions.SelfTests();
             var results = TestSuite.RunRangedMatrix(Find.CurrentMap);
             Log.Message(TestSuite.FormatRangedReport(results, self));
+        }
+
+        [DebugAction(Category, "Wound and height checks", allowedGameStates = AllowedGameStates.Entry
+                                                                            | AllowedGameStates.PlayingOnMap)]
+        private static void RunWoundChecks()
+        {
+            Log.Message(TestSuite.FormatChecks("wound formula checks", WoundAssertions.SelfTests())
+                        + "\n" + TestSuite.FormatChecks("height formula checks", HeightAssertions.SelfTests()));
         }
 
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]

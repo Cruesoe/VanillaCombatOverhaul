@@ -91,12 +91,32 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
             }
 
+            Section(l, "VCO_Section_Armor");
+            Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
+            if (s.enableAdvancedArmor)
+            {
+                var thresholdPct = 200f / Mathf.Max(s.armorScale, 0.001f);
+                thresholdPct = Slider(l, "VCO_ArmorThreshold", thresholdPct, 40f, 200f, "0");
+                s.armorScale = 200f / Mathf.Max(thresholdPct, 1f);
+                s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 5f);
+            }
+
             Section(l, "VCO_Section_Damage");
             Toggle(l, "VCO_DirectionalDamage", ref s.enableDirectionalDamage, restartRequired: true);
             if (s.enableDirectionalDamage)
             {
                 Toggle(l, "VCO_MeleeFlanking", ref s.enableMeleeFlanking);
             }
+            Toggle(l, "VCO_HeightTargeting", ref s.enableHeightTargeting);
+
+            Section(l, "VCO_Section_Wounds");
+            Toggle(l, "VCO_BulletWorker", ref s.enableBulletWorker);
+            if (s.enableBulletWorker)
+            {
+                s.bulletStoppingPowerCap = Slider(l, "VCO_BulletStoppingPowerCap",
+                    s.bulletStoppingPowerCap, 1f, 20f, "0");
+            }
+            Toggle(l, "VCO_ArrowWorker", ref s.enableArrowWorker);
 
             Section(l, "VCO_Section_Ranged");
             Toggle(l, "VCO_AdvancedAccuracy", ref s.enableAdvancedAccuracy);
@@ -115,6 +135,14 @@ namespace VanillaCombatOverhaul
             if (s.enableFiringArc)
             {
                 s.firingArcDegrees = Slider(l, "VCO_FiringArcDegrees", s.firingArcDegrees, 1f, 179f, "0");
+                s.firingArcType = Mathf.RoundToInt(
+                    Slider(l, "VCO_FiringArcType", s.firingArcType, 0f, 5f, "0"));
+            }
+            Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
+            if (s.enableVisibleTracers)
+            {
+                s.tracerLength = Slider(l, "VCO_TracerLength", s.tracerLength, 0.4f, 8f);
+                s.tracerWidth = Slider(l, "VCO_TracerWidth", s.tracerWidth, 0.04f, 0.5f);
             }
             Toggle(l, "VCO_Suppression", ref s.enableSuppression, implemented: false);
             if (s.enableSuppression)
@@ -137,6 +165,19 @@ namespace VanillaCombatOverhaul
             Section(l, "VCO_Section_Carrying");
             Toggle(l, "VCO_Sidearms", ref s.enableSidearms, implemented: false);
             Toggle(l, "VCO_Loadouts", ref s.enableLoadouts, implemented: false);
+
+            Section(l, "VCO_Section_Apparel");
+            l.Label("VCO_Apparel_Intro".Translate());
+            l.Gap(6f);
+            Toggle(l, "VCO_HandFeetPatch", ref s.enableHandFeetPatch, restartRequired: true);
+            Toggle(l, "VCO_AcidHeatPatch", ref s.enableAcidHeatPatch, restartRequired: true);
+            Toggle(l, "VCO_ThumpBluntPatch", ref s.enableThumpBluntPatch, restartRequired: true);
+            Toggle(l, "VCO_GlassesHelmetPatch", ref s.enableGlassesHelmetPatch, restartRequired: true);
+            Toggle(l, "VCO_NoseMouthPatch", ref s.enableNoseMouthPatch, restartRequired: true);
+            Toggle(l, "VCO_MaskPatch", ref s.enableMaskPatch, restartRequired: true);
+            Toggle(l, "VCO_HeadsetPatch", ref s.enableHeadsetPatch, restartRequired: true);
+            Toggle(l, "VCO_ArrayHeadsetPatch", ref s.enableArrayHeadsetPatch, restartRequired: true);
+            Toggle(l, "VCO_ApparelTweaks", ref s.enableApparelTweaks);
         }
 
         private static void DrawDiagnostics(Listing_Standard l, VCOSettings s)

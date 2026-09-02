@@ -64,7 +64,8 @@ namespace VanillaCombatOverhaul
 
         // ------------------------------------------------------------------ report
 
-        public static string FormatReport(List<ArenaResult> results, List<AssertionResult> facing)
+        public static string FormatReport(List<ArenaResult> results, List<AssertionResult> facing,
+                                          List<AssertionResult> armor = null)
         {
             var sb = new StringBuilder();
             sb.AppendLine("=== VCO combat test ===");
@@ -77,6 +78,18 @@ namespace VanillaCombatOverhaul
                 sb.AppendLine();
                 sb.AppendLine("-- facing unit checks --");
                 foreach (var a in facing)
+                {
+                    sb.AppendLine("  " + a);
+                    total++;
+                    if (a.Passed) { passed++; }
+                }
+            }
+
+            if (armor != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("-- armor formula checks --");
+                foreach (var a in armor)
                 {
                     sb.AppendLine("  " + a);
                     total++;
@@ -118,6 +131,22 @@ namespace VanillaCombatOverhaul
             }
 
             sb.AppendLine();
+            sb.AppendLine($"=== {passed} of {total} checks passed ===");
+            return sb.ToString();
+        }
+
+        public static string FormatChecks(string title, List<AssertionResult> checks)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== VCO " + title + " ===");
+            var passed = 0;
+            var total = 0;
+            foreach (var a in checks)
+            {
+                sb.AppendLine("  " + a);
+                total++;
+                if (a.Passed) { passed++; }
+            }
             sb.AppendLine($"=== {passed} of {total} checks passed ===");
             return sb.ToString();
         }
