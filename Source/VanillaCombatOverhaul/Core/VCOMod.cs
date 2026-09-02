@@ -12,6 +12,11 @@ namespace VanillaCombatOverhaul
 
         private Vector2 scrollPosition;
         private float contentHeight = 600f;
+        private SettingsTab drawnTab = SettingsTab.Combat;
+
+        // Empty means collapsed. The Combat tab is long enough that an always-open
+        // list buries later options (tracers, suppression) below the fold.
+        private static readonly HashSet<string> ExpandedSections = new HashSet<string>();
 
         public VCOMod(ModContentPack content) : base(content)
         {
@@ -48,6 +53,12 @@ namespace VanillaCombatOverhaul
                 Tab("VCO_Tab_Diagnostics", SettingsTab.Diagnostics)
             });
 
+            if (s.CurrentTab != drawnTab)
+            {
+                drawnTab = s.CurrentTab;
+                scrollPosition = Vector2.zero;
+            }
+
             var outRect = body.ContractedBy(12f);
             var viewRect = new Rect(0f, 0f, outRect.width - 20f, Mathf.Max(contentHeight, outRect.height));
 
@@ -68,9 +79,15 @@ namespace VanillaCombatOverhaul
                     break;
             }
 
-            contentHeight = l.CurHeight;
+            contentHeight = l.CurHeight + 8f;
             l.End();
             Widgets.EndScrollView();
+
+            if (scrollPosition.y > 0f)
+            {
+                scrollPosition.y = Mathf.Min(scrollPosition.y,
+                    Mathf.Max(0f, contentHeight - outRect.height));
+            }
         }
 
         private static TabRecord Tab(string key, SettingsTab tab) =>
@@ -80,165 +97,195 @@ namespace VanillaCombatOverhaul
 
         private static void DrawCombat(Listing_Standard l, VCOSettings s)
         {
-            Section(l, "VCO_Section_Melee");
-            Toggle(l, "VCO_Parry", ref s.enableParry);
-            if (s.enableParry)
+            if (Section(l, "VCO_Section_Melee"))
             {
-                s.parryFrontFactor = Slider(l, "VCO_ParryFrontFactor", s.parryFrontFactor, 0.1f, 5f);
-                s.parrySideFactor = Slider(l, "VCO_ParrySideFactor", s.parrySideFactor, 0f, 5f);
-                s.parryBudgetPerWindow = Mathf.RoundToInt(
-                    Slider(l, "VCO_ParryBudget", s.parryBudgetPerWindow, 1f, 6f, "0"));
-                Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
+                Toggle(l, "VCO_Parry", ref s.enableParry);
+                if (s.enableParry)
+                {
+                    s.parryFrontFactor = Slider(l, "VCO_ParryFrontFactor", s.parryFrontFactor, 0.1f, 5f);
+                    s.parrySideFactor = Slider(l, "VCO_ParrySideFactor", s.parrySideFactor, 0f, 5f);
+                    s.parryBudgetPerWindow = Mathf.RoundToInt(
+                        Slider(l, "VCO_ParryBudget", s.parryBudgetPerWindow, 1f, 6f, "0"));
+                    Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
+                }
             }
 
-            Section(l, "VCO_Section_Armor");
-            Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
-            if (s.enableAdvancedArmor)
+            if (Section(l, "VCO_Section_Armor"))
             {
-                var thresholdPct = 200f / Mathf.Max(s.armorScale, 0.001f);
-                thresholdPct = Slider(l, "VCO_ArmorThreshold", thresholdPct, 40f, 200f, "0");
-                s.armorScale = 200f / Mathf.Max(thresholdPct, 1f);
-                s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 5f);
+                Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
+                if (s.enableAdvancedArmor)
+                {
+                    var thresholdPct = 200f / Mathf.Max(s.armorScale, 0.001f);
+                    thresholdPct = Slider(l, "VCO_ArmorThreshold", thresholdPct, 40f, 200f, "0");
+                    s.armorScale = 200f / Mathf.Max(thresholdPct, 1f);
+                    s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 5f);
+                }
             }
 
-            Section(l, "VCO_Section_Damage");
-            Toggle(l, "VCO_DirectionalDamage", ref s.enableDirectionalDamage, restartRequired: true);
-            if (s.enableDirectionalDamage)
+            if (Section(l, "VCO_Section_Damage"))
             {
-                Toggle(l, "VCO_MeleeFlanking", ref s.enableMeleeFlanking);
+                Toggle(l, "VCO_DirectionalDamage", ref s.enableDirectionalDamage, restartRequired: true);
+                if (s.enableDirectionalDamage)
+                {
+                    Toggle(l, "VCO_MeleeFlanking", ref s.enableMeleeFlanking);
+                }
+                Toggle(l, "VCO_HeightTargeting", ref s.enableHeightTargeting);
             }
-            Toggle(l, "VCO_HeightTargeting", ref s.enableHeightTargeting);
 
-            Section(l, "VCO_Section_Wounds");
-            Toggle(l, "VCO_BulletWorker", ref s.enableBulletWorker);
-            if (s.enableBulletWorker)
+            if (Section(l, "VCO_Section_Wounds"))
             {
-                s.bulletStoppingPowerCap = Slider(l, "VCO_BulletStoppingPowerCap",
-                    s.bulletStoppingPowerCap, 1f, 20f, "0");
+                Toggle(l, "VCO_BulletWorker", ref s.enableBulletWorker);
+                if (s.enableBulletWorker)
+                {
+                    s.bulletStoppingPowerCap = Slider(l, "VCO_BulletStoppingPowerCap",
+                        s.bulletStoppingPowerCap, 1f, 20f, "0");
+                }
+                Toggle(l, "VCO_ArrowWorker", ref s.enableArrowWorker);
             }
-            Toggle(l, "VCO_ArrowWorker", ref s.enableArrowWorker);
 
-            Section(l, "VCO_Section_Ranged");
-            Toggle(l, "VCO_AdvancedAccuracy", ref s.enableAdvancedAccuracy);
-            if (s.enableAdvancedAccuracy)
+            if (Section(l, "VCO_Section_Ranged"))
             {
-                s.accuracyScale = Slider(l, "VCO_AccuracyScale", s.accuracyScale, 1f, 60f, "0");
+                Toggle(l, "VCO_AdvancedAccuracy", ref s.enableAdvancedAccuracy);
+                if (s.enableAdvancedAccuracy)
+                {
+                    s.accuracyScale = Slider(l, "VCO_AccuracyScale", s.accuracyScale, 1f, 60f, "0");
+                }
+                Toggle(l, "VCO_Evasion", ref s.enableEvasion);
+                if (s.enableEvasion)
+                {
+                    s.evasionFactor = Slider(l, "VCO_EvasionFactor", s.evasionFactor, 0.01f, 1f);
+                    s.evasionMinSpeed = Slider(l, "VCO_EvasionMinSpeed", s.evasionMinSpeed, 0f, 30f);
+                    Toggle(l, "VCO_EvasionSkillContest", ref s.evasionSkillContest);
+                }
+                Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
+                if (s.enableFiringArc)
+                {
+                    s.firingArcDegrees = Slider(l, "VCO_FiringArcDegrees", s.firingArcDegrees, 1f, 179f, "0");
+                    s.firingArcType = Mathf.RoundToInt(
+                        Slider(l, "VCO_FiringArcType", s.firingArcType, 0f, 5f, "0"));
+                }
             }
-            Toggle(l, "VCO_Evasion", ref s.enableEvasion);
-            if (s.enableEvasion)
+
+            if (Section(l, "VCO_Section_Tracers"))
             {
-                s.evasionFactor = Slider(l, "VCO_EvasionFactor", s.evasionFactor, 0.01f, 1f);
-                s.evasionMinSpeed = Slider(l, "VCO_EvasionMinSpeed", s.evasionMinSpeed, 0f, 30f);
-                Toggle(l, "VCO_EvasionSkillContest", ref s.evasionSkillContest);
+                Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
+                if (s.enableVisibleTracers)
+                {
+                    s.tracerLength = Slider(l, "VCO_TracerLength", s.tracerLength, 0.4f, 8f);
+                    s.tracerWidth = Slider(l, "VCO_TracerWidth", s.tracerWidth, 0.04f, 0.5f);
+                }
             }
-            Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
-            if (s.enableFiringArc)
+
+            if (Section(l, "VCO_Section_Suppression"))
             {
-                s.firingArcDegrees = Slider(l, "VCO_FiringArcDegrees", s.firingArcDegrees, 1f, 179f, "0");
-                s.firingArcType = Mathf.RoundToInt(
-                    Slider(l, "VCO_FiringArcType", s.firingArcType, 0f, 5f, "0"));
-            }
-            Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
-            if (s.enableVisibleTracers)
-            {
-                s.tracerLength = Slider(l, "VCO_TracerLength", s.tracerLength, 0.4f, 8f);
-                s.tracerWidth = Slider(l, "VCO_TracerWidth", s.tracerWidth, 0.04f, 0.5f);
-            }
-            Toggle(l, "VCO_Suppression", ref s.enableSuppression, implemented: false);
-            if (s.enableSuppression)
-            {
-                s.suppressionBuildRate = Slider(l, "VCO_SuppressionRate", s.suppressionBuildRate, 0.1f, 3f);
+                Toggle(l, "VCO_Suppression", ref s.enableSuppression, implemented: false);
+                if (s.enableSuppression)
+                {
+                    s.suppressionBuildRate = Slider(l, "VCO_SuppressionRate", s.suppressionBuildRate, 0.1f, 3f);
+                }
             }
         }
 
         private static void DrawEquipment(Listing_Standard l, VCOSettings s)
         {
-            Section(l, "VCO_Section_Ammo");
-            l.Label("VCO_Ammo_Intro".Translate());
-            l.Gap(6f);
-            Toggle(l, "VCO_Ammo", ref s.enableAmmo, restartRequired: true, implemented: false);
-            if (s.enableAmmo)
+            if (Section(l, "VCO_Section_Ammo"))
             {
-                s.ammoYieldFactor = Slider(l, "VCO_AmmoYield", s.ammoYieldFactor, 0.1f, 5f);
+                l.Label("VCO_Ammo_Intro".Translate());
+                l.Gap(6f);
+                Toggle(l, "VCO_Ammo", ref s.enableAmmo, restartRequired: true, implemented: false);
+                if (s.enableAmmo)
+                {
+                    s.ammoYieldFactor = Slider(l, "VCO_AmmoYield", s.ammoYieldFactor, 0.1f, 5f);
+                }
             }
 
-            Section(l, "VCO_Section_Carrying");
-            Toggle(l, "VCO_Sidearms", ref s.enableSidearms, implemented: false);
-            Toggle(l, "VCO_Loadouts", ref s.enableLoadouts, implemented: false);
+            if (Section(l, "VCO_Section_Carrying"))
+            {
+                Toggle(l, "VCO_Sidearms", ref s.enableSidearms, implemented: false);
+                Toggle(l, "VCO_Loadouts", ref s.enableLoadouts, implemented: false);
+            }
 
-            Section(l, "VCO_Section_Apparel");
-            l.Label("VCO_Apparel_Intro".Translate());
-            l.Gap(6f);
-            Toggle(l, "VCO_HandFeetPatch", ref s.enableHandFeetPatch, restartRequired: true);
-            Toggle(l, "VCO_AcidHeatPatch", ref s.enableAcidHeatPatch, restartRequired: true);
-            Toggle(l, "VCO_ThumpBluntPatch", ref s.enableThumpBluntPatch, restartRequired: true);
-            Toggle(l, "VCO_GlassesHelmetPatch", ref s.enableGlassesHelmetPatch, restartRequired: true);
-            Toggle(l, "VCO_NoseMouthPatch", ref s.enableNoseMouthPatch, restartRequired: true);
-            Toggle(l, "VCO_MaskPatch", ref s.enableMaskPatch, restartRequired: true);
-            Toggle(l, "VCO_HeadsetPatch", ref s.enableHeadsetPatch, restartRequired: true);
-            Toggle(l, "VCO_ArrayHeadsetPatch", ref s.enableArrayHeadsetPatch, restartRequired: true);
-            Toggle(l, "VCO_ApparelTweaks", ref s.enableApparelTweaks);
+            if (Section(l, "VCO_Section_Apparel"))
+            {
+                l.Label("VCO_Apparel_Intro".Translate());
+                l.Gap(6f);
+                Toggle(l, "VCO_HandFeetPatch", ref s.enableHandFeetPatch, restartRequired: true);
+                Toggle(l, "VCO_AcidHeatPatch", ref s.enableAcidHeatPatch, restartRequired: true);
+                Toggle(l, "VCO_ThumpBluntPatch", ref s.enableThumpBluntPatch, restartRequired: true);
+                Toggle(l, "VCO_GlassesHelmetPatch", ref s.enableGlassesHelmetPatch, restartRequired: true);
+                Toggle(l, "VCO_NoseMouthPatch", ref s.enableNoseMouthPatch, restartRequired: true);
+                Toggle(l, "VCO_MaskPatch", ref s.enableMaskPatch, restartRequired: true);
+                Toggle(l, "VCO_HeadsetPatch", ref s.enableHeadsetPatch, restartRequired: true);
+                Toggle(l, "VCO_ArrayHeadsetPatch", ref s.enableArrayHeadsetPatch, restartRequired: true);
+                Toggle(l, "VCO_ApparelTweaks", ref s.enableApparelTweaks);
+            }
         }
 
         private static void DrawDiagnostics(Listing_Standard l, VCOSettings s)
         {
-            Section(l, "VCO_Section_Logging");
-            Toggle(l, "VCO_VerboseLogging", ref s.verboseLogging);
-            if (s.verboseLogging)
+            if (Section(l, "VCO_Section_Logging"))
             {
-                s.diagnosticDumpIntervalTicks = Mathf.RoundToInt(
-                    Slider(l, "VCO_DumpInterval", s.diagnosticDumpIntervalTicks, 0f, 15000f, "0"));
-            }
-
-            Section(l, "VCO_Section_Counters");
-            l.Label("VCO_Counters_Intro".Translate());
-            l.Gap(6f);
-
-            if (!s.verboseLogging)
-            {
-                l.Label("VCO_Counters_Disabled".Translate());
-            }
-            else if (!VCODiagnostics.HasData)
-            {
-                l.Label("VCO_Counters_Empty".Translate());
-            }
-            else
-            {
-                foreach (var line in VCODiagnostics.Lines())
+                Toggle(l, "VCO_VerboseLogging", ref s.verboseLogging);
+                if (s.verboseLogging)
                 {
-                    var row = l.GetRect(Text.LineHeight);
-                    Widgets.Label(row.LeftPart(0.55f), line.Key);
-                    Widgets.Label(row.RightPart(0.45f), line.Value);
-                }
-                l.Gap(8f);
-
-                var buttons = l.GetRect(30f);
-                if (Widgets.ButtonText(buttons.LeftHalf().ContractedBy(2f), "VCO_Counters_Write".Translate()))
-                {
-                    VCODiagnostics.WriteReport();
-                    Messages.Message("VCO_Counters_Written".Translate(), MessageTypeDefOf.TaskCompletion, false);
-                }
-                if (Widgets.ButtonText(buttons.RightHalf().ContractedBy(2f), "VCO_Counters_Reset".Translate()))
-                {
-                    VCODiagnostics.Reset();
+                    s.diagnosticDumpIntervalTicks = Mathf.RoundToInt(
+                        Slider(l, "VCO_DumpInterval", s.diagnosticDumpIntervalTicks, 0f, 15000f, "0"));
                 }
             }
 
-            Section(l, "VCO_Section_PatchStatus");
-            l.Label("VCO_Diagnostics_Intro".Translate());
-            l.Gap(6f);
+            if (Section(l, "VCO_Section_Counters"))
+            {
+                l.Label("VCO_Counters_Intro".Translate());
+                l.Gap(6f);
 
-            var any = false;
-            foreach (var guard in PatchGuard.All)
-            {
-                l.Label(guard.Id + ": " + (guard.Satisfied
-                    ? "VCO_PatchOk".Translate()
-                    : "VCO_PatchBroken".Translate(guard.Actual, guard.Expected)));
-                any = true;
+                if (!s.verboseLogging)
+                {
+                    l.Label("VCO_Counters_Disabled".Translate());
+                }
+                else if (!VCODiagnostics.HasData)
+                {
+                    l.Label("VCO_Counters_Empty".Translate());
+                }
+                else
+                {
+                    foreach (var line in VCODiagnostics.Lines())
+                    {
+                        var row = l.GetRect(Text.LineHeight);
+                        Widgets.Label(row.LeftPart(0.55f), line.Key);
+                        Widgets.Label(row.RightPart(0.45f), line.Value);
+                    }
+                    l.Gap(8f);
+
+                    var buttons = l.GetRect(30f);
+                    if (Widgets.ButtonText(buttons.LeftHalf().ContractedBy(2f), "VCO_Counters_Write".Translate()))
+                    {
+                        VCODiagnostics.WriteReport();
+                        Messages.Message("VCO_Counters_Written".Translate(), MessageTypeDefOf.TaskCompletion, false);
+                    }
+                    if (Widgets.ButtonText(buttons.RightHalf().ContractedBy(2f), "VCO_Counters_Reset".Translate()))
+                    {
+                        VCODiagnostics.Reset();
+                    }
+                }
             }
-            if (!any)
+
+            if (Section(l, "VCO_Section_PatchStatus"))
             {
-                l.Label("VCO_NoGuardedPatches".Translate());
+                l.Label("VCO_Diagnostics_Intro".Translate());
+                l.Gap(6f);
+
+                var any = false;
+                foreach (var guard in PatchGuard.All)
+                {
+                    l.Label(guard.Id + ": " + (guard.Satisfied
+                        ? "VCO_PatchOk".Translate()
+                        : "VCO_PatchBroken".Translate(guard.Actual, guard.Expected)));
+                    any = true;
+                }
+                if (!any)
+                {
+                    l.Label("VCO_NoGuardedPatches".Translate());
+                }
             }
         }
 
@@ -247,13 +294,41 @@ namespace VanillaCombatOverhaul
         /// <summary>Grey used for options that have no implementation behind them yet.</summary>
         private static readonly Color DisabledColour = new Color(1f, 1f, 1f, 0.45f);
 
-        private static void Section(Listing_Standard l, string key)
+        /// <summary>
+        /// Clickable foldout heading. Returns true while the body should be drawn.
+        /// Starts collapsed so every heading on a tab is visible without scrolling.
+        /// </summary>
+        private static bool Section(Listing_Standard l, string key)
         {
-            l.Gap(10f);
+            l.Gap(8f);
+            var rect = l.GetRect(28f);
+            var expanded = ExpandedSections.Contains(key);
+
+            Widgets.DrawHighlightIfMouseover(rect);
+            if (Widgets.ButtonInvisible(rect))
+            {
+                if (expanded)
+                {
+                    ExpandedSections.Remove(key);
+                }
+                else
+                {
+                    ExpandedSections.Add(key);
+                }
+                expanded = !expanded;
+            }
+
+            var icon = expanded ? TexButton.Collapse : TexButton.Reveal;
+            GUI.DrawTexture(new Rect(rect.x, rect.y + 2f, 24f, 24f), icon);
+
+            var previous = Text.Font;
             Text.Font = GameFont.Medium;
-            l.Label(key.Translate());
-            Text.Font = GameFont.Small;
+            Widgets.Label(new Rect(rect.x + 28f, rect.y, rect.width - 28f, rect.height),
+                          key.Translate());
+            Text.Font = previous;
+
             l.GapLine(4f);
+            return expanded;
         }
 
         /// <summary>

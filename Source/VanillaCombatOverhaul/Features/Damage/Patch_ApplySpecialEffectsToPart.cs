@@ -10,10 +10,11 @@ namespace VanillaCombatOverhaul
     [HarmonyPatch(typeof(DamageWorker_AddInjury), "ApplySpecialEffectsToPart")]
     public static class Patch_ApplySpecialEffectsToPart
     {
-        private delegate void FinalizeInjury(DamageWorker_AddInjury worker, Pawn pawn,
+        // 1.6 FinalizeAndAddInjury returns the remaining damage (float), not void.
+        private delegate float FinalizeInjury(DamageWorker_AddInjury worker, Pawn pawn,
             float totalDamage, DamageInfo dinfo, DamageWorker.DamageResult result);
 
-        private delegate float ReduceOutside(DamageWorker worker, float totalDamage,
+        private delegate float ReduceOutside(DamageWorker_AddInjury worker, float totalDamage,
             DamageInfo dinfo, Pawn pawn);
 
         private static readonly FinalizeInjury FinalizeAndAddInjury =
@@ -27,7 +28,8 @@ namespace VanillaCombatOverhaul
 
         private static readonly ReduceOutside ReduceDamageToPreserveOutsideParts =
             AccessTools.MethodDelegate<ReduceOutside>(
-                AccessTools.DeclaredMethod(typeof(DamageWorker), "ReduceDamageToPreserveOutsideParts"));
+                AccessTools.DeclaredMethod(typeof(DamageWorker_AddInjury),
+                    "ReduceDamageToPreserveOutsideParts"));
 
         public static bool Prefix(DamageWorker_AddInjury __instance, Pawn pawn, float totalDamage,
                                   DamageInfo dinfo, DamageWorker.DamageResult result)

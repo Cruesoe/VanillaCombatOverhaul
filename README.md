@@ -12,12 +12,39 @@ Shipped and verified in-game:
 | **Counter-attack** | A successful parry lets the defender strike back immediately. Counters never chain. |
 | **Parry budget** | Caps parries per short window, so being surrounded overwhelms you. Negligible one-on-one, material against six. |
 | **Directional damage** | Where a hit lands depends on which side it arrives from. Flanking exposes different body parts; frontal attacks are unrestricted. Applies to ranged fire and, separately toggled, to melee. |
+| **Height targeting** | Drafted colonists pick None / Legs / Torso / Head. NPCs roll a random height on spawn. Skill raises the chance of landing in that band; a miss still hits that side. |
+| **Leftover armor** | Armor that exceeds a hit's penetration still stretches leftover rating into extra protection. Weapons show 2× AP on the inspect card. |
 | **Advanced accuracy** | Skilled shooters partially overcome penalties from a poor weapon at range and from bad weather. Cover and smoke are unaffected. |
 | **Evasion** | Moving pawns are harder to hit; standing still gives no benefit. Optional skill contest lets good shooters track runners. |
-| **Firing arc** | Missed shots spread wider with distance, making long-range fire less reliable. |
+| **Firing arc** | Missed shots spread wider with distance. All six Reloaded miss-spread distributions ship; type 0 is the default. |
+| **Bullet and arrow wounds** | Stopping-power fragmentation / pass-through / mushrooming for bullets, and arrow split/internal hits. Intercepts vanilla injury application instead of replacing DamageDef workers. |
+| **Visible tracers** | A short glowing streak behind projectiles, coloured by damage type. |
+| **Apparel coverage** | Reloaded's coverage pack: hands/feet, acid-as-heat, thump-as-blunt, glasses with helmets, masks, headsets. Settings-gated; most need a restart. |
 
 On the roadmap, locked off in settings until built: suppression, ammo as tech-tier buckets,
-sidearms, loadouts, and a height-targeting gizmo.
+sidearms, and loadouts.
+
+## Vanilla Combat Reloaded coverage
+
+Every live VCR combat toggle and every apparel/XML patch now ships in VCO. Reloaded's
+beam damage worker is commented out in 1.6 and was not ported.
+
+| Reloaded surface | In VCO | How it differs |
+|---|---|---|
+| Parry | Yes | Same curve. VCO adds a StatDef, a prefix instead of a local-slot transpiler, a 2/sec budget, and a free counter. |
+| Advanced armor | Yes | Same leftover stretch and 2× displayed AP. |
+| Advanced accuracy | Yes | Same skill mitigation of weapon and weather only. |
+| Evasion | Yes | Same `0.8^(speed − 2.5)` model. |
+| Firing arc (types 0–5) | Yes | Type 0 remains the default. |
+| Directional flanking + melee flanking | Yes | Same side restriction. VCO's seeder also lets a flank land on the torso. |
+| Height targeting gizmo | Yes | Same None / Legs / Torso / Head command. A missed band still hits that side. |
+| Bullet and arrow damage workers | Yes | Same wound shapes, without swapping `workerClass` on Bullet/Arrow. |
+| Shot / melee inspect readout | Yes | Vanilla vs skill-adjusted factors, evasion, side, height, parry. |
+| Apparel coverage pack (9 patches) | Yes | Settings-gated copies; most need a restart. |
+
+VCO-only: parry budget, counter-attack, visible tracers, combat StatDefs, PatchGuard, and
+the arena suite. Still to build, and not in Reloaded either: suppression, ammo, sidearms,
+loadouts.
 
 ## What Vanilla Combat Reloaded gets wrong
 
@@ -45,8 +72,8 @@ inherit. Line references are to VCR 1.5.
   and the behaviour cannot disagree.
 - **The mechanic is invisible and unmoddable.** VCR computes parry inline from `MeleeHitChance`.
   VCO exposes it as `VCO_ParryChance`, a real `StatDef` other mods can influence via `StatPart`.
-- **No verification.** VCR ships no tests. VCO's arena suite runs 107 assertions (melee and
-  ranged) in a headless game, on one command.
+- **No verification.** VCR ships no tests. VCO's arena suite runs melee, ranged, armor, wound,
+  and height checks in a headless game, on one command.
 
 ## Design rules
 
@@ -83,10 +110,13 @@ Source/VanillaCombatOverhaul/
   Core/             Mod entry, settings, Harmony bootstrap, patch guards, context
   Stats/            StatDefs and their StatParts
   Features/
-    Melee/          Parry, counter-attack
-    Ranged/         Advanced accuracy, evasion, firing arc
-    Directional/    Flanking hit location
-    Testing/        Arena harness (orchestration at root; Melee/ and Ranged/ suites)
+    Melee/          Parry, counter-attack, melee inspect readout
+    Ranged/         Advanced accuracy, evasion, firing arc, tracers, shot readout
+    Directional/    Flanking hit location, height targeting
+    Damage/         Bullet and arrow wound intercept
+    Armor/          Leftover armor stretch
+    Apparel/        Headgear classification
+    Testing/        Arena harness (Melee, Ranged, Armor, Damage suites)
 Tools/
   run-combat-test.ps1   Headless autotest launcher
   package-steam.ps1     Build and stage for RimWorld Mods folder
@@ -138,8 +168,12 @@ duplicate rather than updating the original.
 | Shared facing model (`FacingUtility`) | Done |
 | Melee: parry + counter-attack | Shipped. Calibrated to VCR, verified in-game |
 | Directional damage (ranged + melee) | Shipped. Seeder verified against real bodies |
-| Ranged: advanced accuracy, evasion, firing arc | Shipped. Calibrated to VCR, verified in-game (107/107) |
-| Height-targeting gizmo | Not started |
+| Height-targeting gizmo | Shipped. Drafted command + NPC roll |
+| Ranged: advanced accuracy, evasion, firing arc | Shipped. All six Reloaded arc types; type 0 default |
+| Leftover armor | Shipped. Calibrated to VCR |
+| Bullet and arrow wounds | Shipped. Harmony intercept, not workerClass swap |
+| Visible tracers | Shipped. Vanilla projectile streak |
+| Apparel coverage pack | Shipped. Settings-gated Reloaded XML |
 | Suppression | Not started |
 | Ammo (tech-tier buckets) | Not started |
 | Sidearms and loadouts | Not started |
@@ -202,9 +236,9 @@ factor of 50%, skill 10 raises it to roughly 71% and skill 20 to roughly 84%.
 (speed - minSpeed)` with defaults 0.8 and 2.5. Stationary pawns read zero on the `VCO_Evasion`
 stat. Optional skill contest reuses the mitigation curve against the evasion multiplier.
 
-**Firing arc.** VCR arc type 0 only: wild-miss radius scales with `distance * tan(arc/2) / 10`.
-Default arc is 45 degrees. A guarded transpiler on `ChangeDestToMissWild` verifies the splice
-on startup.
+**Firing arc.** All six Reloaded miss-spread distributions ship; type 0 is the default.
+Type 0 scales wild-miss radius with `distance * tan(arc/2) / 10`. Default arc is 45 degrees.
+A guarded transpiler on `ChangeDestToMissWild` verifies the splice on startup.
 
 ## Defaults
 
