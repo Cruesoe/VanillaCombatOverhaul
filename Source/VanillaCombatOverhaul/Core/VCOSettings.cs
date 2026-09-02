@@ -88,6 +88,9 @@ namespace VanillaCombatOverhaul
 
         // ---- Loadout / sidearms ------------------------------------------------
         public bool enableSidearms = Unbuilt;
+        // Ticks per unit of weapon mass, divided by the pawn's VCO_WeaponSwapSpeed. A revolver
+        // (mass 1.4) is about a second and a half at 60; a minigun (mass 20) is most of a fight.
+        public float sidearmSwapTicksPerMass = 60f;
         public bool enableLoadouts = Unbuilt;
 
         // ---- Apparel / coverage (VCR XML pack) ---------------------------------
@@ -150,6 +153,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref ammoYieldFactor, nameof(ammoYieldFactor), 1f);
 
             Scribe_Values.Look(ref enableSidearms, nameof(enableSidearms), Unbuilt);
+            Scribe_Values.Look(ref sidearmSwapTicksPerMass, nameof(sidearmSwapTicksPerMass), 60f);
             Scribe_Values.Look(ref enableLoadouts, nameof(enableLoadouts), Unbuilt);
 
             Scribe_Values.Look(ref enableHandFeetPatch, nameof(enableHandFeetPatch), Shipped);

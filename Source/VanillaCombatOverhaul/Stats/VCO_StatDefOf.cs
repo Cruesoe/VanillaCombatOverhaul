@@ -18,6 +18,9 @@ namespace VanillaCombatOverhaul
         /// <summary>Resistance to suppression accumulating from incoming fire.</summary>
         public static StatDef VCO_SuppressionResistance;
 
+        /// <summary>How quickly a weapon is put away and another brought up.</summary>
+        public static StatDef VCO_WeaponSwapSpeed;
+
         static VCO_StatDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(VCO_StatDefOf));

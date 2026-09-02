@@ -11,8 +11,24 @@ namespace VanillaCombatOverhaul
         public static VCOMod Instance { get; private set; }
 
         private Vector2 scrollPosition;
-        private float contentHeight = 600f;
         private SettingsTab drawnTab = SettingsTab.Combat;
+
+        /// <summary>
+        /// Measured content height, per tab. One shared height was not enough: the scroll view is
+        /// sized from the previous frame's measurement, so arriving on a long tab carrying a short
+        /// tab's height drew the overflow outside the scrollable region, where it could neither be
+        /// seen nor scrolled to, and no scrollbar appeared for it either.
+        /// </summary>
+        private readonly Dictionary<SettingsTab, float> contentHeights =
+            new Dictionary<SettingsTab, float>();
+
+        /// <summary>
+        /// Height assumed for a tab that has not been measured yet. Deliberately taller than any
+        /// tab can be: over-estimating costs one frame of empty space below the content, whereas
+        /// under-estimating hides content outright, so the first draw errs long and the
+        /// measurement taken from it corrects the next one.
+        /// </summary>
+        private const float UnmeasuredHeight = 4000f;
 
         // Empty means collapsed. The Combat tab is long enough that an always-open
         // list buries later options (tracers, suppression) below the fold.
@@ -60,6 +76,18 @@ namespace VanillaCombatOverhaul
             }
 
             var outRect = body.ContractedBy(12f);
+
+            if (!contentHeights.TryGetValue(s.CurrentTab, out var contentHeight))
+            {
+                contentHeight = UnmeasuredHeight;
+            }
+
+            // Clamped before the draw rather than after it. Collapsing a section shortens the
+            // content under a scroll position that is still deep, and correcting that only on the
+            // following frame shows a frame of blank space past the end of the list.
+            scrollPosition.y = Mathf.Clamp(scrollPosition.y, 0f,
+                                           Mathf.Max(0f, contentHeight - outRect.height));
+
             var viewRect = new Rect(0f, 0f, outRect.width - 20f, Mathf.Max(contentHeight, outRect.height));
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
@@ -79,15 +107,9 @@ namespace VanillaCombatOverhaul
                     break;
             }
 
-            contentHeight = l.CurHeight + 8f;
+            contentHeights[s.CurrentTab] = l.CurHeight + 8f;
             l.End();
             Widgets.EndScrollView();
-
-            if (scrollPosition.y > 0f)
-            {
-                scrollPosition.y = Mathf.Min(scrollPosition.y,
-                    Mathf.Max(0f, contentHeight - outRect.height));
-            }
         }
 
         private static TabRecord Tab(string key, SettingsTab tab) =>
@@ -202,6 +224,15 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Carrying"))
             {
                 Toggle(l, "VCO_Sidearms", ref s.enableSidearms, implemented: false);
+                if (s.enableSidearms)
+                {
+                    s.sidearmSwapTicksPerMass = Slider(l, "VCO_SidearmSwapTicks",
+                                                       s.sidearmSwapTicksPerMass, 10f, 180f, "0");
+                }
+                if (SidearmUtility.ConflictingMod != null)
+                {
+                    l.Label("VCO_Sidearms_Conflict".Translate(SidearmUtility.ConflictingMod));
+                }
                 Toggle(l, "VCO_Loadouts", ref s.enableLoadouts, implemented: false);
             }
 

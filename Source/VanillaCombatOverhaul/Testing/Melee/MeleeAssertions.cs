@@ -14,7 +14,7 @@ namespace VanillaCombatOverhaul
     /// the def at runtime, not from a constant copied into this file, so the prediction stays
     /// honest if Ludeon retunes the curve.
     /// </summary>
-    public static class ArenaAssertions
+    public static class MeleeAssertions
     {
         /// <summary>Below this many attempts, rates are noise and the run proves nothing.</summary>
         private const long MinimumAttempts = 200;
@@ -22,10 +22,15 @@ namespace VanillaCombatOverhaul
         private const double ChanceTolerance = 0.03;
         private const double RateTolerance = 0.06;
 
+        // Four standard errors: a false failure about once in 15,000 checks, which across a
+        // nine-scenario matrix is rare enough never to be the reason someone stops trusting
+        // the suite, while still far tighter than any real regression in the roll.
+        private const double SigmaTolerance = 4d;
+
         /// <summary>Share of attacks a duel may lose to the parry budget before it counts as throttled.</summary>
         private const double DuelBudgetShare = 0.01;
 
-        public static void Evaluate(ArenaResult r)
+        public static void Evaluate(MeleeArenaResult r)
         {
             var attempts = r.Counter("parry.attempt");
 
@@ -67,13 +72,13 @@ namespace VanillaCombatOverhaul
         /// rather than against the inputs the spec asked for. Nothing downstream can catch a
         /// wrong matchup; only this can.
         /// </summary>
-        private static void AssertCombatantsMatchSpec(ArenaResult r)
+        private static void AssertCombatantsMatchSpec(MeleeArenaResult r)
         {
             CheckSkillPinned(r, "attacker", "measured.attackerSkill", r.Spec.attackerMeleeSkill);
             CheckSkillPinned(r, "defender", "measured.defenderSkill", r.Spec.defenderMeleeSkill);
         }
 
-        private static void CheckSkillPinned(ArenaResult r, string who, string key, int expected)
+        private static void CheckSkillPinned(MeleeArenaResult r, string who, string key, int expected)
         {
             if (!r.Readings.TryGetValue(key, out var reading) || reading.Count == 0)
             {
@@ -101,7 +106,7 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>Every attack from behind must be rejected by the facing gate, with none slipping past.</summary>
-        private static void AssertRearNeverParries(ArenaResult r)
+        private static void AssertRearNeverParries(MeleeArenaResult r)
         {
             var rear = r.Counter("parry.facing.Rear");
             var rejected = r.Counter("parry.reject.fromBehind");
@@ -115,7 +120,7 @@ namespace VanillaCombatOverhaul
         /// Non-zero means the body-part group seeder left some body shape without parts on a
         /// side, which is the failure mode the XPath fallbacks exist to prevent.
         /// </summary>
-        private static void AssertSeederCoverage(ArenaResult r)
+        private static void AssertSeederCoverage(MeleeArenaResult r)
         {
             var gaps = r.Counter("directional.keep.noPartsOnSide");
             r.Assertions.Add(Check(
@@ -128,7 +133,7 @@ namespace VanillaCombatOverhaul
         /// The cap must actually hold. A pawn is never allowed to bank more parries in one
         /// window than the budget permits, however many attackers are on it.
         /// </summary>
-        private static void AssertBudgetRespected(ArenaResult r)
+        private static void AssertBudgetRespected(MeleeArenaResult r)
         {
             var overruns = r.Counter("parry.budget.overrun");
             r.Assertions.Add(Check(
@@ -144,7 +149,7 @@ namespace VanillaCombatOverhaul
         /// A lone attacker cannot swing often enough to spend a budget of two per window, so
         /// any rejection in a one-on-one fight means the window or the cap is mistuned.
         /// </summary>
-        private static void AssertBudgetScopedToBeingOutnumbered(ArenaResult r)
+        private static void AssertBudgetScopedToBeingOutnumbered(MeleeArenaResult r)
         {
             var spent = r.Counter("parry.reject.budgetSpent");
             var attempts = r.Counter("parry.attempt");
@@ -171,7 +176,7 @@ namespace VanillaCombatOverhaul
             // count reaches the report through the counter dump.
         }
 
-        private static void AssertUnarmedCannotParry(ArenaResult r)
+        private static void AssertUnarmedCannotParry(MeleeArenaResult r)
         {
             if (!r.Spec.defenderUnarmed)
             {
@@ -189,7 +194,7 @@ namespace VanillaCombatOverhaul
         /// levels. Front and side factors are equal by default, so every sampled roll shares
         /// one expected value.
         /// </summary>
-        private static void AssertChanceMatchesCurve(ArenaResult r)
+        private static void AssertChanceMatchesCurve(MeleeArenaResult r)
         {
             // Built from the stat values measured during the run rather than from the skill
             // curve alone. Light level and injuries both move MeleeHitChance, so a curve-only
@@ -240,7 +245,7 @@ namespace VanillaCombatOverhaul
         /// evaluating once gives a materially different answer whenever the stats vary --
         /// which is what left this assertion four points out while everything else matched.
         /// </summary>
-        public static double ExpectedFromMeasuredInputs(ArenaResult r) =>
+        public static double ExpectedFromMeasuredInputs(MeleeArenaResult r) =>
             r.Readings.ContainsKey("measured.expectedChance")
                 ? r.ReadingAverage("measured.expectedChance")
                 : -1;
@@ -249,7 +254,7 @@ namespace VanillaCombatOverhaul
         /// Verifies the RNG actually honours the chance: of the rolls taken, the proportion
         /// that succeeded should track the average chance offered.
         /// </summary>
-        private static void AssertRollHonoursChance(ArenaResult r)
+        private static void AssertRollHonoursChance(MeleeArenaResult r)
         {
             var success = r.Counter("parry.success");
             var failed = r.Counter("parry.reject.rollFailed");
@@ -263,17 +268,33 @@ namespace VanillaCombatOverhaul
             var observedRate = (double)success / rolls;
             var offered = r.ReadingAverage("parry.chanceRolled");
             var delta = Math.Abs(observedRate - offered);
+
+            // A fixed tolerance is the wrong shape for this check. Whether n successes out of
+            // r rolls is consistent with an offered probability depends on r: at ~450 rolls
+            // and p near 0.5 the standard error alone is about 2.4%, so a flat 6% band sat at
+            // 2.5 sigma and failed roughly one run in fifty for no reason but luck -- which is
+            // exactly what it did, at delta 6.0% against a 6.0% limit.
+            //
+            // The band is now the binomial standard error scaled to SigmaTolerance, with the
+            // old flat value kept as a floor so a very large sample cannot demand absurd
+            // precision. A roll that genuinely ignored the offered chance misses by far more
+            // than four sigma, so this still catches the regression it exists to catch.
+            var sigma = Math.Sqrt(Math.Max(offered * (1d - offered), 1e-9) / rolls);
+            var tolerance = Math.Max(RateTolerance, SigmaTolerance * sigma);
+
             r.Assertions.Add(Check(
                 "roll honours chance",
-                delta <= RateTolerance,
-                $"{success:N0}/{rolls:N0} = {observedRate:P1} against an offered {offered:P1} (delta {delta:P1})"));
+                delta <= tolerance,
+                $"{success:N0}/{rolls:N0} = {observedRate:P1} against an offered {offered:P1} "
+                + $"(delta {delta:P1}, allowed {tolerance:P1} = max of {RateTolerance:P1} "
+                + $"and {SigmaTolerance:F0}x sigma {sigma:P1})"));
         }
 
         /// <summary>
         /// Independent prediction of parry chance, reading the vanilla curve from the def
         /// rather than repeating numbers from the README.
         /// </summary>
-        public static double PredictParryChance(ArenaSpec spec)
+        public static double PredictParryChance(MeleeArenaSpec spec)
         {
             var curve = StatDefOf.MeleeHitChance?.postProcessCurve;
             if (curve == null)

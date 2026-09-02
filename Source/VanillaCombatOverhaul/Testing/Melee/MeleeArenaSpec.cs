@@ -8,7 +8,7 @@ namespace VanillaCombatOverhaul
     /// The point of fixing skills and weapons is that it lets a run verify a *specific cell*
     /// of the balance table rather than an aggregate that averages several matchups together.
     /// </summary>
-    public class ArenaSpec
+    public class MeleeArenaSpec
     {
         public string label = "default";
 
@@ -48,7 +48,7 @@ namespace VanillaCombatOverhaul
         /// <summary>Non-zero pins the RNG, making a run reproducible for regression checks.</summary>
         public int seed = 0;
 
-        public ArenaSpec Clone() => (ArenaSpec)MemberwiseClone();
+        public MeleeArenaSpec Clone() => (MeleeArenaSpec)MemberwiseClone();
 
         public IEnumerable<KeyValuePair<string, string>> Describe()
         {
@@ -65,9 +65,9 @@ namespace VanillaCombatOverhaul
         }
     }
 
-    public class ArenaResult
+    public class MeleeArenaResult
     {
-        public ArenaSpec Spec;
+        public MeleeArenaSpec Spec;
         public Dictionary<string, long> Counters = new Dictionary<string, long>();
         public Dictionary<string, VCODiagnostics.Reading> Readings = new Dictionary<string, VCODiagnostics.Reading>();
         public List<AssertionResult> Assertions = new List<AssertionResult>();
@@ -86,14 +86,5 @@ namespace VanillaCombatOverhaul
             Readings.TryGetValue(key, out var r) ? r.Average : 0d;
 
         public bool AllAssertionsPassed => !Assertions.Exists(a => !a.Passed);
-    }
-
-    public class AssertionResult
-    {
-        public string Name;
-        public bool Passed;
-        public string Detail;
-
-        public override string ToString() => (Passed ? "PASS  " : "FAIL  ") + Name + "  " + Detail;
     }
 }

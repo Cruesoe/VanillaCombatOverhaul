@@ -15,14 +15,14 @@ namespace VanillaCombatOverhaul
         /// even fight, a mismatch in each direction, plus a control that must produce no
         /// parries at all.
         /// </summary>
-        public static IEnumerable<ArenaSpec> DefaultMatrix()
+        public static IEnumerable<MeleeArenaSpec> DefaultMatrix()
         {
-            yield return new ArenaSpec { label = "even-novice",   attackerMeleeSkill = 0,  defenderMeleeSkill = 0 };
-            yield return new ArenaSpec { label = "even-skilled",  attackerMeleeSkill = 10, defenderMeleeSkill = 10 };
-            yield return new ArenaSpec { label = "even-master",   attackerMeleeSkill = 20, defenderMeleeSkill = 20 };
-            yield return new ArenaSpec { label = "weak-attacker", attackerMeleeSkill = 0,  defenderMeleeSkill = 20 };
-            yield return new ArenaSpec { label = "weak-defender", attackerMeleeSkill = 20, defenderMeleeSkill = 0 };
-            yield return new ArenaSpec { label = "unarmed-control", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
+            yield return new MeleeArenaSpec { label = "even-novice",   attackerMeleeSkill = 0,  defenderMeleeSkill = 0 };
+            yield return new MeleeArenaSpec { label = "even-skilled",  attackerMeleeSkill = 10, defenderMeleeSkill = 10 };
+            yield return new MeleeArenaSpec { label = "even-master",   attackerMeleeSkill = 20, defenderMeleeSkill = 20 };
+            yield return new MeleeArenaSpec { label = "weak-attacker", attackerMeleeSkill = 0,  defenderMeleeSkill = 20 };
+            yield return new MeleeArenaSpec { label = "weak-defender", attackerMeleeSkill = 20, defenderMeleeSkill = 0 };
+            yield return new MeleeArenaSpec { label = "unarmed-control", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          defenderUnarmed = true };
 
             // The only scenario that puts the parry budget under any pressure. Every matchup
@@ -34,37 +34,37 @@ namespace VanillaCombatOverhaul
             // most of the window is then spent with nothing attacking a downed pawn -- six
             // attackers produced fewer samples than three until this dropped to 30. The three
             // crowd scenarios share a cadence so they can be compared with each other.
-            yield return new ArenaSpec { label = "outnumbered-3v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
+            yield return new MeleeArenaSpec { label = "outnumbered-3v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 3, pairs = 12, refreshEveryTicks = 15 };
 
             // Six attackers, run twice: once as configured, once with the cap lifted. The pair
             // is the experiment -- the difference between them is exactly what the budget
             // contributes, and everything else in the drop belongs to the facing gate. Without
             // the control the two effects are impossible to tell apart from one number.
-            yield return new ArenaSpec { label = "outnumbered-6v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
+            yield return new MeleeArenaSpec { label = "outnumbered-6v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 6, pairs = 14, refreshEveryTicks = 15, ticks = 16000 };
-            yield return new ArenaSpec { label = "outnumbered-6v1-nobudget", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
+            yield return new MeleeArenaSpec { label = "outnumbered-6v1-nobudget", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 6, pairs = 14, refreshEveryTicks = 15, ticks = 16000,
                                          parryBudgetOverride = 9999 };
         }
 
-        public static List<ArenaResult> RunMatrix(Map map, int seed = 0)
+        public static List<MeleeArenaResult> RunMatrix(Map map, int seed = 0)
         {
-            var results = new List<ArenaResult>();
+            var results = new List<MeleeArenaResult>();
             foreach (var spec in DefaultMatrix())
             {
                 if (seed != 0)
                 {
                     spec.seed = seed;
                 }
-                results.Add(CombatArena.Run(spec, map));
+                results.Add(MeleeCombatArena.Run(spec, map));
             }
             return results;
         }
 
         // ------------------------------------------------------------------ report
 
-        public static string FormatReport(List<ArenaResult> results, List<AssertionResult> facing,
+        public static string FormatReport(List<MeleeArenaResult> results, List<AssertionResult> facing,
                                           List<AssertionResult> armor = null)
         {
             var sb = new StringBuilder();
@@ -112,8 +112,8 @@ namespace VanillaCombatOverhaul
                 var success = r.Counter("parry.success");
                 sb.AppendLine($"  parry: {success:N0} of {attempts:N0} eligible attacks" +
                               (attempts > 0 ? $" ({(double)success / attempts:P1})" : ""));
-                sb.AppendLine($"  chance: curve predicts {ArenaAssertions.PredictParryChance(r.Spec):P1}, " +
-                              $"measured inputs predict {ArenaAssertions.ExpectedFromMeasuredInputs(r):P1}, " +
+                sb.AppendLine($"  chance: curve predicts {MeleeAssertions.PredictParryChance(r.Spec):P1}, " +
+                              $"measured inputs predict {MeleeAssertions.ExpectedFromMeasuredInputs(r):P1}, " +
                               $"rolled {r.ReadingAverage("parry.chanceRolled"):P1}");
 
                 sb.AppendLine("  counters:");

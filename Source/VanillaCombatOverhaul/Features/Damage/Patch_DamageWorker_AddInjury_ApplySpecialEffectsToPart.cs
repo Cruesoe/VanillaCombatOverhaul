@@ -8,7 +8,7 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     [HarmonyPatch(typeof(DamageWorker_AddInjury), "ApplySpecialEffectsToPart")]
-    public static class Patch_ApplySpecialEffectsToPart
+    public static class Patch_DamageWorker_AddInjury_ApplySpecialEffectsToPart
     {
         // 1.6 FinalizeAndAddInjury returns the remaining damage (float), not void.
         private delegate float FinalizeInjury(DamageWorker_AddInjury worker, Pawn pawn,

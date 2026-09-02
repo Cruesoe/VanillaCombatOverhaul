@@ -10,6 +10,12 @@ namespace VanillaCombatOverhaul
 {
     public static class ParryUtility
     {
+        // Built once at startup; see VCODiagnostics.KeyTable. Concatenating at the call site
+        // costs a reflective Enum.ToString on every eligible melee attack, even when
+        // counting is switched off.
+        private static readonly string[] FacingKeys =
+            VCODiagnostics.KeyTable<AttackFacing>("parry.facing.");
+
         // Private members of Verb_MeleeAttack we need to respect. Resolved once; if RimWorld
         // renames either, Harmony's AccessTools throws at startup rather than silently
         // returning defaults, which is the failure mode we want.
@@ -80,7 +86,7 @@ namespace VanillaCombatOverhaul
             }
 
             var facing = FacingUtility.Relative(attacker.Position, defender);
-            VCODiagnostics.CountFor(defender, "parry.facing." + facing);
+            VCODiagnostics.CountFor(defender, FacingKeys[(int)facing]);
             var facingFactor = FacingFactor(facing, settings);
             if (facingFactor <= 0f)
             {

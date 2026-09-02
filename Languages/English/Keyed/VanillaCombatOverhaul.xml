@@ -180,6 +180,17 @@
   <VCO_StatPart_Moving>While moving</VCO_StatPart_Moving>
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
 
+  <!-- Sidearms -->
+  <VCO_SidearmSwapTicks>Time to draw a weapon: {0} ticks per unit of mass</VCO_SidearmSwapTicks>
+  <VCO_SidearmSwapTicks_Tip>How long swapping weapons takes. A heavier weapon takes longer, and a pawn with damaged hands is slower still.\n\n60 ticks is one second, so at the default a revolver takes about a second and a half to bring up. Lower this if you want swapping to be a reflex; raise it if you want it to be a commitment.</VCO_SidearmSwapTicks_Tip>
+  <VCO_Sidearms_Conflict>Switched off: {0} is installed and already manages carried weapons. Two mods doing that at once lose weapons, so this one stands down. Nothing else in VCO is affected.</VCO_Sidearms_Conflict>
+  <VCO_CarryAsSidearm>Carry {0} as sidearm</VCO_CarryAsSidearm>
+  <VCO_CarryAsSidearmReplacing>Carry {0} as sidearm (replaces {1})</VCO_CarryAsSidearmReplacing>
+  <VCO_CannotCarryAsSidearm>Cannot carry {0} as sidearm</VCO_CannotCarryAsSidearm>
+  <VCO_Sidearm_CannotEquip>cannot be equipped</VCO_Sidearm_CannotEquip>
+  <VCO_Job_TakeSidearm>taking {0} as a sidearm.</VCO_Job_TakeSidearm>
+  <VCO_Job_SwapWeapon>swapping weapons.</VCO_Job_SwapWeapon>
+
   <!-- In-world text -->
   <VCO_Mote_Parried>Parried!</VCO_Mote_Parried>
 

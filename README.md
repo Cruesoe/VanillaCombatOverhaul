@@ -22,7 +22,8 @@ Shipped and verified in-game:
 | **Apparel coverage** | Reloaded's coverage pack: hands/feet, acid-as-heat, thump-as-blunt, glasses with helmets, masks, headsets. Settings-gated; most need a restart. |
 
 On the roadmap, locked off in settings until built: suppression, ammo as tech-tier buckets,
-sidearms, and loadouts.
+and loadouts. Sidearms are built but paused and stay locked off — Simple Sidearms owns that
+space, and VCO stands down whenever it is loaded.
 
 ## Vanilla Combat Reloaded coverage
 
@@ -43,8 +44,8 @@ beam damage worker is commented out in 1.6 and was not ported.
 | Apparel coverage pack (9 patches) | Yes | Settings-gated copies; most need a restart. |
 
 VCO-only: parry budget, counter-attack, visible tracers, combat StatDefs, PatchGuard, and
-the arena suite. Still to build, and not in Reloaded either: suppression, ammo, sidearms,
-loadouts.
+the arena suite. Still to build, and not in Reloaded either: suppression, ammo, loadouts.
+Sidearms are built but dormant.
 
 ## What Vanilla Combat Reloaded gets wrong
 
@@ -116,11 +117,48 @@ Source/VanillaCombatOverhaul/
     Damage/         Bullet and arrow wound intercept
     Armor/          Leftover armor stretch
     Apparel/        Headgear classification
-    Testing/        Arena harness (Melee, Ranged, Armor, Damage suites)
+  Testing/          Arena harness, a sibling of Features rather than one of them:
+                    it ships in the assembly but is not a gameplay feature.
+                    Melee/ Ranged/ Armor/ Damage/ Directional/ suites
 Tools/
   run-combat-test.ps1   Headless autotest launcher
   package-steam.ps1     Build and stage for RimWorld Mods folder
 ```
+
+## Naming conventions
+
+The namespace is flat -- every type in the assembly is `VanillaCombatOverhaul.<Name>` --
+so a type name has to carry its own context. Folders group; they do not disambiguate.
+
+**One public type per file, named after that type.** The exception is a type and its own
+payload record, which stay together because neither means anything alone: `ShotContext`
+with `CombatContext`, `TranspilerGuard` with `PatchGuard`, `ReadoutScratch` with the
+readout patch it feeds.
+
+**Harmony patches are `Patch_<DeclaringType>_<Method>`.** `Patch_ArmorUtility_ApplyArmor`,
+`Patch_Pawn_DraftController_Drafted`. The name states exactly what vanilla method is being
+touched, so an audit of the mod's surface is a directory listing. A patch that supplies
+`TargetMethods()` has no single declaring type, so it takes a descriptive
+`Patch_<Concept>` instead -- `Patch_ChooseHitPart`, `Patch_ArmorPenetration` -- and those
+two are the only ones allowed to.
+
+**Static helpers end in `Utility`.** `ParryUtility`, `EvasionUtility`, `FiringArcUtility`,
+`HeightTargetingUtility`.
+
+**RimWorld's own prefixes win where the game expects them.** `StatPart_*`, `Comp*` /
+`CompProperties_*`, `Command_*`, `PatchOperation*`. These are referenced by name from XML,
+so they are not ours to rename freely.
+
+**`VCO_` marks a def-facing identifier, not a C# one.** DefOf classes and defNames take it
+(`VCO_StatDefOf`, `VCO_ParryChance`, `VCO_Left`) because the prefix has to match the def
+it resolves. Ordinary C# types that merely belong to the mod do not need it; the four that
+carry it unseparated -- `VCOMod`, `VCOSettings`, `VCODiagnostics`, `VCODebugActions` --
+are mod-wide singletons where the prefix reads as part of the word.
+
+**Test suites are prefixed by the system they exercise.** `MeleeArenaSpec` /
+`RangedArenaSpec`, `MeleeCombatArena` / `RangedCombatArena`, `MeleeAssertions` /
+`RangedAssertions`. Suite-neutral types stay unprefixed at `Testing/` root
+(`AssertionResult`, `TestSuite`, `AutoTest`).
 
 ## Building
 
@@ -176,7 +214,8 @@ duplicate rather than updating the original.
 | Apparel coverage pack | Shipped. Settings-gated Reloaded XML |
 | Suppression | Not started |
 | Ammo (tech-tier buckets) | Not started |
-| Sidearms and loadouts | Not started |
+| Sidearms | Paused. Phase 1 is built and green (13 arena checks) but dormant behind a locked toggle: Simple Sidearms owns this space, and VCO stands down whenever it is loaded. Reasoning and the live alternative are in [Docs/Sidearms-and-Loadouts.md](Docs/Sidearms-and-Loadouts.md) §9 |
+| Loadouts | Not started. Deferred to future development |
 
 Runs in-game. The automated suite loads the mod in a real RimWorld process, generates a map,
 fights several thousand melee attacks, exercises ranged accuracy scenarios, and asserts on the
@@ -242,7 +281,7 @@ A guarded transpiler on `ChangeDestToMissWild` verifies the splice on startup.
 
 ## Defaults
 
-Defaults are set per feature in `Source/VanillaCombatOverhaul/Core/Settings.cs`, against two
+Defaults are set per feature in `Source/VanillaCombatOverhaul/Core/VCOSettings.cs`, against two
 named constants:
 
 - `Shipped` — built and verified by the arena suite. Parry, counter-attack, directional damage
@@ -350,10 +389,35 @@ The expected parry chance is derived from vanilla's `MeleeHitChance` post-proces
 out of the def at runtime, not from constants copied into the test, so the prediction stays
 honest if Ludeon retunes the curve.
 
-Seeding (`-Seed`) makes a run reproducible for regression checks; leave it unseeded when
-measuring balance, since a fixed seed hides variance.
+### Seeding, and why a run is not reproducible
 
-### Baseline (all 89 checks passing)
+`-Seed` pins everything the mod controls: the world seed, both arenas' own RNG state, and the
+serial portion of map generation. It does **not** make a run reproducible, and it cannot.
+
+RimWorld 1.6 generates parts of a map in parallel, and `Verse.Rand` holds its seed and state
+stack in plain statics rather than `[ThreadStatic]`. Worker threads therefore draw from one
+shared generator in whatever order the scheduler picks, so two runs of the same seed build
+different maps — measured at 58, 73 and 82 pawns across three runs of seed 12345, with the
+world seed, tile, size, weather and clock all identical. Every `thingIDNumber` shifts with
+that, and RimWorld schedules rare ticks and seeds much of its own randomness off those IDs.
+
+The practical consequences:
+
+- **The suite is statistical, not reproducible.** Assertions on sampled rates must derive
+  their tolerance from the sample size. `roll honours chance` sizes its band as four binomial
+  standard errors, and prints the arithmetic, so a failure can be read rather than guessed at.
+  A flat 6% band sat at about 2.5 sigma and failed roughly one run in fifty on luck alone.
+- **A seed is still worth passing.** It removes the map-*layout* variance, which is the part
+  that decides whether a scenario can place its combatants at all.
+- **Every run prints a fingerprint** — world seed, tile, weather, clock, pawn count, pawn ID
+  sum, next thing ID — taken before any arena runs. Two reports that disagree below the
+  fingerprint but agree in it have diverged inside the arenas; two that disagree in the
+  fingerprint itself never had the same map to begin with.
+
+Leave the seed off when measuring balance: it hides none of the variance that matters, and
+nothing depends on it.
+
+### Baseline (all 146 checks passing)
 
 Nine scenarios, RimWorld 1.6.4871, ~5,000 real melee attacks. Duels verify the formula across
 the skill range; the outnumbered scenarios verify the facing gate and the parry budget.
@@ -370,7 +434,7 @@ the skill range; the outnumbered scenarios verify the facing gate and the parry 
 | outnumbered-6v1 | 10 / 10 | 47.5% | 45.1% | 45.1% | 209 / 680 (30.7%) |
 | 6v1, cap lifted | 10 / 10 | 47.5% | 45.3% | 45.3% | 300 / 859 (34.9%) |
 
-`formula` is an independent reimplementation of the parry maths in `ArenaAssertions`, fed the
+`formula` is an independent reimplementation of the parry maths in `MeleeAssertions`, fed the
 same inputs at the same instant the mod computed its own chance; `rolled` is what the mod
 used. They agree to a decimal place, which is the point. `parry rate` is lower than `rolled`
 wherever the facing gate or the budget rejected attacks before any roll was taken.
@@ -434,3 +498,17 @@ Worth reading before extending the suite.
 - **Clean up corpses.** A dead pawn sits inside a `Corpse`, a separate spawned Thing that
   destroying the pawn does not remove. Left behind they change the ground the next scenario
   spawns on, and two runs of the same seed stop agreeing.
+- **Every arena needs the skill-pinning lesson, not just the first one.** The melee arena
+  learned that assigning `SkillRecord.Level` can silently do nothing and started reading the
+  value back. The ranged arena was written later and did not, so a scenario asking for a
+  skill-20 shooter would quietly run at whatever the generator produced and then report that
+  high skill had failed to improve the weapon factor — a mod-shaped failure with a harness
+  cause. Both arenas now discard unsuitable pawns and assert the skill actually landed.
+- **A scenario precondition must be asserted, not assumed.** The moving-target scenario sent
+  its pawn to one hardcoded destination and never checked it set off. When that cell was
+  unreachable the pawn stood still, evasion correctly read 1.0, and the report blamed evasion.
+  Anything a scenario needs in order to mean what it says — a pinned skill, a moving target —
+  is now its own named check that fails as a setup failure.
+- **Fixed tolerances on sampled rates are a bug with a long fuse.** They pass for months and
+  then fail on an unlucky seed, and the natural reading of that failure is "the mod broke".
+  Size the band from the sample.

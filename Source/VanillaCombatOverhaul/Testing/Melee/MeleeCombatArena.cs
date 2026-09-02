@@ -16,7 +16,7 @@ namespace VanillaCombatOverhaul
     /// skills, weapons and facing all drift. This pins those and generates the volume in
     /// seconds by driving the tick loop directly rather than waiting on wall-clock time.
     /// </summary>
-    public static class CombatArena
+    public static class MeleeCombatArena
     {
         /// <summary>
         /// Where attackers are placed around a defender, orthogonals first so a small group
@@ -29,9 +29,9 @@ namespace VanillaCombatOverhaul
             new IntVec3(1, 0, -1), new IntVec3(-1, 0, -1)
         };
 
-        public static ArenaResult Run(ArenaSpec spec, Map map)
+        public static MeleeArenaResult Run(MeleeArenaSpec spec, Map map)
         {
-            var result = new ArenaResult { Spec = spec };
+            var result = new MeleeArenaResult { Spec = spec };
 
             if (map == null)
             {
@@ -96,7 +96,7 @@ namespace VanillaCombatOverhaul
                 result.Counters = VCODiagnostics.SnapshotCounters();
                 result.Readings = VCODiagnostics.SnapshotReadings();
                 result.PawnsDied = attackers.Concat(defenders).Count(p => p.Dead);
-                ArenaAssertions.Evaluate(result);
+                MeleeAssertions.Evaluate(result);
             }
             finally
             {
@@ -162,7 +162,7 @@ namespace VanillaCombatOverhaul
         /// assertions contributes nothing to fail. A run that could not set itself up has to
         /// be a failure, not an absence.
         /// </summary>
-        private static ArenaResult Abort(ArenaResult result, string reason)
+        private static MeleeArenaResult Abort(MeleeArenaResult result, string reason)
         {
             Log.Error("[VCO] Arena aborted: " + reason);
             result.Assertions.Add(new AssertionResult
@@ -181,7 +181,7 @@ namespace VanillaCombatOverhaul
         /// tracked so two groups never share ground; overlapping rings would let an attacker
         /// reach a defender it was not assigned to and quietly contaminate the matchup.
         /// </summary>
-        private static void SpawnCombatants(ArenaSpec spec, Map map, Faction enemyFaction,
+        private static void SpawnCombatants(MeleeArenaSpec spec, Map map, Faction enemyFaction,
                                             ThingDef attackerWeapon, ThingDef defenderWeapon,
                                             List<Pawn> attackers, List<int> attackerTarget,
                                             List<Pawn> defenders)
@@ -357,7 +357,7 @@ namespace VanillaCombatOverhaul
 
         // ------------------------------------------------------------------ run
 
-        private static void RunTicks(ArenaSpec spec, List<Pawn> attackers, List<int> attackerTarget,
+        private static void RunTicks(MeleeArenaSpec spec, List<Pawn> attackers, List<int> attackerTarget,
                                      List<Pawn> defenders, ThingDef attackerWeapon, ThingDef defenderWeapon)
         {
             var tickManager = Find.TickManager;
@@ -461,7 +461,7 @@ namespace VanillaCombatOverhaul
             // unfiltered, an asymmetric matchup averages both directions and reports the
             // symmetric value -- 43% where 87% was expected, and 49% where 1% was.
             VCODiagnostics.SampleFor(defender, "measured.expectedChance",
-                (float)ArenaAssertions.FormulaFor(aptitude, attackerMelee, directionFactor));
+                (float)MeleeAssertions.FormulaFor(aptitude, attackerMelee, directionFactor));
         }
 
         private static float SkillLevel(Pawn pawn)

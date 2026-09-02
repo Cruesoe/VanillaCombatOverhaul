@@ -118,13 +118,13 @@ namespace VanillaCombatOverhaul
                     sb.AppendLine("   " + "VCO_TargetSide".Translate() + ": " + side.labelShort);
                 }
 
-                var height = HeightTargeting.GetTargetHeight(caster);
+                var height = HeightTargetingUtility.GetTargetHeight(caster);
                 if (height != BodyPartHeight.Undefined)
                 {
-                    var chance = HeightTargeting.ChanceToLand(
+                    var chance = HeightTargetingUtility.ChanceToLand(
                         caster, hitPawn, side, height, DamageDefOf.Bullet, melee: false);
                     sb.AppendLine("   " + "VCO_HeightChance".Translate()
-                                  + HeightTargeting.LabelFor(height) + ": " + chance.ToStringPercent());
+                                  + HeightTargetingUtility.LabelFor(height) + ": " + chance.ToStringPercent());
                 }
             }
 

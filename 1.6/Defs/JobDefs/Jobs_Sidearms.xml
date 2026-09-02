@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Two jobs, one driver. The difference is what may interrupt them: a swap ordered in the
+       base is an ordinary chore, a swap ordered under fire is not something to abandon halfway.
+       The driver reports its own text, so reportString is only a fallback. -->
+
+  <JobDef>
+    <defName>VCO_SwapWeapon</defName>
+    <driverClass>VanillaCombatOverhaul.JobDriver_SwapWeapon</driverClass>
+    <reportString>swapping weapons.</reportString>
+    <allowOpportunisticPrefix>false</allowOpportunisticPrefix>
+  </JobDef>
+
+  <JobDef>
+    <defName>VCO_SwapWeaponCombat</defName>
+    <driverClass>VanillaCombatOverhaul.JobDriver_SwapWeapon</driverClass>
+    <reportString>swapping weapons.</reportString>
+    <allowOpportunisticPrefix>false</allowOpportunisticPrefix>
+    <casualInterruptible>false</casualInterruptible>
+    <alwaysShowWeapon>true</alwaysShowWeapon>
+  </JobDef>
+
+</Defs>

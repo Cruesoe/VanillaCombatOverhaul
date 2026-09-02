@@ -8,7 +8,7 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     [HarmonyPatch(typeof(TooltipUtility), nameof(TooltipUtility.ShotCalculationTipString))]
-    public static class Patch_ShotCalculationTipString
+    public static class Patch_TooltipUtility_ShotCalculationTipString
     {
         private delegate float GetNonMissChance(Verb_MeleeAttack verb, LocalTargetInfo target);
         private delegate float GetDodgeChance(Verb_MeleeAttack verb, LocalTargetInfo target);
@@ -75,13 +75,13 @@ namespace VanillaCombatOverhaul
                 {
                     sb.AppendLine("   " + "VCO_TargetSide".Translate() + ": " + side.labelShort);
                 }
-                var height = HeightTargeting.GetTargetHeight(pawn);
+                var height = HeightTargetingUtility.GetTargetHeight(pawn);
                 if (height != BodyPartHeight.Undefined)
                 {
-                    var chance = HeightTargeting.ChanceToLand(
+                    var chance = HeightTargetingUtility.ChanceToLand(
                         pawn, hitPawn, side, height, meleeVerb.GetDamageDef(), melee: true);
                     sb.AppendLine("   " + "VCO_HeightChance".Translate()
-                                  + HeightTargeting.LabelFor(height) + ": " + chance.ToStringPercent());
+                                  + HeightTargetingUtility.LabelFor(height) + ": " + chance.ToStringPercent());
                 }
             }
 

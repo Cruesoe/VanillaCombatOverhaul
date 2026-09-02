@@ -46,12 +46,16 @@ namespace VanillaCombatOverhaul
             var scale = new Vector3(width, 1f, length);
             var rotation = Quaternion.LookRotation(dir);
 
+            // One lookup for both quads: MatFor runs the damage-type colour switch and a
+            // MaterialPool dictionary hit, and this is per projectile per frame.
+            var material = MatFor(projectile);
+
             Graphics.DrawMesh(MeshPool.plane10, Matrix4x4.TRS(mid, rotation, scale),
-                              MatFor(projectile), 0);
+                              material, 0);
 
             var headScale = new Vector3(width * 1.6f, 1f, width * 1.6f);
             Graphics.DrawMesh(MeshPool.plane10, Matrix4x4.TRS(drawLoc, rotation, headScale),
-                              MatFor(projectile), 0);
+                              material, 0);
         }
 
         public static Color ColorFor(Projectile projectile)
@@ -82,12 +86,5 @@ namespace VanillaCombatOverhaul
 
         private static Material MatFor(Projectile projectile) =>
             MaterialPool.MatFrom(BaseContent.WhiteTex, ShaderDatabase.MoteGlow, ColorFor(projectile), 0);
-    }
-
-    [HarmonyPatch(typeof(Projectile), "DrawAt")]
-    public static class Patch_Projectile_DrawAt
-    {
-        public static void Postfix(Projectile __instance, Vector3 drawLoc) =>
-            TracerUtility.Draw(__instance, drawLoc);
     }
 }
