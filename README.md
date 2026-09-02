@@ -93,6 +93,28 @@ dotnet build Source/VanillaCombatOverhaul/VanillaCombatOverhaul.csproj -c Releas
 Output lands in `1.6/Assemblies/`. Reference assemblies are pinned to `Krafs.Rimworld.Ref
 1.6.4871`; bump that when RimWorld updates.
 
+## Packaging and installing
+
+`Tools\package-steam.ps1` builds a release assembly and stages a distributable copy in
+`Dist\VanillaCombatOverhaul` — About, 1.6, Languages and LoadFolders.xml, and nothing else.
+No source, no build intermediates, no git history, and no README: this file is developer
+documentation and has no place in a Workshop item.
+
+```
+powershell -File Tools\package-steam.ps1 -InstallToMods
+```
+
+`-InstallToMods` also replaces `RimWorld\Mods\VanillaCombatOverhaul` with the packaged copy,
+so what sits there is always a distributable mod. That folder is a build output, not a link to
+the working tree, so **rerun this after any code change you want to see in game** — including
+before running the test suite, which loads the mod by packageId from the Mods folder.
+
+The script refuses to package if a stray assembly is sitting beside the mod DLL (RimWorld
+loads every assembly in that folder, so two copies would each apply their patches), fails if
+the preview image exceeds Steam's 1 MB limit, and carries `About\PublishedFileId.txt` across
+repackaging — losing that file orphans the Workshop item and the next upload creates a
+duplicate rather than updating the original.
+
 ## Status
 
 | System | State |

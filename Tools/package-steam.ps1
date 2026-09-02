@@ -3,26 +3,37 @@
     Builds a clean, Steam-uploadable copy of the mod.
 
 .DESCRIPTION
-    RimWorld uploads a mod from whatever is in its Mods folder, verbatim. This repo doubles as
-    that folder via a directory junction, which means an upload from here would carry the C#
-    project, its obj/ and bin/ intermediates, the test tooling and the git history into the
-    Workshop item. This produces a folder containing only what a player needs.
+    RimWorld uploads a mod from whatever is in its Mods folder, verbatim. Pointing that folder
+    at the working tree is convenient while developing but would push the C# project, its obj/
+    and bin/ intermediates, the test tooling and the git history straight into the Workshop
+    item. This produces a folder containing only what a player needs.
 
-    The result is a normal mod folder. To publish it, move or junction it into
-    RimWorld\Mods\, tick it in the mod list, and use the in-game Upload button. Steam writes a
-    PublishedFileId.txt into the folder on first upload; keep that file, because it is what
-    ties later uploads to the same Workshop item.
+    With -InstallToMods it also replaces the copy under RimWorld\Mods, so what sits there is
+    always a distributable mod rather than a view of the source. Steam writes a
+    PublishedFileId.txt into that folder on first upload; it is preserved across reinstalls,
+    because losing it orphans the Workshop item and the next upload creates a duplicate.
 
 .PARAMETER OutputPath
     Where to write the package. Defaults to Dist\VanillaCombatOverhaul beside the repo.
 
 .PARAMETER SkipBuild
     Use the assembly already in 1.6\Assemblies rather than rebuilding.
+
+.PARAMETER InstallToMods
+    Also replace the copy in RimWorld\Mods with the freshly packaged one. The Mods folder then
+    holds a distributable mod rather than a link to the working tree, so it carries no source,
+    no build intermediates and no git history -- but it also stops tracking rebuilds, so rerun
+    this after any code change you want to test in game.
+
+.PARAMETER ModsPath
+    RimWorld's Mods folder. Defaults to the usual Steam location.
 #>
 [CmdletBinding()]
 param(
     [string] $OutputPath,
-    [switch] $SkipBuild
+    [switch] $SkipBuild,
+    [switch] $InstallToMods,
+    [string] $ModsPath = 'C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -67,9 +78,11 @@ $payload = @(
     @{ Path = 'About';          Required = $true  },
     @{ Path = '1.6';            Required = $true  },
     @{ Path = 'Languages';      Required = $true  },
-    @{ Path = 'LoadFolders.xml';Required = $true  },
-    @{ Path = 'README.md';      Required = $false }
+    @{ Path = 'LoadFolders.xml';Required = $true  }
 )
+
+# README.md is deliberately absent. It is developer documentation -- build steps, test harness
+# notes, and a critique of another author's mod -- none of which belongs in a Workshop item.
 
 foreach ($item in $payload) {
     $source = Join-Path $repoRoot $item.Path
@@ -111,6 +124,47 @@ $size = [math]::Round(((Get-ChildItem $OutputPath -Recurse -File | Measure-Objec
 Write-Host ''
 Write-Host "Packaged to: $OutputPath"
 Write-Host "Total size : $size MB"
+if ($InstallToMods) {
+    if (-not (Test-Path $ModsPath)) {
+        throw "No Mods folder at $ModsPath. Pass -ModsPath."
+    }
+
+    $installed = Join-Path $ModsPath 'VanillaCombatOverhaul'
+
+    if (Test-Path $installed) {
+        $existing = Get-Item $installed -Force
+
+        # Never Remove-Item a junction: depending on the PowerShell version it can follow the
+        # link and delete the target, which here would be the working tree. rmdir removes the
+        # reparse point itself and nothing behind it.
+        if ($existing.LinkType) {
+            Write-Host "Removing existing $($existing.LinkType) at $installed"
+            & cmd.exe /c rmdir "`"$installed`""
+            if (Test-Path $installed) { throw "Could not remove the link at $installed." }
+        }
+        else {
+            # Carry the Workshop id across a reinstall, same as for the staging folder.
+            $installedId = Join-Path $installed 'About\PublishedFileId.txt'
+            if ((Test-Path $installedId) -and -not $publishedId) {
+                $publishedId = Get-Content $installedId -Raw
+            }
+            Remove-Item $installed -Recurse -Force
+        }
+    }
+
+    Copy-Item $OutputPath -Destination $installed -Recurse -Force
+
+    if ($publishedId) {
+        Set-Content -Path (Join-Path $installed 'About\PublishedFileId.txt') `
+                    -Value $publishedId -NoNewline -Encoding ascii
+    }
+
+    Write-Host "Installed to: $installed"
+}
+
 Write-Host ''
-Write-Host 'To publish: copy or junction this folder into RimWorld\Mods, enable it in the'
-Write-Host 'mod list, and press Upload. Keep About\PublishedFileId.txt afterwards.'
+Write-Host 'To publish: enable the mod in the in-game mod list and press Upload.'
+Write-Host 'Keep About\PublishedFileId.txt afterwards -- it ties later uploads to the same item.'
+if (-not $InstallToMods) {
+    Write-Host 'Re-run with -InstallToMods to refresh the copy in RimWorld\Mods.'
+}
