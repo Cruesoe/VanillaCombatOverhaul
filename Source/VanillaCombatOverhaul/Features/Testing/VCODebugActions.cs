@@ -36,6 +36,14 @@ namespace VanillaCombatOverhaul
                 new System.Collections.Generic.List<ArenaResult>(), ArenaAssertions.FacingSelfTest()));
         }
 
+        [DebugAction(Category, "Run ranged accuracy test", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void RunRangedSuite()
+        {
+            var self = RangedAssertions.SelfTests();
+            var results = TestSuite.RunRangedMatrix(Find.CurrentMap);
+            Log.Message(TestSuite.FormatRangedReport(results, self));
+        }
+
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void WriteCounters() => VCODiagnostics.WriteReport();
 

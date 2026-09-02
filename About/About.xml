@@ -34,5 +34,6 @@
 
 Every feature is off by default and toggled individually in mod settings. Nothing is rewritten that another mod might also want to rewrite: no weapon defs are replaced, no core verbs are swapped, and mechanics are exposed as ordinary stats so apparel, hediffs, genes and other mods can influence them.
 
-Planned systems: melee parry and counter, directional damage and flanking, target evasion, suppression, ammo, sidearms, and loadouts.</description>
+Planned systems: melee parry and counter, directional damage and flanking, advanced accuracy,
+evasion, firing arc, target suppression, ammo, sidearms, and loadouts.</description>
 </ModMetaData>

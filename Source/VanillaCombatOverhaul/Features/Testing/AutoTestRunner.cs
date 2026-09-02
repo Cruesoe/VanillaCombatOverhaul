@@ -99,10 +99,16 @@ namespace VanillaCombatOverhaul
             {
                 var facing = ArenaAssertions.FacingSelfTest();
                 var results = TestSuite.RunMatrix(map, Seed);
-                report = TestSuite.FormatReport(results, facing);
+                var rangedSelf = RangedAssertions.SelfTests();
+                var rangedResults = TestSuite.RunRangedMatrix(map, Seed);
+                report = TestSuite.FormatReport(results, facing)
+                         + Environment.NewLine
+                         + TestSuite.FormatRangedReport(rangedResults, rangedSelf);
 
                 allPassed = !facing.Exists(a => !a.Passed)
-                            && results.TrueForAll(r => r.AllAssertionsPassed);
+                            && results.TrueForAll(r => r.AllAssertionsPassed)
+                            && !rangedSelf.Exists(a => !a.Passed)
+                            && rangedResults.TrueForAll(r => r.AllAssertionsPassed);
             }
             catch (Exception e)
             {

@@ -99,12 +99,19 @@ namespace VanillaCombatOverhaul
             }
 
             Section(l, "VCO_Section_Ranged");
-            Toggle(l, "VCO_Evasion", ref s.enableEvasion, implemented: false);
+            Toggle(l, "VCO_AdvancedAccuracy", ref s.enableAdvancedAccuracy);
+            if (s.enableAdvancedAccuracy)
+            {
+                s.accuracyScale = Slider(l, "VCO_AccuracyScale", s.accuracyScale, 1f, 60f, "0");
+            }
+            Toggle(l, "VCO_Evasion", ref s.enableEvasion);
             if (s.enableEvasion)
             {
-                s.evasionFactor = Slider(l, "VCO_EvasionFactor", s.evasionFactor, 0f, 3f);
+                s.evasionFactor = Slider(l, "VCO_EvasionFactor", s.evasionFactor, 0.01f, 1f);
+                s.evasionMinSpeed = Slider(l, "VCO_EvasionMinSpeed", s.evasionMinSpeed, 0f, 30f);
+                Toggle(l, "VCO_EvasionSkillContest", ref s.evasionSkillContest);
             }
-            Toggle(l, "VCO_FiringArc", ref s.enableFiringArc, implemented: false);
+            Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
             if (s.enableFiringArc)
             {
                 s.firingArcDegrees = Slider(l, "VCO_FiringArcDegrees", s.firingArcDegrees, 1f, 179f, "0");

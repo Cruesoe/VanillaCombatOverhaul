@@ -186,6 +186,16 @@ namespace VanillaCombatOverhaul
                 sb.AppendLine($"    -> directional replaced hit part: {(double)Get("directional.replaced") / dirCalls:P1} " +
                               $"of {dirCalls:N0} damage instances");
             }
+            var mitigations = Get("accuracy.mitigation.applied");
+            if (mitigations > 0)
+            {
+                sb.AppendLine($"    -> accuracy mitigation applied: {mitigations:N0} shot reports");
+            }
+            var evasionApplied = Get("evasion.applied");
+            if (evasionApplied > 0)
+            {
+                sb.AppendLine($"    -> evasion applied: {evasionApplied:N0} aim checks");
+            }
             return sb.ToString().TrimEnd();
         }
 

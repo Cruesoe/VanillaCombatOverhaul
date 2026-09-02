@@ -12,9 +12,12 @@ Shipped and verified in-game:
 | **Counter-attack** | A successful parry lets the defender strike back immediately. Counters never chain. |
 | **Parry budget** | Caps parries per short window, so being surrounded overwhelms you. Negligible one-on-one, material against six. |
 | **Directional damage** | Where a hit lands depends on which side it arrives from. Flanking exposes different body parts; frontal attacks are unrestricted. Applies to ranged fire and, separately toggled, to melee. |
+| **Advanced accuracy** | Skilled shooters partially overcome penalties from a poor weapon at range and from bad weather. Cover and smoke are unaffected. |
+| **Evasion** | Moving pawns are harder to hit; standing still gives no benefit. Optional skill contest lets good shooters track runners. |
+| **Firing arc** | Missed shots spread wider with distance, making long-range fire less reliable. |
 
-On the roadmap, locked off in settings until built: ranged evasion, firing arcs, suppression,
-ammo as tech-tier buckets, sidearms, loadouts, and a height-targeting gizmo.
+On the roadmap, locked off in settings until built: suppression, ammo as tech-tier buckets,
+sidearms, loadouts, and a height-targeting gizmo.
 
 ## What Vanilla Combat Reloaded gets wrong
 
@@ -42,8 +45,8 @@ inherit. Line references are to VCR 1.5.
   and the behaviour cannot disagree.
 - **The mechanic is invisible and unmoddable.** VCR computes parry inline from `MeleeHitChance`.
   VCO exposes it as `VCO_ParryChance`, a real `StatDef` other mods can influence via `StatPart`.
-- **No verification.** VCR ships no tests. VCO's arena suite runs 71 assertions against several
-  thousand real melee attacks in a headless game, on one command.
+- **No verification.** VCR ships no tests. VCO's arena suite runs 107 assertions (melee and
+  ranged) in a headless game, on one command.
 
 ## Design rules
 
@@ -79,7 +82,14 @@ Languages/          Keyed strings
 Source/VanillaCombatOverhaul/
   Core/             Mod entry, settings, Harmony bootstrap, patch guards, context
   Stats/            StatDefs and their StatParts
-  Features/         One folder per feature: Melee, Ranged, Ammo, Loadout, Suppression
+  Features/
+    Melee/          Parry, counter-attack
+    Ranged/         Advanced accuracy, evasion, firing arc
+    Directional/    Flanking hit location
+    Testing/        Arena harness (orchestration at root; Melee/ and Ranged/ suites)
+Tools/
+  run-combat-test.ps1   Headless autotest launcher
+  package-steam.ps1     Build and stage for RimWorld Mods folder
 ```
 
 ## Building
@@ -126,16 +136,17 @@ duplicate rather than updating the original.
 | Stat definitions + reference StatParts | Done |
 | Parry budget (`ParryTracker`) | Done |
 | Shared facing model (`FacingUtility`) | Done |
-| Melee: parry + counter-attack | Shipped. Calibrated to VCR, verified in-game (71/71) |
+| Melee: parry + counter-attack | Shipped. Calibrated to VCR, verified in-game |
 | Directional damage (ranged + melee) | Shipped. Seeder verified against real bodies |
+| Ranged: advanced accuracy, evasion, firing arc | Shipped. Calibrated to VCR, verified in-game (107/107) |
 | Height-targeting gizmo | Not started |
-| Ranged: evasion, firing arc | Not started |
 | Suppression | Not started |
 | Ammo (tech-tier buckets) | Not started |
 | Sidearms and loadouts | Not started |
 
 Runs in-game. The automated suite loads the mod in a real RimWorld process, generates a map,
-fights several thousand melee attacks and asserts on the results.
+fights several thousand melee attacks, exercises ranged accuracy scenarios, and asserts on the
+results.
 
 ## Credits
 
@@ -183,6 +194,18 @@ one-on-one numbers above untouched.
 deny a parry. Flanking still matters through directional damage: the side an attack arrives
 from determines which body parts it can reach.
 
+**Advanced accuracy.** VCR's mitigation curve is kept: `factor ^ (1 / (skill / scale))` applied
+only to weapon and weather factors inside `ShotReport`. Default scale is 5. At a raw weapon
+factor of 50%, skill 10 raises it to roughly 71% and skill 20 to roughly 84%.
+
+**Evasion.** VCR's movement model is kept: hit chance is multiplied by `evasionFactor ^
+(speed - minSpeed)` with defaults 0.8 and 2.5. Stationary pawns read zero on the `VCO_Evasion`
+stat. Optional skill contest reuses the mitigation curve against the evasion multiplier.
+
+**Firing arc.** VCR arc type 0 only: wild-miss radius scales with `distance * tan(arc/2) / 10`.
+Default arc is 45 degrees. A guarded transpiler on `ChangeDestToMissWild` verifies the splice
+on startup.
+
 ## Defaults
 
 Defaults are set per feature in `Source/VanillaCombatOverhaul/Core/Settings.cs`, against two
@@ -223,6 +246,9 @@ directional.source.{melee,ranged}
 directional.facing.{Front,Left,Right,Rear}
 directional.keep.{frontal, noPartsOnSide}
 directional.skip.meleeDisabled
+accuracy.mitigation.{applied,factor.weather,factor.weapon}
+evasion.{considered,applied,stationary}
+firingArc.adjusted
 ```
 
 Two are worth watching specifically:

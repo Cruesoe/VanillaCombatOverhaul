@@ -9,6 +9,9 @@ namespace VanillaCombatOverhaul
         /// <summary>Chance to deflect an incoming melee attack with a held weapon.</summary>
         public static StatDef VCO_ParryChance;
 
+        /// <summary>Ability to overcome weapon and weather accuracy penalties.</summary>
+        public static StatDef VCO_AccuracyMitigation;
+
         /// <summary>Reduction to an attacker's chance to hit this pawn while it is moving.</summary>
         public static StatDef VCO_Evasion;
 

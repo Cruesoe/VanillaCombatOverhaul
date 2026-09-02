@@ -121,5 +121,51 @@ namespace VanillaCombatOverhaul
             sb.AppendLine($"=== {passed} of {total} checks passed ===");
             return sb.ToString();
         }
+
+        public static string FormatRangedReport(List<RangedArenaResult> results, List<AssertionResult> selfTests)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== VCO ranged accuracy test ===");
+
+            var passed = 0;
+            var total = 0;
+
+            if (selfTests != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("-- ranged formula checks --");
+                foreach (var a in selfTests)
+                {
+                    sb.AppendLine("  " + a);
+                    total++;
+                    if (a.Passed) { passed++; }
+                }
+            }
+
+            foreach (var r in results)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"-- scenario: {r.Spec.label} --");
+                sb.AppendLine($"  shooter skill {r.Spec.shooterSkill}, distance {r.Spec.distance}, " +
+                              $"target moving {r.Spec.targetMoving}");
+                sb.AppendLine($"  weapon factor raw {r.EquipmentFactor:P3}, mitigated {r.MitigatedEquipmentFactor:P3}, " +
+                              $"expected {r.ExpectedMitigatedEquipment:P3}");
+                sb.AppendLine($"  evasion multiplier {r.EvasionMultiplier:P3}, aim {r.AimOnTarget:P1}");
+
+                foreach (var a in r.Assertions)
+                {
+                    sb.AppendLine("  " + a);
+                    total++;
+                    if (a.Passed) { passed++; }
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine($"=== {passed} of {total} ranged checks passed ===");
+            return sb.ToString();
+        }
+
+        public static List<RangedArenaResult> RunRangedMatrix(Map map, int seed = 0) =>
+            RangedCombatArena.RunMatrix(map, seed);
     }
 }

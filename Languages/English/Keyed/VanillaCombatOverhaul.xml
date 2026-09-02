@@ -48,10 +48,19 @@
   <VCO_MeleeFlanking_Tip>Melee attacks also hit the side they come from, not just guns and bows.</VCO_MeleeFlanking_Tip>
 
   <!-- Ranged -->
+  <VCO_AdvancedAccuracy>Skilled shooters overcome bad weapons and weather</VCO_AdvancedAccuracy>
+  <VCO_AdvancedAccuracy_Tip>A good shooter partially overcomes penalties from a poor weapon at range and from bad weather.\n\nCover, smoke and target size are not affected — only equipment and weather factors.</VCO_AdvancedAccuracy_Tip>
+  <VCO_AccuracyScale>Skill scaling: {0}</VCO_AccuracyScale>
+  <VCO_AccuracyScale_Tip>How strongly shooting skill mitigates weapon and weather penalties.\n\nLower values make each point of skill matter more. Default 5 matches Vanilla Combat Reloaded.</VCO_AccuracyScale_Tip>
+
   <VCO_Evasion>Moving pawns are harder to shoot</VCO_Evasion>
   <VCO_Evasion_Tip>A pawn who is running is harder to hit than one standing still.\n\nStanding still gives no benefit, so this is a trade: move and be safer, or stand and shoot back.</VCO_Evasion_Tip>
-  <VCO_EvasionFactor>How much harder to hit: {0}</VCO_EvasionFactor>
-  <VCO_EvasionFactor_Tip>Higher means running pawns are harder to hit. Lower means movement helps less.</VCO_EvasionFactor_Tip>
+  <VCO_EvasionFactor>Movement evasion per speed step: {0}</VCO_EvasionFactor>
+  <VCO_EvasionFactor_Tip>Each step of movement speed above the minimum multiplies hit chance by this value.\n\nLower means running pawns are harder to hit. Default 0.8 matches Vanilla Combat Reloaded.</VCO_EvasionFactor_Tip>
+  <VCO_EvasionMinSpeed>Minimum speed before evasion applies: {0}</VCO_EvasionMinSpeed>
+  <VCO_EvasionMinSpeed_Tip>Movement speed below this gives no evasion benefit. Default 2.5.</VCO_EvasionMinSpeed_Tip>
+  <VCO_EvasionSkillContest>Skilled shooters track runners better</VCO_EvasionSkillContest>
+  <VCO_EvasionSkillContest_Tip>When advanced accuracy is on, a skilled shooter's evasion mitigation also applies against moving targets.\n\nRequires skilled shooters overcome bad weapons and weather to be enabled.</VCO_EvasionSkillContest_Tip>
 
   <VCO_FiringArc>Missed shots spread out with distance</VCO_FiringArc>
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
@@ -96,6 +105,8 @@
   <!-- Stat explanations -->
   <VCO_StatPart_NoWeapon>No weapon to parry with</VCO_StatPart_NoWeapon>
   <VCO_StatPart_MeleeAbility>Melee ability</VCO_StatPart_MeleeAbility>
+  <VCO_StatPart_ShootingAbility>Shooting ability</VCO_StatPart_ShootingAbility>
+  <VCO_StatPart_Moving>While moving</VCO_StatPart_Moving>
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
 
   <!-- In-world text -->

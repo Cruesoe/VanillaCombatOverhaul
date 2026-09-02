@@ -50,9 +50,14 @@ namespace VanillaCombatOverhaul
         public bool enableMeleeFlanking = Shipped;
 
         // ---- Ranged ------------------------------------------------------------
-        public bool enableEvasion = Unbuilt;
-        public float evasionFactor = 1f;
-        public bool enableFiringArc = Unbuilt;
+        public bool enableAdvancedAccuracy = Shipped;
+        public float accuracyScale = 5f;
+        public bool enableEvasion = Shipped;
+        // Per speed unit above minSpeed; lower means more evasion. VCR default 0.8.
+        public float evasionFactor = 0.8f;
+        public float evasionMinSpeed = 2.5f;
+        public bool evasionSkillContest = true;
+        public bool enableFiringArc = Shipped;
         public float firingArcDegrees = 45f;
 
         // ---- Suppression -------------------------------------------------------
@@ -87,9 +92,13 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableDirectionalDamage, nameof(enableDirectionalDamage), Shipped);
             Scribe_Values.Look(ref enableMeleeFlanking, nameof(enableMeleeFlanking), Shipped);
 
-            Scribe_Values.Look(ref enableEvasion, nameof(enableEvasion), Unbuilt);
-            Scribe_Values.Look(ref evasionFactor, nameof(evasionFactor), 1f);
-            Scribe_Values.Look(ref enableFiringArc, nameof(enableFiringArc), Unbuilt);
+            Scribe_Values.Look(ref enableAdvancedAccuracy, nameof(enableAdvancedAccuracy), Shipped);
+            Scribe_Values.Look(ref accuracyScale, nameof(accuracyScale), 5f);
+            Scribe_Values.Look(ref enableEvasion, nameof(enableEvasion), Shipped);
+            Scribe_Values.Look(ref evasionFactor, nameof(evasionFactor), 0.8f);
+            Scribe_Values.Look(ref evasionMinSpeed, nameof(evasionMinSpeed), 2.5f);
+            Scribe_Values.Look(ref evasionSkillContest, nameof(evasionSkillContest), true);
+            Scribe_Values.Look(ref enableFiringArc, nameof(enableFiringArc), Shipped);
             Scribe_Values.Look(ref firingArcDegrees, nameof(firingArcDegrees), 45f);
 
             Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Unbuilt);
@@ -120,8 +129,6 @@ namespace VanillaCombatOverhaul
         /// </summary>
         public void ForceUnbuiltOff()
         {
-            enableEvasion = Unbuilt;
-            enableFiringArc = Unbuilt;
             enableSuppression = Unbuilt;
             enableAmmo = Unbuilt;
             enableSidearms = Unbuilt;
