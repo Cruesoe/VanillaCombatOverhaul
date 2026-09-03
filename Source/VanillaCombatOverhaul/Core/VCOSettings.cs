@@ -18,9 +18,10 @@ namespace VanillaCombatOverhaul
     /// imply an effect that does not exist -- a toggle a player can enable to no effect is
     /// worse than no toggle at all, because it makes the mod look broken rather than unfinished.
     ///
-    /// Verbose logging is the exception: it is diagnostic scaffolding, on for the test build so
-    /// tester reports come with counters attached, and it comes out before public release along
-    /// with VCODiagnostics itself.
+    /// Verbose logging is diagnostic scaffolding and ships off. A playtester's log should hold
+    /// their own mod list's problems, not a per-hour dump of our counters, and a tester who
+    /// needs one can turn it on in the Diagnostics tab and reproduce. It comes out entirely
+    /// before public release, along with VCODiagnostics itself.
     /// </summary>
     public class VCOSettings : ModSettings
     {
@@ -107,7 +108,7 @@ namespace VanillaCombatOverhaul
         public bool enableApparelTweaks = Shipped;
 
         // ---- Diagnostics -------------------------------------------------------
-        public bool verboseLogging = true;
+        public bool verboseLogging = false;
         // Ticks between automatic diagnostic dumps to the log. 2500 ticks is about one
         // in-game hour. Zero disables the periodic dump without losing the counters.
         public int diagnosticDumpIntervalTicks = 2500;
@@ -167,7 +168,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableArrayHeadsetPatch, nameof(enableArrayHeadsetPatch), Shipped);
             Scribe_Values.Look(ref enableApparelTweaks, nameof(enableApparelTweaks), Shipped);
 
-            Scribe_Values.Look(ref verboseLogging, nameof(verboseLogging), true);
+            Scribe_Values.Look(ref verboseLogging, nameof(verboseLogging), false);
             Scribe_Values.Look(ref diagnosticDumpIntervalTicks, nameof(diagnosticDumpIntervalTicks), 2500);
 
             // A config written by an earlier build could have any of the unbuilt features
