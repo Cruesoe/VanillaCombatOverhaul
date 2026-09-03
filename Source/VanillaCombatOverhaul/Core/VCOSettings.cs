@@ -68,8 +68,10 @@ namespace VanillaCombatOverhaul
         // Vanilla Combat Reloaded ships six miss-spread distributions; 0 is the default.
         public int firingArcType = 0;
         public bool enableVisibleTracers = Shipped;
-        public float tracerLength = 2.2f;
-        public float tracerWidth = 0.14f;
+        // One knob, not two: the streak has one right look, and length and width only ever
+        // wanted to move together. 1 is the shipped size, and the range is the useful span
+        // either side of it rather than everything the draw code can survive.
+        public float tracerScale = 1f;
 
         // ---- Armor -------------------------------------------------------------
         // Leftover stretch and AP compensation. Defaults match Vanilla Combat Reloaded:
@@ -139,8 +141,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref firingArcDegrees, nameof(firingArcDegrees), 45f);
             Scribe_Values.Look(ref firingArcType, nameof(firingArcType), 0);
             Scribe_Values.Look(ref enableVisibleTracers, nameof(enableVisibleTracers), Shipped);
-            Scribe_Values.Look(ref tracerLength, nameof(tracerLength), 2.2f);
-            Scribe_Values.Look(ref tracerWidth, nameof(tracerWidth), 0.14f);
+            Scribe_Values.Look(ref tracerScale, nameof(tracerScale), 1f);
 
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);

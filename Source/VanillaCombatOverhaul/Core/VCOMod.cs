@@ -193,8 +193,7 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
                 if (s.enableVisibleTracers)
                 {
-                    s.tracerLength = Slider(l, "VCO_TracerLength", s.tracerLength, 0.4f, 8f);
-                    s.tracerWidth = Slider(l, "VCO_TracerWidth", s.tracerWidth, 0.04f, 0.5f);
+                    s.tracerScale = Slider(l, "VCO_TracerScale", s.tracerScale, 0.5f, 2f, "0.0");
                 }
             }
 

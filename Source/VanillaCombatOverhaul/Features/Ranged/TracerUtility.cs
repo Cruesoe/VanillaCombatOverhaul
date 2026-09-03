@@ -13,6 +13,10 @@ namespace VanillaCombatOverhaul
     /// </summary>
     public static class TracerUtility
     {
+        // The streak at 1x, in cells. Both dimensions move together off tracerScale.
+        private const float BaseLength = 1.1f;
+        private const float BaseWidth = 0.07f;
+
         private static readonly AccessTools.FieldRef<Projectile, Vector3> Origin =
             AccessTools.FieldRefAccess<Projectile, Vector3>("origin");
 
@@ -37,8 +41,9 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var length = Mathf.Max(settings.tracerLength, 0.4f);
-            var width = Mathf.Clamp(settings.tracerWidth, 0.04f, 0.6f);
+            var sizeScale = Mathf.Clamp(settings.tracerScale, 0.5f, 2f);
+            var length = BaseLength * sizeScale;
+            var width = BaseWidth * sizeScale;
             var dir = travel.normalized;
             var tail = drawLoc - dir * length;
             tail.y = drawLoc.y;
