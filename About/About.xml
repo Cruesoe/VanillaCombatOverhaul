@@ -31,11 +31,29 @@
     <li>Mlie.YayosCombat3</li>
     <li>Donald.VCR</li>
   </incompatibleWith>
-  <description>Depth for vanilla combat, without replacing it.
+  <description>Adds depth to RimWorld's combat without replacing it.
 
-Every feature is toggled individually in mod settings. Mechanics that can be stats are stats, so apparel, hediffs, genes and other mods can influence them.
+MELEE
+- Pawns can parry incoming attacks, and a good parry opens a counter-attack.
+- Hits from the side or behind do more damage.
+- Being outnumbered makes you easier to hit.
+- Attacks aim where the attacker can reach - a short pawn is not swinging at a tall one's head.
 
-Shipped: melee parry and counter, directional damage and height targeting, leftover armor, advanced accuracy, evasion, firing arc, bullet and arrow wound shapes, visible tracers, and Vanilla Combat Reloaded's apparel coverage patches.
+RANGED
+- Shooting skill matters more, and the gap between a good shot and a bad one is wider.
+- Moving targets are harder to hit than standing ones.
+- Missed shots go wide of the target rather than landing anywhere nearby, and spread further at long range.
+- Bullets and arrows wound differently - bullets by force, arrows by cutting deep.
+- Projectiles leave a short glowing trail, so you can see where fire is coming from.
 
-Still on the roadmap: suppression, ammo, sidearms, and loadouts.</description>
+ARMOUR
+- Armour that fails to stop a hit still reduces it, instead of the all-or-nothing vanilla roll.
+- Weapon armour penetration is shown on the weapon.
+
+CLOTHING
+- Gloves and boots protect hands and feet. Masks, helmets and glasses cover the face properly.
+
+Every feature can be turned on or off individually in the mod settings.
+
+Not compatible with Combat Extended, Yayo's Combat, or Vanilla Combat Reloaded.</description>
 </ModMetaData>
