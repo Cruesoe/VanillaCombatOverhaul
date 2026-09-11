@@ -29,17 +29,4 @@ Not compatible with:
 - Auto Arm
 
 Vanilla Combat Reloaded inspired several combat systems, while Auto Arm inspired automatic
-weapon selection. Vanilla Combat Overhaul uses its own implementation of both.
-
-## Installation
-
-Install Harmony, then place this mod after Harmony in the RimWorld mod list. Existing saves
-can use the mod; apparel coverage changes require restarting RimWorld after changing them.
-
-## Building from source
-
-```powershell
-dotnet build Source\VanillaCombatOverhaul\VanillaCombatOverhaul.csproj -c Release
-```
-
-The compiled assembly is written to `1.6/Assemblies/`.
+weapon selection.
