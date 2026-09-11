@@ -196,45 +196,10 @@ namespace VanillaCombatOverhaul
                     s.tracerScale = Slider(l, "VCO_TracerScale", s.tracerScale, 0.5f, 2f, "0.0");
                 }
             }
-
-            if (Section(l, "VCO_Section_Suppression"))
-            {
-                Toggle(l, "VCO_Suppression", ref s.enableSuppression, implemented: false);
-                if (s.enableSuppression)
-                {
-                    s.suppressionBuildRate = Slider(l, "VCO_SuppressionRate", s.suppressionBuildRate, 0.1f, 3f);
-                }
-            }
         }
 
         private static void DrawEquipment(Listing_Standard l, VCOSettings s)
         {
-            if (Section(l, "VCO_Section_Ammo"))
-            {
-                l.Label("VCO_Ammo_Intro".Translate());
-                l.Gap(6f);
-                Toggle(l, "VCO_Ammo", ref s.enableAmmo, restartRequired: true, implemented: false);
-                if (s.enableAmmo)
-                {
-                    s.ammoYieldFactor = Slider(l, "VCO_AmmoYield", s.ammoYieldFactor, 0.1f, 5f);
-                }
-            }
-
-            if (Section(l, "VCO_Section_Carrying"))
-            {
-                Toggle(l, "VCO_Sidearms", ref s.enableSidearms, implemented: false);
-                if (s.enableSidearms)
-                {
-                    s.sidearmSwapTicksPerMass = Slider(l, "VCO_SidearmSwapTicks",
-                                                       s.sidearmSwapTicksPerMass, 10f, 180f, "0");
-                }
-                if (SidearmUtility.ConflictingMod != null)
-                {
-                    l.Label("VCO_Sidearms_Conflict".Translate(SidearmUtility.ConflictingMod));
-                }
-                Toggle(l, "VCO_Loadouts", ref s.enableLoadouts, implemented: false);
-            }
-
             if (Section(l, "VCO_Section_Apparel"))
             {
                 l.Label("VCO_Apparel_Intro".Translate());
@@ -321,9 +286,6 @@ namespace VanillaCombatOverhaul
 
         // --------------------------------------------------------------- helpers
 
-        /// <summary>Grey used for options that have no implementation behind them yet.</summary>
-        private static readonly Color DisabledColour = new Color(1f, 1f, 1f, 0.45f);
-
         /// <summary>
         /// Clickable foldout heading. Returns true while the body should be drawn.
         /// Starts collapsed so every heading on a tab is visible without scrolling.
@@ -362,36 +324,14 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>
-        /// A labelled checkbox. Every option carries a plain-language tooltip; options with no
-        /// implementation behind them yet say so on the label, so a toggle can never imply an
-        /// effect it does not have.
+        /// A labelled checkbox. Every option carries a plain-language tooltip.
         /// </summary>
         private static void Toggle(Listing_Standard l, string key, ref bool value,
-                                   bool restartRequired = false, bool implemented = true)
+                                   bool restartRequired = false)
         {
             var label = key.Translate().ToString();
             var tip = (key + "_Tip").Translate().ToString();
 
-            if (!implemented)
-            {
-                // Drawn greyed and inert rather than merely labelled. A switch that moves but
-                // does nothing reads as a broken feature; one that cannot move reads as an
-                // unfinished one, which is the truth.
-                var unbuilt = false;
-                var row = l.GetRect(Text.LineHeight);
-                var previous = GUI.color;
-                GUI.color = DisabledColour;
-                Widgets.CheckboxLabeled(row, label + "  " + "VCO_NotImplemented".Translate(),
-                                        ref unbuilt, disabled: true);
-                GUI.color = previous;
-                TooltipHandler.TipRegion(row, tip + "\n\n" + "VCO_NotImplemented_Tip".Translate());
-                Widgets.DrawHighlightIfMouseover(row);
-
-                // The caller still holds a ref to the real field, and the roadmap features
-                // gate XML patching, so it is pinned off rather than merely left alone.
-                value = false;
-                return;
-            }
             if (restartRequired)
             {
                 label += "  " + "VCO_RestartTag".Translate();

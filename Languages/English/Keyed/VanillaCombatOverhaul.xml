@@ -5,7 +5,7 @@
 
   <!-- Tabs -->
   <VCO_Tab_Combat>Combat</VCO_Tab_Combat>
-  <VCO_Tab_Equipment>Equipment</VCO_Tab_Equipment>
+  <VCO_Tab_Equipment>Apparel</VCO_Tab_Equipment>
   <VCO_Tab_Diagnostics>Diagnostics</VCO_Tab_Diagnostics>
 
   <!-- Section headers -->
@@ -14,15 +14,10 @@
   <VCO_Section_Damage>Damage and hit location</VCO_Section_Damage>
   <VCO_Section_Ranged>Ranged</VCO_Section_Ranged>
   <VCO_Section_Tracers>Tracers</VCO_Section_Tracers>
-  <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
-  <VCO_Section_Ammo>Ammunition</VCO_Section_Ammo>
-  <VCO_Section_Carrying>Carrying weapons</VCO_Section_Carrying>
   <VCO_Section_Logging>Logging</VCO_Section_Logging>
   <VCO_Section_PatchStatus>Patch status</VCO_Section_PatchStatus>
 
   <!-- Badges -->
-  <VCO_NotImplemented>(NOT YET BUILT)</VCO_NotImplemented>
-  <VCO_NotImplemented_Tip>This feature is on the roadmap but is not written yet, so the switch is locked off. It will unlock in a later version. Nothing in your game is affected by it today.</VCO_NotImplemented_Tip>
   <VCO_RestartTag>[needs restart]</VCO_RestartTag>
   <VCO_RestartTag_Tip>This one changes how the game loads its data, so it only takes effect after you close and reopen RimWorld.</VCO_RestartTag_Tip>
   <VCO_RestartNeeded>Restart RimWorld for this setting to take effect.</VCO_RestartNeeded>
@@ -104,24 +99,6 @@
   <VCO_TracerScale>Tracer size: {0}x</VCO_TracerScale>
   <VCO_TracerScale_Tip>How big the streak is, as a multiple of the default. Length and thickness scale together.\n\nLeave this at 1 unless the streaks read too heavy or too faint at the zoom you play at.</VCO_TracerScale_Tip>
 
-  <VCO_Suppression>Being shot at pins pawns down</VCO_Suppression>
-  <VCO_Suppression_Tip>Pawns under sustained fire get rattled and try to take cover instead of standing in the open trading shots.\n\nThis makes covering fire useful even when it does not hit anything.</VCO_Suppression_Tip>
-  <VCO_SuppressionRate>How quickly pawns get pinned: {0}</VCO_SuppressionRate>
-  <VCO_SuppressionRate_Tip>Higher means it takes less incoming fire to pin someone down.</VCO_SuppressionRate_Tip>
-
-  <!-- Ammo -->
-  <VCO_Ammo_Intro>Ammunition is grouped into a few simple types by tech level and damage, rather than a separate calibre for every gun. That means weapons from other mods work automatically, with no compatibility patch needed.</VCO_Ammo_Intro>
-  <VCO_Ammo>Guns and bows need ammunition</VCO_Ammo>
-  <VCO_Ammo_Tip>Ranged weapons use up ammunition when fired, and have to be reloaded.\n\nWhich ammunition a weapon needs is worked out from its tech level and damage type, so a flamethrower wants a different type than a rifle.</VCO_Ammo_Tip>
-  <VCO_AmmoYield>Ammunition made per craft: {0}</VCO_AmmoYield>
-  <VCO_AmmoYield_Tip>Multiplies how much ammunition you get from one crafting job. Raise it if making ammo feels too slow.</VCO_AmmoYield_Tip>
-
-  <!-- Carrying -->
-  <VCO_Sidearms>Pawns can carry a backup weapon</VCO_Sidearms>
-  <VCO_Sidearms_Tip>Pawns can carry extra weapons in their inventory and switch to them, so a sniper can pull out a knife when something reaches them.</VCO_Sidearms_Tip>
-  <VCO_Loadouts>Pawns keep themselves stocked</VCO_Loadouts>
-  <VCO_Loadouts_Tip>Set what each pawn should be carrying, and they will go and collect it themselves instead of you hauling things to them by hand.</VCO_Loadouts_Tip>
-
   <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
   <VCO_Apparel_Intro>These are Vanilla Combat Reloaded's coverage and layering patches. They change how vanilla and DLC apparel sits on the body. Each one needs a restart except improved headgear layering.</VCO_Apparel_Intro>
   <VCO_HandFeetPatch>Armour on arms or legs also covers hands or feet</VCO_HandFeetPatch>
@@ -179,9 +156,6 @@
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
 
   <!-- Sidearms -->
-  <VCO_SidearmSwapTicks>Time to draw a weapon: {0} ticks per unit of mass</VCO_SidearmSwapTicks>
-  <VCO_SidearmSwapTicks_Tip>How long swapping weapons takes. A heavier weapon takes longer, and a pawn with damaged hands is slower still.\n\n60 ticks is one second, so at the default a revolver takes about a second and a half to bring up. Lower this if you want swapping to be a reflex; raise it if you want it to be a commitment.</VCO_SidearmSwapTicks_Tip>
-  <VCO_Sidearms_Conflict>Switched off: {0} is installed and already manages carried weapons. Two mods doing that at once lose weapons, so this one stands down. Nothing else in VCO is affected.</VCO_Sidearms_Conflict>
   <VCO_CarryAsSidearm>Carry {0} as sidearm</VCO_CarryAsSidearm>
   <VCO_CarryAsSidearmReplacing>Carry {0} as sidearm (replaces {1})</VCO_CarryAsSidearmReplacing>
   <VCO_CannotCarryAsSidearm>Cannot carry {0} as sidearm</VCO_CannotCarryAsSidearm>

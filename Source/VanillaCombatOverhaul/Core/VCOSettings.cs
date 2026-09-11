@@ -13,10 +13,8 @@ namespace VanillaCombatOverhaul
     /// <summary>
     /// Defaults are set per feature, not by one global switch.
     ///
-    /// A feature defaults ON only once it is built and verified by the arena suite. Everything
-    /// still on the roadmap defaults OFF and is locked off in the UI, so a switch can never
-    /// imply an effect that does not exist -- a toggle a player can enable to no effect is
-    /// worse than no toggle at all, because it makes the mod look broken rather than unfinished.
+    /// A feature defaults ON only once it is built and verified by the arena suite. Work in
+    /// progress is kept out of the settings screen until it is ready for players.
     ///
     /// Verbose logging is diagnostic scaffolding and ships off. A playtester's log should hold
     /// their own mod list's problems, not a per-hour dump of our counters, and a tester who
@@ -81,21 +79,11 @@ namespace VanillaCombatOverhaul
         public float armorScale = 2f;
         public float penetrationScale = 2f;
 
-        // ---- Suppression -------------------------------------------------------
-        public bool enableSuppression = Unbuilt;
-        public float suppressionBuildRate = 1f;
-
-        // ---- Ammo --------------------------------------------------------------
-        public bool enableAmmo = Unbuilt;
-        public float ammoYieldFactor = 1f;
-
-        // ---- Loadout / sidearms ------------------------------------------------
+        // ---- Sidearms (test-only until the player-facing controls are complete) ----------
         public bool enableSidearms = Unbuilt;
         // Ticks per unit of weapon mass, divided by the pawn's VCO_WeaponSwapSpeed. A revolver
         // (mass 1.4) is about a second and a half at 60; a minigun (mass 20) is most of a fight.
         public float sidearmSwapTicksPerMass = 60f;
-        public bool enableLoadouts = Unbuilt;
-
         // ---- Apparel / coverage (VCR XML pack) ---------------------------------
         public bool enableHandFeetPatch = Shipped;
         public bool enableAcidHeatPatch = Shipped;
@@ -148,15 +136,8 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
 
-            Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Unbuilt);
-            Scribe_Values.Look(ref suppressionBuildRate, nameof(suppressionBuildRate), 1f);
-
-            Scribe_Values.Look(ref enableAmmo, nameof(enableAmmo), Unbuilt);
-            Scribe_Values.Look(ref ammoYieldFactor, nameof(ammoYieldFactor), 1f);
-
             Scribe_Values.Look(ref enableSidearms, nameof(enableSidearms), Unbuilt);
             Scribe_Values.Look(ref sidearmSwapTicksPerMass, nameof(sidearmSwapTicksPerMass), 60f);
-            Scribe_Values.Look(ref enableLoadouts, nameof(enableLoadouts), Unbuilt);
 
             Scribe_Values.Look(ref enableHandFeetPatch, nameof(enableHandFeetPatch), Shipped);
             Scribe_Values.Look(ref enableAcidHeatPatch, nameof(enableAcidHeatPatch), Shipped);
@@ -187,10 +168,7 @@ namespace VanillaCombatOverhaul
         /// </summary>
         public void ForceUnbuiltOff()
         {
-            enableSuppression = Unbuilt;
-            enableAmmo = Unbuilt;
             enableSidearms = Unbuilt;
-            enableLoadouts = Unbuilt;
         }
 
         /// <summary>
@@ -202,10 +180,6 @@ namespace VanillaCombatOverhaul
             if (enableDirectionalDamage)
             {
                 yield return "DirectionalDamage";
-            }
-            if (enableAmmo)
-            {
-                yield return "Ammo";
             }
             if (enableHandFeetPatch)
             {
