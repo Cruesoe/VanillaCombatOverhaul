@@ -191,8 +191,8 @@ namespace VanillaCombatOverhaul
 
         /// <summary>
         /// The chance actually rolled should match the documented formula for these two skill
-        /// levels. Front and side factors are equal by default, so every sampled roll shares
-        /// one expected value.
+        /// levels. Arena opponents face one another, so every sampled roll uses the frontal
+        /// factor and shares one expected value.
         /// </summary>
         private static void AssertChanceMatchesCurve(MeleeArenaResult r)
         {

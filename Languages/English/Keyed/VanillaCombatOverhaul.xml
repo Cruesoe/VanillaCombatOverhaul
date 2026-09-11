@@ -6,7 +6,6 @@
   <!-- Tabs -->
   <VCO_Tab_Combat>Combat</VCO_Tab_Combat>
   <VCO_Tab_Equipment>Equipment</VCO_Tab_Equipment>
-  <VCO_Tab_Diagnostics>Diagnostics</VCO_Tab_Diagnostics>
 
   <!-- Section headers -->
   <VCO_Section_Melee>Melee</VCO_Section_Melee>
@@ -14,8 +13,6 @@
   <VCO_Section_Damage>Damage and hit location</VCO_Section_Damage>
   <VCO_Section_Ranged>Ranged</VCO_Section_Ranged>
   <VCO_Section_Tracers>Tracers</VCO_Section_Tracers>
-  <VCO_Section_Logging>Logging</VCO_Section_Logging>
-  <VCO_Section_PatchStatus>Patch status</VCO_Section_PatchStatus>
 
   <!-- Badges -->
   <VCO_RestartTag>[needs restart]</VCO_RestartTag>
@@ -30,7 +27,7 @@
   <VCO_ParryFrontFactor_Tip>How easy it is to parry someone attacking you face to face.\n\nHigher means more parries. Lower means fewer.</VCO_ParryFrontFactor_Tip>
 
   <VCO_ParrySideFactor>Parrying attacks from the side: {0}</VCO_ParrySideFactor>
-  <VCO_ParrySideFactor_Tip>How easy it is to parry someone attacking from your left or right.\n\nBy default this is the same as the front, so being flanked does not stop you parrying. Lower it if you want getting to someone's side to be a real advantage.</VCO_ParrySideFactor_Tip>
+  <VCO_ParrySideFactor_Tip>How easy it is to parry someone attacking from your left or right.\n\nThe default is 1.25, lower than the frontal value of 1.5, so gaining a flank weakens parries without preventing them outright.</VCO_ParrySideFactor_Tip>
 
   <VCO_ParryBudget>Most parries per second: {0}</VCO_ParryBudget>
   <VCO_ParryBudget_Tip>The most attacks one pawn can parry in a single second, no matter how skilled they are.\n\nThis stops one great fighter from holding off a whole crowd forever. It only starts to matter at roughly five or more attackers at once.</VCO_ParryBudget_Tip>
@@ -65,6 +62,8 @@
   <VCO_CommandSetHeight_Tip>Weight incoming hits toward this height band. None is vanilla, any height.</VCO_CommandSetHeight_Tip>
 
   <VCO_Section_Wounds>Projectile wounds</VCO_Section_Wounds>
+  <VCO_ProjectileWounds>Distinct bullet and arrow wounds</VCO_ProjectileWounds>
+  <VCO_ProjectileWounds_Tip>Bullets fragment, pass through or mushroom according to their stopping power. Arrows can stab inward or slice across adjacent outer parts.</VCO_ProjectileWounds_Tip>
   <VCO_BulletWorker>Bullets fragment, pass through or mushroom</VCO_BulletWorker>
   <VCO_BulletWorker_Tip>Stopping power shapes the wound instead of only staggering small pawns.\n\nBelow 1 (pistols): the round fragments across nearby parts.\n1 to 1.5 (rifles): it passes through from the organ to the outer part covering it.\nAbove 1.5: it mushrooms, dumping extra damage into one part.\n\nA vest that already reduced the hit cancels all of this, so armor that catches the round also stops the extra trick.</VCO_BulletWorker_Tip>
   <VCO_BulletStoppingPowerCap>Stopping power cap: {0}</VCO_BulletStoppingPowerCap>
@@ -100,6 +99,8 @@
   <VCO_TracerScale_Tip>How big the streak is, as a multiple of the default. Length and thickness scale together.\n\nLeave this at 1 unless the streaks read too heavy or too faint at the zoom you play at.</VCO_TracerScale_Tip>
 
   <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
+  <VCO_ApparelCoverage>Improved apparel coverage and layering</VCO_ApparelCoverage>
+  <VCO_ApparelCoverage_Tip>Applies the complete coverage pack: sensible protection for hands, feet and faces; corrected acid and thump armour types; and improved layering for glasses, masks, helmets and headsets.</VCO_ApparelCoverage_Tip>
   <VCO_Apparel_Intro>These are Vanilla Combat Reloaded's coverage and layering patches. They change how vanilla and DLC apparel sits on the body. Each one needs a restart except improved headgear layering.</VCO_Apparel_Intro>
   <VCO_HandFeetPatch>Armour on arms or legs also covers hands or feet</VCO_HandFeetPatch>
   <VCO_HandFeetPatch_Tip>Arm and leg armour also covers hands and feet. Gloves and boots that only cover those parts move to a layer that can be worn with the armour. Needs a restart.</VCO_HandFeetPatch_Tip>
@@ -142,37 +143,12 @@
   <VCO_TargetDodgeChance>Target dodge chance: {0}</VCO_TargetDodgeChance>
   <VCO_TargetParryChance>Enemy parry chance: {0}</VCO_TargetParryChance>
 
-  <!-- Diagnostics -->
-  <VCO_Section_Counters>Activity counters</VCO_Section_Counters>
-  <VCO_VerboseLogging>Verbose logging and activity counters</VCO_VerboseLogging>
-  <VCO_VerboseLogging_Tip>Confirms on startup that everything hooked in correctly, and counts how often each part of the mod actually fires.\n\nThis is here to help tune the mod while it is being built. It costs nothing noticeable, but there is no reason to leave it on once you are just playing.</VCO_VerboseLogging_Tip>
-  <VCO_DumpInterval>Write counters to the log every: {0} ticks</VCO_DumpInterval>
-  <VCO_DumpInterval_Tip>How often the counters below are also written to the debug log, so a session leaves a record behind.\n\n2500 ticks is about one in-game hour. Set to 0 to stop the automatic writing without losing the counters.</VCO_DumpInterval_Tip>
-  <VCO_Counters_Intro>How often each part of the mod has fired since the counters were last reset. Rejection reasons show why a parry did not happen, which is usually more informative than the success count on its own.</VCO_Counters_Intro>
-  <VCO_Counters_Disabled>Counters are off. Switch on verbose logging above to start collecting.</VCO_Counters_Disabled>
-  <VCO_Counters_Empty>Nothing recorded yet. Counters fill up once combat happens.</VCO_Counters_Empty>
-  <VCO_Counters_Write>Write to log now</VCO_Counters_Write>
-  <VCO_Counters_Reset>Reset counters</VCO_Counters_Reset>
-  <VCO_Counters_Written>Diagnostics written to the log.</VCO_Counters_Written>
-  <VCO_Diagnostics_Intro>This mod changes some of RimWorld's own code to work. If a game update or another mod changes that code first, a change can quietly stop applying. Anything listed as broken here means the feature behind it is not working.</VCO_Diagnostics_Intro>
-  <VCO_NoGuardedPatches>Nothing to report. This mod currently hooks into RimWorld only in ways that cannot silently fail, so there is nothing here that needs watching.</VCO_NoGuardedPatches>
-  <VCO_PatchOk>OK</VCO_PatchOk>
-  <VCO_PatchBroken>BROKEN - applied {0} of {1}</VCO_PatchBroken>
-
   <!-- Stat explanations -->
   <VCO_StatPart_NoWeapon>No weapon to parry with</VCO_StatPart_NoWeapon>
   <VCO_StatPart_MeleeAbility>Melee ability</VCO_StatPart_MeleeAbility>
   <VCO_StatPart_ShootingAbility>Shooting ability</VCO_StatPart_ShootingAbility>
   <VCO_StatPart_Moving>While moving</VCO_StatPart_Moving>
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
-
-  <!-- Sidearms -->
-  <VCO_CarryAsSidearm>Carry {0} as sidearm</VCO_CarryAsSidearm>
-  <VCO_CarryAsSidearmReplacing>Carry {0} as sidearm (replaces {1})</VCO_CarryAsSidearmReplacing>
-  <VCO_CannotCarryAsSidearm>Cannot carry {0} as sidearm</VCO_CannotCarryAsSidearm>
-  <VCO_Sidearm_CannotEquip>cannot be equipped</VCO_Sidearm_CannotEquip>
-  <VCO_Job_TakeSidearm>taking {0} as a sidearm.</VCO_Job_TakeSidearm>
-  <VCO_Job_SwapWeapon>swapping weapons.</VCO_Job_SwapWeapon>
 
   <!-- In-world text -->
   <VCO_Mote_Parried>Parried!</VCO_Mote_Parried>

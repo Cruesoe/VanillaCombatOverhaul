@@ -82,9 +82,11 @@ namespace VanillaCombatOverhaul
         public static bool IsUpgrade(float currentScore, float candidateScore,
             float requiredRatio, bool currentAllowed)
         {
+            var requiredScore = currentScore * Mathf.Max(requiredRatio, 1f);
+            var comparisonTolerance = Mathf.Max(1f, Mathf.Abs(requiredScore)) * 0.000001f;
             return candidateScore > 0f
                    && (!currentAllowed || currentScore <= 0f
-                       || candidateScore >= currentScore * Mathf.Max(requiredRatio, 1f));
+                       || candidateScore >= requiredScore - comparisonTolerance);
         }
     }
 }

@@ -9,6 +9,20 @@ namespace VanillaCombatOverhaul
     {
         private static readonly Dictionary<int, int> RetryAfterTick = new Dictionary<int, int>();
 
+        /// <summary>
+        /// MainColonistBehaviorCore places this node under a ThinkNode_PrioritySorter. Every
+        /// direct child of that sorter must report a priority or RimWorld discards it without
+        /// calling TryGiveJob. Keep automatic equipment just above ordinary scheduled work
+        /// (which reaches 9), but below urgent food (9.5).
+        /// </summary>
+        public override float GetPriority(Pawn pawn)
+        {
+            var settings = VCOMod.Settings;
+            return settings != null && settings.enableAutoEquip && CanConsiderEquipment(pawn)
+                ? 9.25f
+                : 0f;
+        }
+
         protected override Job TryGiveJob(Pawn pawn)
         {
             var settings = VCOMod.Settings;
@@ -25,10 +39,6 @@ namespace VanillaCombatOverhaul
 
             var now = Find.TickManager.TicksGame;
             if (RetryAfterTick.TryGetValue(pawn.thingIDNumber, out var retry) && now < retry)
-            {
-                return null;
-            }
-            if (!pawn.IsHashIntervalTick(current == null ? 60 : 600))
             {
                 return null;
             }

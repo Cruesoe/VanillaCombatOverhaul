@@ -53,10 +53,6 @@ namespace VanillaCombatOverhaul
         {
             var s = Settings;
 
-            // Belt and braces alongside the load-time reset: whatever a config file or an
-            // earlier build left behind, a roadmap feature is never shown as enabled.
-            s.ForceUnbuiltOff();
-
             var tabAnchor = new Rect(inRect.x, inRect.y + TabDrawer.TabHeight, inRect.width, 0f);
             var body = new Rect(inRect.x, inRect.y + TabDrawer.TabHeight, inRect.width,
                                 inRect.height - TabDrawer.TabHeight);
@@ -65,8 +61,7 @@ namespace VanillaCombatOverhaul
             TabDrawer.DrawTabs(tabAnchor, new List<TabRecord>
             {
                 Tab("VCO_Tab_Combat", SettingsTab.Combat),
-                Tab("VCO_Tab_Equipment", SettingsTab.Equipment),
-                Tab("VCO_Tab_Diagnostics", SettingsTab.Diagnostics)
+                Tab("VCO_Tab_Equipment", SettingsTab.Equipment)
             });
 
             if (s.CurrentTab != drawnTab)
@@ -99,9 +94,6 @@ namespace VanillaCombatOverhaul
                 case SettingsTab.Equipment:
                     DrawEquipment(l, s);
                     break;
-                case SettingsTab.Diagnostics:
-                    DrawDiagnostics(l, s);
-                    break;
                 default:
                     DrawCombat(l, s);
                     break;
@@ -124,10 +116,6 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_Parry", ref s.enableParry);
                 if (s.enableParry)
                 {
-                    s.parryFrontFactor = Slider(l, "VCO_ParryFrontFactor", s.parryFrontFactor, 0.1f, 5f);
-                    s.parrySideFactor = Slider(l, "VCO_ParrySideFactor", s.parrySideFactor, 0f, 5f);
-                    s.parryBudgetPerWindow = Mathf.RoundToInt(
-                        Slider(l, "VCO_ParryBudget", s.parryBudgetPerWindow, 1f, 6f, "0"));
                     Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
                 }
             }
@@ -135,13 +123,6 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Armor"))
             {
                 Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
-                if (s.enableAdvancedArmor)
-                {
-                    var thresholdPct = 200f / Mathf.Max(s.armorScale, 0.001f);
-                    thresholdPct = Slider(l, "VCO_ArmorThreshold", thresholdPct, 40f, 200f, "0");
-                    s.armorScale = 200f / Mathf.Max(thresholdPct, 1f);
-                    s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 5f);
-                }
             }
 
             if (Section(l, "VCO_Section_Damage"))
@@ -156,45 +137,22 @@ namespace VanillaCombatOverhaul
 
             if (Section(l, "VCO_Section_Wounds"))
             {
-                Toggle(l, "VCO_BulletWorker", ref s.enableBulletWorker);
-                if (s.enableBulletWorker)
+                var enabled = s.enableBulletWorker || s.enableArrowWorker;
+                var before = enabled;
+                Toggle(l, "VCO_ProjectileWounds", ref enabled);
+                if (enabled != before)
                 {
-                    s.bulletStoppingPowerCap = Slider(l, "VCO_BulletStoppingPowerCap",
-                        s.bulletStoppingPowerCap, 1f, 20f, "0");
+                    s.enableBulletWorker = enabled;
+                    s.enableArrowWorker = enabled;
                 }
-                Toggle(l, "VCO_ArrowWorker", ref s.enableArrowWorker);
             }
 
             if (Section(l, "VCO_Section_Ranged"))
             {
                 Toggle(l, "VCO_AdvancedAccuracy", ref s.enableAdvancedAccuracy);
-                if (s.enableAdvancedAccuracy)
-                {
-                    s.accuracyScale = Slider(l, "VCO_AccuracyScale", s.accuracyScale, 1f, 60f, "0");
-                }
                 Toggle(l, "VCO_Evasion", ref s.enableEvasion);
-                if (s.enableEvasion)
-                {
-                    s.evasionFactor = Slider(l, "VCO_EvasionFactor", s.evasionFactor, 0.01f, 1f);
-                    s.evasionMinSpeed = Slider(l, "VCO_EvasionMinSpeed", s.evasionMinSpeed, 0f, 30f);
-                    Toggle(l, "VCO_EvasionSkillContest", ref s.evasionSkillContest);
-                }
                 Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
-                if (s.enableFiringArc)
-                {
-                    s.firingArcDegrees = Slider(l, "VCO_FiringArcDegrees", s.firingArcDegrees, 1f, 179f, "0");
-                    s.firingArcType = Mathf.RoundToInt(
-                        Slider(l, "VCO_FiringArcType", s.firingArcType, 0f, 5f, "0"));
-                }
-            }
-
-            if (Section(l, "VCO_Section_Tracers"))
-            {
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
-                if (s.enableVisibleTracers)
-                {
-                    s.tracerScale = Slider(l, "VCO_TracerScale", s.tracerScale, 0.5f, 2f, "0.0");
-                }
             }
         }
 
@@ -205,94 +163,27 @@ namespace VanillaCombatOverhaul
                 l.Label("VCO_AutoEquip_Intro".Translate());
                 l.Gap(6f);
                 Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip);
-                if (s.enableAutoEquip)
-                {
-                    var margin = (s.autoEquipUpgradeThreshold - 1f) * 100f;
-                    margin = Slider(l, "VCO_AutoEquipUpgradeMargin", margin, 1f, 50f, "0");
-                    s.autoEquipUpgradeThreshold = 1f + margin / 100f;
-                }
             }
 
             if (Section(l, "VCO_Section_Apparel"))
             {
-                l.Label("VCO_Apparel_Intro".Translate());
-                l.Gap(6f);
-                Toggle(l, "VCO_HandFeetPatch", ref s.enableHandFeetPatch, restartRequired: true);
-                Toggle(l, "VCO_AcidHeatPatch", ref s.enableAcidHeatPatch, restartRequired: true);
-                Toggle(l, "VCO_ThumpBluntPatch", ref s.enableThumpBluntPatch, restartRequired: true);
-                Toggle(l, "VCO_GlassesHelmetPatch", ref s.enableGlassesHelmetPatch, restartRequired: true);
-                Toggle(l, "VCO_NoseMouthPatch", ref s.enableNoseMouthPatch, restartRequired: true);
-                Toggle(l, "VCO_MaskPatch", ref s.enableMaskPatch, restartRequired: true);
-                Toggle(l, "VCO_HeadsetPatch", ref s.enableHeadsetPatch, restartRequired: true);
-                Toggle(l, "VCO_ArrayHeadsetPatch", ref s.enableArrayHeadsetPatch, restartRequired: true);
-                Toggle(l, "VCO_ApparelTweaks", ref s.enableApparelTweaks);
-            }
-        }
-
-        private static void DrawDiagnostics(Listing_Standard l, VCOSettings s)
-        {
-            if (Section(l, "VCO_Section_Logging"))
-            {
-                Toggle(l, "VCO_VerboseLogging", ref s.verboseLogging);
-                if (s.verboseLogging)
+                var enabled = s.enableHandFeetPatch || s.enableAcidHeatPatch || s.enableThumpBluntPatch
+                              || s.enableGlassesHelmetPatch || s.enableNoseMouthPatch
+                              || s.enableMaskPatch || s.enableHeadsetPatch
+                              || s.enableArrayHeadsetPatch || s.enableApparelTweaks;
+                var before = enabled;
+                Toggle(l, "VCO_ApparelCoverage", ref enabled, restartRequired: true);
+                if (enabled != before)
                 {
-                    s.diagnosticDumpIntervalTicks = Mathf.RoundToInt(
-                        Slider(l, "VCO_DumpInterval", s.diagnosticDumpIntervalTicks, 0f, 15000f, "0"));
-                }
-            }
-
-            if (Section(l, "VCO_Section_Counters"))
-            {
-                l.Label("VCO_Counters_Intro".Translate());
-                l.Gap(6f);
-
-                if (!s.verboseLogging)
-                {
-                    l.Label("VCO_Counters_Disabled".Translate());
-                }
-                else if (!VCODiagnostics.HasData)
-                {
-                    l.Label("VCO_Counters_Empty".Translate());
-                }
-                else
-                {
-                    foreach (var line in VCODiagnostics.Lines())
-                    {
-                        var row = l.GetRect(Text.LineHeight);
-                        Widgets.Label(row.LeftPart(0.55f), line.Key);
-                        Widgets.Label(row.RightPart(0.45f), line.Value);
-                    }
-                    l.Gap(8f);
-
-                    var buttons = l.GetRect(30f);
-                    if (Widgets.ButtonText(buttons.LeftHalf().ContractedBy(2f), "VCO_Counters_Write".Translate()))
-                    {
-                        VCODiagnostics.WriteReport();
-                        Messages.Message("VCO_Counters_Written".Translate(), MessageTypeDefOf.TaskCompletion, false);
-                    }
-                    if (Widgets.ButtonText(buttons.RightHalf().ContractedBy(2f), "VCO_Counters_Reset".Translate()))
-                    {
-                        VCODiagnostics.Reset();
-                    }
-                }
-            }
-
-            if (Section(l, "VCO_Section_PatchStatus"))
-            {
-                l.Label("VCO_Diagnostics_Intro".Translate());
-                l.Gap(6f);
-
-                var any = false;
-                foreach (var guard in PatchGuard.All)
-                {
-                    l.Label(guard.Id + ": " + (guard.Satisfied
-                        ? "VCO_PatchOk".Translate()
-                        : "VCO_PatchBroken".Translate(guard.Actual, guard.Expected)));
-                    any = true;
-                }
-                if (!any)
-                {
-                    l.Label("VCO_NoGuardedPatches".Translate());
+                    s.enableHandFeetPatch = enabled;
+                    s.enableAcidHeatPatch = enabled;
+                    s.enableThumpBluntPatch = enabled;
+                    s.enableGlassesHelmetPatch = enabled;
+                    s.enableNoseMouthPatch = enabled;
+                    s.enableMaskPatch = enabled;
+                    s.enableHeadsetPatch = enabled;
+                    s.enableArrayHeadsetPatch = enabled;
+                    s.enableApparelTweaks = enabled;
                 }
             }
         }
@@ -359,12 +250,5 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>A labelled slider; the label carries the tooltip.</summary>
-        private static float Slider(Listing_Standard l, string key, float value,
-                                    float min, float max, string format = "0.00")
-        {
-            l.Label(key.Translate(value.ToString(format)), -1f, (key + "_Tip").Translate());
-            return l.Slider(value, min, max);
-        }
     }
 }

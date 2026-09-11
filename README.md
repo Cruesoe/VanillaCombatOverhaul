@@ -23,8 +23,7 @@ Shipped and verified in-game:
 | **Automatic primary weapons** | Colonists choose from the weapons allowed by their assigned policy. Damage, cycle time, accuracy, penetration, condition and pawn skills affect the choice; a configurable upgrade margin prevents churn. |
 
 On the roadmap, locked off in settings until built: suppression, ammo as tech-tier buckets,
-and full item loadouts. Automatic primary-weapon selection is shipped; sidearms are built but
-paused and stay locked off — Simple Sidearms owns that space, and VCO stands down whenever it is loaded.
+and full item loadouts. Automatic primary-weapon selection is shipped separately.
 
 ## Vanilla Combat Reloaded coverage
 
@@ -47,7 +46,6 @@ beam damage worker is commented out in 1.6 and was not ported.
 VCO-only: parry budget, counter-attack, visible tracers, automatic primary weapons, combat
 StatDefs, PatchGuard, and the arena suite. Still to build, and not in Reloaded either:
 suppression, ammo, and full item loadouts.
-Sidearms are built but dormant.
 
 ## What Vanilla Combat Reloaded gets wrong
 
@@ -96,7 +94,7 @@ player has installed.
    (`CombatContext`). Reads outside a scope return "no data" rather than a stale value.
 5. **Every transpiler is verified.** A Harmony transpiler that misses its target silently does
    nothing. Every one of ours declares a `PatchGuard` and asserts its splice count on startup;
-   failures are logged loudly and shown in the Diagnostics settings tab.
+   failures are logged loudly for troubleshooting.
 6. **Generic categories over per-item patches.** Ammo uses tech-tier buckets, not calibers, so
    an unrecognised modded gun falls into a bucket instead of needing a compatibility patch.
 
@@ -217,7 +215,6 @@ duplicate rather than updating the original.
 | Automatic primary weapons | Shipped. Policy filter, skill-aware scoring, manual locks, and upgrade hysteresis |
 | Suppression | Not started |
 | Ammo (tech-tier buckets) | Not started |
-| Sidearms | Paused. Phase 1 is built and green (13 arena checks) but dormant behind a locked toggle: Simple Sidearms owns this space, and VCO stands down whenever it is loaded. Reasoning and the live alternative are in [Docs/Sidearms-and-Loadouts.md](Docs/Sidearms-and-Loadouts.md) §9 |
 | Full item loadouts | Not started. Deferred; primary-weapon automation is shipped separately |
 
 Runs in-game. The automated suite loads the mod in a real RimWorld process, generates a map,
@@ -243,9 +240,10 @@ Most players never open a settings menu, so the defaults are the mod. They are n
 here; where a mechanic has an equivalent in Vanilla Combat Reloaded, its stock values are
 carried over, because those are the only numbers that have had real playtime behind them.
 
-**Parry.** VCR's curve is kept exactly: `aptitude ^ ((1/d) / (1 - attackerMelee))`, with
-`d = 1.5` for both front and side. Aptitude comes from vanilla `MeleeHitChance`, whose
-post-process curve puts skill 0 at 50%, skill 10 at 80% and skill 20 at 90%. That yields:
+**Parry.** VCR's curve is kept: `aptitude ^ ((1/d) / (1 - attackerMelee))`. Front attacks
+use VCR's `d = 1.5`; side attacks default to `d = 1.25`, making a flank meaningfully harder
+to parry without denying the attempt. Aptitude comes from vanilla `MeleeHitChance`, whose
+post-process curve puts skill 0 at 50%, skill 10 at 80% and skill 20 at 90%. Front attacks yield:
 
 | defender | vs skill 0 | vs 5 | vs 10 | vs 15 | vs 20 |
 |---|---|---|---|---|---|
@@ -254,8 +252,8 @@ post-process curve puts skill 0 at 50%, skill 10 at 80% and skill 20 at 90%. Tha
 | skill 20 | 87% | 82% | 70% | 63% | 50% |
 
 Two things this preserves that a defender-only stat could not: the chance is *contested*, so a
-skilled attacker punches through a parry, and front and side are equal by default, so only
-getting behind someone denies a parry outright.
+skilled attacker punches through a parry, and direction matters continuously: side attacks
+weaken the chance while rear attacks deny a parry outright.
 
 **Why resolving before the hit roll changes nothing.** VCR parried only attacks that would
 otherwise have landed; this mod parries first and lets the rest resolve normally. Writing `m`
@@ -270,9 +268,9 @@ bind at around `4/p` attackers — about 5 opponents against a strong defender, 
 even matchup. It is a backstop against swarms, not a routine tax, and it leaves the
 one-on-one numbers above untouched.
 
-**Flanking.** Because front and side parry are equal by stock values, a side flank does not
-deny a parry. Flanking still matters through directional damage: the side an attack arrives
-from determines which body parts it can reach.
+**Flanking.** A side flank lowers the parry exponent divisor from 1.5 to 1.25, weakening the
+defender's chance without denying it. Flanking also matters through directional damage: the
+side an attack arrives from determines which body parts it can reach.
 
 **Advanced accuracy.** VCR's mitigation curve is kept: `factor ^ (1 / (skill / scale))` applied
 only to weapon and weather factors inside `ShotReport`. Default scale is 5. At a raw weapon
@@ -288,18 +286,11 @@ A guarded transpiler on `ChangeDestToMissWild` verifies the splice on startup.
 
 ## Defaults
 
-Defaults are set per feature in `Source/VanillaCombatOverhaul/Core/VCOSettings.cs`, against two
-named constants:
+Defaults are set per feature in `Source/VanillaCombatOverhaul/Core/VCOSettings.cs` against the
+`Shipped` constant: built and verified features default on. Parry, counter-attack, directional
+damage and melee flanking are examples.
 
-- `Shipped` — built and verified by the arena suite. Parry, counter-attack, directional damage
-  and melee flanking default on.
-- `Unbuilt` — on the roadmap. Default off, **and locked off**: `ForceUnbuiltOff()` runs both on
-  settings load and every time the window draws, so neither a stale config nor a hand-edited
-  file can raise one. In the UI they render greyed, non-interactive and tagged `(NOT YET BUILT)`.
-
-This is a deliberate softening of design rule #1 for the test build. A switch a player can
-enable to no effect makes the mod look broken rather than unfinished, so unbuilt features are
-visible but inert instead of merely unchecked.
+Unbuilt roadmap features are not exposed in the player settings window.
 
 ## Diagnostic counters — temporary
 
@@ -307,9 +298,9 @@ visible but inert instead of merely unchecked.
 rather than guessed at. A clean startup log proves nothing crashed; it says nothing about
 whether pawns are actually parrying.
 
-Counters are gated behind the `verboseLogging` setting (currently defaulted on), shown live in
-the Diagnostics settings tab, and written to the log every `diagnosticDumpIntervalTicks`
-(default 2500, about one in-game hour).
+Counters are gated behind the internal `verboseLogging` setting (default off) and can be written
+to the log every `diagnosticDumpIntervalTicks` (default 2500, about one in-game hour). These
+controls remain available to developers but are not exposed in the player settings window.
 
 Rejection reasons are counted individually, which is the useful part — `parry.attempt` versus
 `parry.success` only tells you the rate, while `parry.reject.*` tells you *which gate* is

@@ -57,21 +57,4 @@
     </parts>
   </StatDef>
 
-  <StatDef>
-    <defName>VCO_WeaponSwapSpeed</defName>
-    <label>weapon swap speed</label>
-    <description>How quickly this pawn puts one weapon away and brings another up.\n\nThe time a swap takes comes from the weapon's mass divided by this. Manipulation drives it, so an injured hand makes drawing a sidearm slower rather than impossible.</description>
-    <defaultBaseValue>1.0</defaultBaseValue>
-    <minValue>0.05</minValue>
-    <maxValue>5</maxValue>
-    <toStringStyle>PercentZero</toStringStyle>
-    <showIfUndefined>false</showIfUndefined>
-    <capacityFactors>
-      <li>
-        <capacity>Manipulation</capacity>
-        <weight>1.0</weight>
-      </li>
-    </capacityFactors>
-  </StatDef>
-
 </Defs>

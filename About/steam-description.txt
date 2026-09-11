@@ -1,0 +1,32 @@
+Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven while keeping RimWorld's familiar combat at its core.
+
+[h1]Melee with momentum[/h1]
+[list]
+[*]Armed pawns can parry attacks and answer a successful parry with a counter-attack.
+[*]Attacking from the side or rear matters, while surrounded defenders become easier to overwhelm.
+[*]Attack direction and height influence where blows land.
+[/list]
+
+[h1]More expressive firefights[/h1]
+[list]
+[*]Skilled shooters handle inaccurate weapons and bad weather more effectively.
+[*]Moving targets are harder to hit, and misses spread further at long range.
+[*]Visible projectile trails make incoming fire easier to read.
+[*]Bullets and arrows produce distinct wounds based on how they strike the target.
+[/list]
+
+[h1]Armour and equipment[/h1]
+[list]
+[*]Strong armour can stop weak hits outright, while partial protection still reduces their impact.
+[*]Colonists automatically choose and upgrade primary weapons according to their skills and assigned weapon policy.
+[*]Manual weapon choices remain locked until you allow automatic upgrades again.
+[*]Improved apparel coverage gives gloves, boots, masks, helmets and glasses more sensible protection and layering.
+[/list]
+
+Combat and equipment systems can be configured individually, so you can keep the parts that suit your colony.
+
+[h1]Compatibility[/h1]
+Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded or Auto Arm because they control overlapping combat or equipment systems.
+
+[h1]Thanks and inspiration[/h1]
+Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.

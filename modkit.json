@@ -1,0 +1,8 @@
+{
+  "name": "Vanilla Combat Overhaul",
+  "assemblyName": "VanillaCombatOverhaul",
+  "workshopFolder": "VanillaCombatOverhaul",
+  "gameVersion": "1.6",
+  "ship": ["1.6", "About", "Languages", "LoadFolders.xml"],
+  "sharedBuild": false
+}

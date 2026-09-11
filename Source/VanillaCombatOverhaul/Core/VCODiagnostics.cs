@@ -14,7 +14,7 @@ namespace VanillaCombatOverhaul
     ///
     /// Deliberately a summary rather than a line per event: a single fight produces hundreds
     /// of damage instances, and per-event logging would bury anything useful. Counters
-    /// accumulate and are dumped on an interval, on demand, and shown live in mod settings.
+    /// accumulate and are dumped on an interval or on demand through developer debug actions.
     ///
     /// This is scaffolding for tuning, not a shipping feature. Remove it, along with the
     /// Count/Sample calls it is paired with, once the numbers stop being interesting.

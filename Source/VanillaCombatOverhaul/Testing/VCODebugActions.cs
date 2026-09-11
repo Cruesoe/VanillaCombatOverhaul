@@ -64,40 +64,11 @@ namespace VanillaCombatOverhaul
                         + "\n" + TestSuite.FormatChecks("height formula checks", HeightAssertions.SelfTests()));
         }
 
-        [DebugAction(Category, "Sidearm checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
-        private static void RunSidearmChecks()
-        {
-            Log.Message(TestSuite.FormatChecks("sidearm formula checks", SidearmAssertions.SelfTests())
-                        + "\n" + TestSuite.FormatChecks("sidearm live checks",
-                                                        SidearmAssertions.LiveTests(Find.CurrentMap)));
-        }
-
         [DebugAction(Category, "Automatic weapon checks", allowedGameStates = AllowedGameStates.Entry
                                                                               | AllowedGameStates.PlayingOnMap)]
         private static void RunAutoEquipChecks()
         {
             Log.Message(TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
-        }
-
-        /// <summary>
-        /// Sidearms are still an unbuilt roadmap toggle, so the settings window pins them off and
-        /// there is no supported way to switch them on. This is the developer's way in until the
-        /// gizmo lands and the toggle unlocks; opening mod settings turns it straight back off.
-        /// </summary>
-        [DebugAction(Category, "Sidearms: enable for this session",
-                     allowedGameStates = AllowedGameStates.PlayingOnMap)]
-        private static void EnableSidearmsForSession()
-        {
-            if (SidearmUtility.ConflictingMod != null)
-            {
-                Log.Warning("[VCO] Sidearms cannot be enabled: " + SidearmUtility.ConflictingMod
-                            + " is installed and already manages carried weapons.");
-                return;
-            }
-            VCOMod.Settings.enableSidearms = true;
-            Log.Message("[VCO] Sidearms enabled for this session. Right-click a weapon with a "
-                        + "colonist selected to carry it as a sidearm. Opening mod settings "
-                        + "switches this back off.");
         }
 
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]

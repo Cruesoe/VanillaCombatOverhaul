@@ -6,8 +6,7 @@ namespace VanillaCombatOverhaul
     public enum SettingsTab
     {
         Combat,
-        Equipment,
-        Diagnostics
+        Equipment
     }
 
     /// <summary>
@@ -16,28 +15,24 @@ namespace VanillaCombatOverhaul
     /// A feature defaults ON only once it is built and verified by the arena suite. Work in
     /// progress is kept out of the settings screen until it is ready for players.
     ///
-    /// Verbose logging is diagnostic scaffolding and ships off. A playtester's log should hold
-    /// their own mod list's problems, not a per-hour dump of our counters, and a tester who
-    /// needs one can turn it on in the Diagnostics tab and reproduce. It comes out entirely
-    /// before public release, along with VCODiagnostics itself.
+    /// Verbose logging is internal diagnostic scaffolding and ships off. A player's log should
+    /// hold their own mod list's problems, not a per-hour dump of our counters. These values are
+    /// retained for developer configuration but are not exposed in the player settings window.
     /// </summary>
     public class VCOSettings : ModSettings
     {
         // Built, verified by the arena suite, safe to ship enabled.
         private const bool Shipped = true;
 
-        // On the roadmap. Locked off in the UI until the implementation exists.
-        private const bool Unbuilt = false;
-
         public SettingsTab CurrentTab = SettingsTab.Combat;
 
         // ---- Melee -------------------------------------------------------------
         public bool enableParry = Shipped;
         // Exponent divisors, not linear multipliers: higher means easier to parry.
-        // 1.5 for both matches Vanilla Combat Reloaded, where only a rear attack
-        // denied a parry outright.
+        // Front keeps Vanilla Combat Reloaded's 1.5. Side is deliberately lower so
+        // gaining a flank weakens a defender's parry without denying it outright.
         public float parryFrontFactor = 1.5f;
-        public float parrySideFactor = 1.5f;
+        public float parrySideFactor = 1.25f;
         // Measured at 2: negligible in a duel (0 rejections), light at 3v1 (2.4% of
         // attacks), and material at 6v1 (9.9%). See the balance notes in README.md.
         public int parryBudgetPerWindow = 2;
@@ -85,11 +80,6 @@ namespace VanillaCombatOverhaul
         // The margin prevents pawns oscillating between near-identical choices.
         public float autoEquipUpgradeThreshold = 1.10f;
 
-        // ---- Sidearms (test-only until the player-facing controls are complete) ----------
-        public bool enableSidearms = Unbuilt;
-        // Ticks per unit of weapon mass, divided by the pawn's VCO_WeaponSwapSpeed. A revolver
-        // (mass 1.4) is about a second and a half at 60; a minigun (mass 20) is most of a fight.
-        public float sidearmSwapTicksPerMass = 60f;
         // ---- Apparel / coverage (VCR XML pack) ---------------------------------
         public bool enableHandFeetPatch = Shipped;
         public bool enableAcidHeatPatch = Shipped;
@@ -101,7 +91,7 @@ namespace VanillaCombatOverhaul
         public bool enableArrayHeadsetPatch = Shipped;
         public bool enableApparelTweaks = Shipped;
 
-        // ---- Diagnostics -------------------------------------------------------
+        // ---- Internal diagnostics (not shown in player settings) ---------------
         public bool verboseLogging = false;
         // Ticks between automatic diagnostic dumps to the log. 2500 ticks is about one
         // in-game hour. Zero disables the periodic dump without losing the counters.
@@ -113,7 +103,7 @@ namespace VanillaCombatOverhaul
 
             Scribe_Values.Look(ref enableParry, nameof(enableParry), Shipped);
             Scribe_Values.Look(ref parryFrontFactor, nameof(parryFrontFactor), 1.5f);
-            Scribe_Values.Look(ref parrySideFactor, nameof(parrySideFactor), 1.5f);
+            Scribe_Values.Look(ref parrySideFactor, nameof(parrySideFactor), 1.25f);
             Scribe_Values.Look(ref parryBudgetPerWindow, nameof(parryBudgetPerWindow), 2);
             Scribe_Values.Look(ref parryWindowTicks, nameof(parryWindowTicks), 60);
             Scribe_Values.Look(ref enableCounterAttack, nameof(enableCounterAttack), Shipped);
@@ -145,9 +135,6 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableAutoEquip, nameof(enableAutoEquip), Shipped);
             Scribe_Values.Look(ref autoEquipUpgradeThreshold, nameof(autoEquipUpgradeThreshold), 1.10f);
 
-            Scribe_Values.Look(ref enableSidearms, nameof(enableSidearms), Unbuilt);
-            Scribe_Values.Look(ref sidearmSwapTicksPerMass, nameof(sidearmSwapTicksPerMass), 60f);
-
             Scribe_Values.Look(ref enableHandFeetPatch, nameof(enableHandFeetPatch), Shipped);
             Scribe_Values.Look(ref enableAcidHeatPatch, nameof(enableAcidHeatPatch), Shipped);
             Scribe_Values.Look(ref enableThumpBluntPatch, nameof(enableThumpBluntPatch), Shipped);
@@ -161,23 +148,6 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref verboseLogging, nameof(verboseLogging), false);
             Scribe_Values.Look(ref diagnosticDumpIntervalTicks, nameof(diagnosticDumpIntervalTicks), 2500);
 
-            // A config written by an earlier build could have any of the unbuilt features
-            // switched on, and those flags reach XML patching before the UI ever draws.
-            // Forced off on load so an old settings file cannot enable something that is
-            // not there.
-            if (Scribe.mode == LoadSaveMode.LoadingVars)
-            {
-                ForceUnbuiltOff();
-            }
-        }
-
-        /// <summary>
-        /// Holds every roadmap feature at its unbuilt default. Called on load and by the
-        /// settings window, so neither a stale config nor the UI can raise one of these.
-        /// </summary>
-        public void ForceUnbuiltOff()
-        {
-            enableSidearms = Unbuilt;
         }
 
         /// <summary>

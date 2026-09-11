@@ -15,9 +15,6 @@ namespace VanillaCombatOverhaul
         /// <summary>Reduction to an attacker's chance to hit this pawn while it is moving.</summary>
         public static StatDef VCO_Evasion;
 
-        /// <summary>How quickly a weapon is put away and another brought up.</summary>
-        public static StatDef VCO_WeaponSwapSpeed;
-
         static VCO_StatDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(VCO_StatDefOf));

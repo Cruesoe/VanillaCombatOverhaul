@@ -127,6 +127,14 @@ namespace VanillaCombatOverhaul
 
             var report = "[VCO] autotest did not produce a report.";
             var allPassed = false;
+            var settings = VCOMod.Settings;
+            var restoreVerboseLogging = settings?.verboseLogging ?? false;
+            if (settings != null)
+            {
+                // Arena assertions observe combat through the internal counters. Player builds
+                // keep them off, so the harness enables them only for this isolated run.
+                settings.verboseLogging = true;
+            }
 
             try
             {
@@ -146,11 +154,6 @@ namespace VanillaCombatOverhaul
                 var rangedSelf = RangedAssertions.SelfTests();
                 var rangedResults = TestSuite.RunRangedMatrix(map, Seed);
 
-                // Sidearms are unbuilt in the settings, so the live checks switch the feature on
-                // for their own duration and put it back. Run last: they spawn and destroy a pawn
-                // of their own, and no other suite should have to reason about that.
-                var sidearms = SidearmAssertions.SelfTests();
-                sidearms.AddRange(SidearmAssertions.LiveTests(map));
                 var autoEquip = AutoEquipAssertions.SelfTests();
 
                 report = Environment.NewLine + fingerprint + Environment.NewLine
@@ -162,8 +165,6 @@ namespace VanillaCombatOverhaul
                          + Environment.NewLine
                          + TestSuite.FormatRangedReport(rangedResults, rangedSelf)
                          + Environment.NewLine
-                         + TestSuite.FormatChecks("sidearm checks", sidearms)
-                         + Environment.NewLine
                          + TestSuite.FormatChecks("automatic weapon checks", autoEquip);
 
                 allPassed = !facing.Exists(a => !a.Passed)
@@ -173,7 +174,6 @@ namespace VanillaCombatOverhaul
                             && results.TrueForAll(r => r.AllAssertionsPassed)
                             && !rangedSelf.Exists(a => !a.Passed)
                             && rangedResults.TrueForAll(r => r.AllAssertionsPassed)
-                            && !sidearms.Exists(a => !a.Passed)
                             && !autoEquip.Exists(a => !a.Passed);
             }
             catch (Exception e)
@@ -182,6 +182,10 @@ namespace VanillaCombatOverhaul
             }
             finally
             {
+                if (settings != null)
+                {
+                    settings.verboseLogging = restoreVerboseLogging;
+                }
                 // Written before the exit code line so a crash still leaves the detail behind.
                 TryWrite(report + Environment.NewLine
                          + "RESULT: " + (allPassed ? "PASS" : "FAIL") + Environment.NewLine);
