@@ -1,5 +1,9 @@
 # Sidearms and loadouts — design plan
 
+> Update: automatic selection and upgrading of the equipped primary weapon is now implemented
+> independently of this dormant sidearm design. It uses a weapon filter attached to each apparel
+> policy; “full loadouts” below still means managing carried item types and quantities.
+
 Status: **paused.** Phase 1 is built, green in the arena suite, and dormant behind a locked toggle.
 Phase 2 (the switch gizmo) is not started and is not currently planned. See §9 for why, and for the
 alternative that pause is holding the door open for.

@@ -79,6 +79,12 @@ namespace VanillaCombatOverhaul
         public float armorScale = 2f;
         public float penetrationScale = 2f;
 
+        // ---- Automatic primary weapons ---------------------------------------
+        public bool enableAutoEquip = Shipped;
+        // A replacement must be this much better than an allowed current weapon.
+        // The margin prevents pawns oscillating between near-identical choices.
+        public float autoEquipUpgradeThreshold = 1.10f;
+
         // ---- Sidearms (test-only until the player-facing controls are complete) ----------
         public bool enableSidearms = Unbuilt;
         // Ticks per unit of weapon mass, divided by the pawn's VCO_WeaponSwapSpeed. A revolver
@@ -135,6 +141,9 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
+
+            Scribe_Values.Look(ref enableAutoEquip, nameof(enableAutoEquip), Shipped);
+            Scribe_Values.Look(ref autoEquipUpgradeThreshold, nameof(autoEquipUpgradeThreshold), 1.10f);
 
             Scribe_Values.Look(ref enableSidearms, nameof(enableSidearms), Unbuilt);
             Scribe_Values.Look(ref sidearmSwapTicksPerMass, nameof(sidearmSwapTicksPerMass), 60f);

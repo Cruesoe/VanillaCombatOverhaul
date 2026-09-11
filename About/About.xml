@@ -30,6 +30,8 @@
     <li>CETeam.CombatExtended</li>
     <li>Mlie.YayosCombat3</li>
     <li>Donald.VCR</li>
+    <!-- Both mods would otherwise issue competing automatic equip jobs. -->
+    <li>Snues.AutoArm</li>
   </incompatibleWith>
   <description>Adds depth to RimWorld's combat without replacing it.
 
@@ -50,10 +52,14 @@ ARMOUR
 - Armour that fails to stop a hit still reduces it, instead of the all-or-nothing vanilla roll.
 - Weapon armour penetration is shown on the weapon.
 
+EQUIPMENT
+- Colonists automatically choose and upgrade their primary weapon using their skills and assigned policy.
+- Manually equipped weapons remain locked until you allow automatic upgrades again.
+
 CLOTHING
 - Gloves and boots protect hands and feet. Masks, helmets and glasses cover the face properly.
 
-Combat and apparel systems can be configured individually in the mod settings.
+Combat and equipment systems can be configured individually in the mod settings.
 
-Not compatible with Combat Extended, Yayo's Combat, or Vanilla Combat Reloaded.</description>
+Not compatible with Auto Arm, Combat Extended, Yayo's Combat, or Vanilla Combat Reloaded.</description>
 </ModMetaData>

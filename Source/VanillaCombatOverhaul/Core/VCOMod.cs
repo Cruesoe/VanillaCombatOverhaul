@@ -200,6 +200,19 @@ namespace VanillaCombatOverhaul
 
         private static void DrawEquipment(Listing_Standard l, VCOSettings s)
         {
+            if (Section(l, "VCO_Section_AutoEquip"))
+            {
+                l.Label("VCO_AutoEquip_Intro".Translate());
+                l.Gap(6f);
+                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip);
+                if (s.enableAutoEquip)
+                {
+                    var margin = (s.autoEquipUpgradeThreshold - 1f) * 100f;
+                    margin = Slider(l, "VCO_AutoEquipUpgradeMargin", margin, 1f, 50f, "0");
+                    s.autoEquipUpgradeThreshold = 1f + margin / 100f;
+                }
+            }
+
             if (Section(l, "VCO_Section_Apparel"))
             {
                 l.Label("VCO_Apparel_Intro".Translate());

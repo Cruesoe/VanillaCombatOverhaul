@@ -5,7 +5,7 @@
 
   <!-- Tabs -->
   <VCO_Tab_Combat>Combat</VCO_Tab_Combat>
-  <VCO_Tab_Equipment>Apparel</VCO_Tab_Equipment>
+  <VCO_Tab_Equipment>Equipment</VCO_Tab_Equipment>
   <VCO_Tab_Diagnostics>Diagnostics</VCO_Tab_Diagnostics>
 
   <!-- Section headers -->
@@ -119,6 +119,17 @@
   <VCO_ArrayHeadsetPatch_Tip>The array headset sits on the eyes, and the mech commander helmet is treated as upper head, so they can be worn together. Needs a restart.</VCO_ArrayHeadsetPatch_Tip>
   <VCO_ApparelTweaks>Improved headgear layering</VCO_ApparelTweaks>
   <VCO_ApparelTweaks_Tip>Treats eye and mouth apparel as headgear for pawn generation, so pawns can spawn wearing glasses or masks with a helmet. Does not need a restart.</VCO_ApparelTweaks_Tip>
+
+  <VCO_Section_AutoEquip>Automatic weapons</VCO_Section_AutoEquip>
+  <VCO_AutoEquip_Intro>Colonists automatically equip a suitable primary weapon and replace it when a clearly better allowed weapon becomes available. Configure allowed weapons in Assign → Manage apparel policies → Weapons.</VCO_AutoEquip_Intro>
+  <VCO_AutoEquip>Automatically equip and upgrade primary weapons</VCO_AutoEquip>
+  <VCO_AutoEquip_Tip>Uses each pawn's apparel policy to decide which weapons are allowed. Selection considers damage, accuracy, armour penetration, condition, and the pawn's shooting or melee skill. Drafted pawns are never interrupted.\n\nManually equipping a weapon locks that choice until you use the pawn's Allow automatic weapon upgrades command.</VCO_AutoEquip_Tip>
+  <VCO_AutoEquipUpgradeMargin>Minimum improvement before upgrading: {0}%</VCO_AutoEquipUpgradeMargin>
+  <VCO_AutoEquipUpgradeMargin_Tip>How much better a replacement must score before a pawn changes an already-allowed weapon. A margin prevents repeated swaps between nearly identical weapons. Disallowed weapons can always be replaced.</VCO_AutoEquipUpgradeMargin_Tip>
+  <VCO_Policy_Apparel>Apparel</VCO_Policy_Apparel>
+  <VCO_Policy_Weapons>Weapons</VCO_Policy_Weapons>
+  <VCO_AutoEquip_Unlock>Allow weapon upgrades</VCO_AutoEquip_Unlock>
+  <VCO_AutoEquip_Unlock_Tip>This weapon was equipped manually. Remove that lock and allow automatic upgrades again.</VCO_AutoEquip_Unlock_Tip>
 
   <VCO_AdjWeapon>Weapon w/ skill</VCO_AdjWeapon>
   <VCO_AdjWeather>Weather w/ skill</VCO_AdjWeather>

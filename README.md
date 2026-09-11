@@ -20,10 +20,11 @@ Shipped and verified in-game:
 | **Bullet and arrow wounds** | Stopping-power fragmentation / pass-through / mushrooming for bullets, and arrow split/internal hits. Intercepts vanilla injury application instead of replacing DamageDef workers. |
 | **Visible tracers** | A short glowing streak behind projectiles, coloured by damage type. |
 | **Apparel coverage** | Reloaded's coverage pack: hands/feet, acid-as-heat, thump-as-blunt, glasses with helmets, masks, headsets. Settings-gated; most need a restart. |
+| **Automatic primary weapons** | Colonists choose from the weapons allowed by their assigned policy. Damage, cycle time, accuracy, penetration, condition and pawn skills affect the choice; a configurable upgrade margin prevents churn. |
 
 On the roadmap, locked off in settings until built: suppression, ammo as tech-tier buckets,
-and loadouts. Sidearms are built but paused and stay locked off — Simple Sidearms owns that
-space, and VCO stands down whenever it is loaded.
+and full item loadouts. Automatic primary-weapon selection is shipped; sidearms are built but
+paused and stay locked off — Simple Sidearms owns that space, and VCO stands down whenever it is loaded.
 
 ## Vanilla Combat Reloaded coverage
 
@@ -43,8 +44,9 @@ beam damage worker is commented out in 1.6 and was not ported.
 | Shot / melee inspect readout | Yes | Vanilla vs skill-adjusted factors, evasion, side, height, parry. |
 | Apparel coverage pack (9 patches) | Yes | Settings-gated copies; most need a restart. |
 
-VCO-only: parry budget, counter-attack, visible tracers, combat StatDefs, PatchGuard, and
-the arena suite. Still to build, and not in Reloaded either: suppression, ammo, loadouts.
+VCO-only: parry budget, counter-attack, visible tracers, automatic primary weapons, combat
+StatDefs, PatchGuard, and the arena suite. Still to build, and not in Reloaded either:
+suppression, ammo, and full item loadouts.
 Sidearms are built but dormant.
 
 ## What Vanilla Combat Reloaded gets wrong
@@ -212,16 +214,21 @@ duplicate rather than updating the original.
 | Bullet and arrow wounds | Shipped. Harmony intercept, not workerClass swap |
 | Visible tracers | Shipped. Vanilla projectile streak |
 | Apparel coverage pack | Shipped. Settings-gated Reloaded XML |
+| Automatic primary weapons | Shipped. Policy filter, skill-aware scoring, manual locks, and upgrade hysteresis |
 | Suppression | Not started |
 | Ammo (tech-tier buckets) | Not started |
 | Sidearms | Paused. Phase 1 is built and green (13 arena checks) but dormant behind a locked toggle: Simple Sidearms owns this space, and VCO stands down whenever it is loaded. Reasoning and the live alternative are in [Docs/Sidearms-and-Loadouts.md](Docs/Sidearms-and-Loadouts.md) §9 |
-| Loadouts | Not started. Deferred to future development |
+| Full item loadouts | Not started. Deferred; primary-weapon automation is shipped separately |
 
 Runs in-game. The automated suite loads the mod in a real RimWorld process, generates a map,
 fights several thousand melee attacks, exercises ranged accuracy scenarios, and asserts on the
 results.
 
 ## Credits
+
+Automatic weapon management is inspired by [Auto Arm](https://github.com/Snusene/AutoArm)
+by Snues. VCO uses an independent implementation with a separate weapon filter per apparel
+policy, conservative scoring, and manual-choice locks.
 
 Two ideas are adapted from [Vanilla Combat Reloaded](https://github.com/DonaldKar/Rimworld-Vanilla-Combat-Reloaded)
 by Donald (DonaldKar): the settings-gated `PatchOperation` pattern, and the generic XPath

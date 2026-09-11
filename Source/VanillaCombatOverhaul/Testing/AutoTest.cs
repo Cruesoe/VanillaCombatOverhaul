@@ -151,6 +151,7 @@ namespace VanillaCombatOverhaul
                 // of their own, and no other suite should have to reason about that.
                 var sidearms = SidearmAssertions.SelfTests();
                 sidearms.AddRange(SidearmAssertions.LiveTests(map));
+                var autoEquip = AutoEquipAssertions.SelfTests();
 
                 report = Environment.NewLine + fingerprint + Environment.NewLine
                          + TestSuite.FormatReport(results, facing, armor)
@@ -161,7 +162,9 @@ namespace VanillaCombatOverhaul
                          + Environment.NewLine
                          + TestSuite.FormatRangedReport(rangedResults, rangedSelf)
                          + Environment.NewLine
-                         + TestSuite.FormatChecks("sidearm checks", sidearms);
+                         + TestSuite.FormatChecks("sidearm checks", sidearms)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("automatic weapon checks", autoEquip);
 
                 allPassed = !facing.Exists(a => !a.Passed)
                             && !armor.Exists(a => !a.Passed)
@@ -170,7 +173,8 @@ namespace VanillaCombatOverhaul
                             && results.TrueForAll(r => r.AllAssertionsPassed)
                             && !rangedSelf.Exists(a => !a.Passed)
                             && rangedResults.TrueForAll(r => r.AllAssertionsPassed)
-                            && !sidearms.Exists(a => !a.Passed);
+                            && !sidearms.Exists(a => !a.Passed)
+                            && !autoEquip.Exists(a => !a.Passed);
             }
             catch (Exception e)
             {

@@ -19,7 +19,8 @@ namespace VanillaCombatOverhaul
             var results = TestSuite.RunMatrix(Find.CurrentMap);
             Log.Message(TestSuite.FormatReport(results, facing, armor)
                         + "\n" + TestSuite.FormatChecks("wound formula checks", WoundAssertions.SelfTests())
-                        + "\n" + TestSuite.FormatChecks("height formula checks", HeightAssertions.SelfTests()));
+                        + "\n" + TestSuite.FormatChecks("height formula checks", HeightAssertions.SelfTests())
+                        + "\n" + TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
         }
 
         [DebugAction(Category, "Run one quick arena", allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -69,6 +70,13 @@ namespace VanillaCombatOverhaul
             Log.Message(TestSuite.FormatChecks("sidearm formula checks", SidearmAssertions.SelfTests())
                         + "\n" + TestSuite.FormatChecks("sidearm live checks",
                                                         SidearmAssertions.LiveTests(Find.CurrentMap)));
+        }
+
+        [DebugAction(Category, "Automatic weapon checks", allowedGameStates = AllowedGameStates.Entry
+                                                                              | AllowedGameStates.PlayingOnMap)]
+        private static void RunAutoEquipChecks()
+        {
+            Log.Message(TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
         }
 
         /// <summary>
