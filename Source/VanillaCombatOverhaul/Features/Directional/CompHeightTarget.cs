@@ -34,6 +34,10 @@ namespace VanillaCombatOverhaul
             {
                 yield break;
             }
+            if (!HeightTargetingUtility.MeetsShootingRequirement(Pawn))
+            {
+                yield break;
+            }
 
             yield return HeightTargetingUtility.CommandFor(this);
         }

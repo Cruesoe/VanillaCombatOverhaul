@@ -52,14 +52,14 @@
   <VCO_MeleeFlanking>Apply this to melee attacks too</VCO_MeleeFlanking>
   <VCO_MeleeFlanking_Tip>Melee attacks also hit the side they come from, not just guns and bows.</VCO_MeleeFlanking_Tip>
 
-  <VCO_HeightTargeting>Drafted pawns can aim high or low</VCO_HeightTargeting>
-  <VCO_HeightTargeting_Tip>Drafted colonists get a gizmo to aim at the head, torso or legs. Skill raises the chance of actually landing there; a miss still hits that side of the body, just not the band you asked for.\n\nEnemies pick a random height when they spawn. Explosives ignore this.</VCO_HeightTargeting_Tip>
+  <VCO_HeightTargeting>Skilled drafted pawns can aim high or low</VCO_HeightTargeting>
+  <VCO_HeightTargeting_Tip>Drafted colonists with Shooting 10 or higher get a gizmo to aim at the head, torso or legs. Greater skill raises the chance of actually landing there; a miss still hits that side of the body, just not the band you asked for.\n\nEnemies with Shooting 10 or higher pick a random height when they spawn. Explosives ignore this.</VCO_HeightTargeting_Tip>
   <VCO_Height_None>None</VCO_Height_None>
   <VCO_Height_Bottom>Legs</VCO_Height_Bottom>
   <VCO_Height_Middle>Torso</VCO_Height_Middle>
   <VCO_Height_Top>Head</VCO_Height_Top>
   <VCO_CommandSetHeight>Aim: {0}</VCO_CommandSetHeight>
-  <VCO_CommandSetHeight_Tip>Weight incoming hits toward this height band. None is vanilla, any height.</VCO_CommandSetHeight_Tip>
+  <VCO_CommandSetHeight_Tip>Weight incoming hits toward this height band. Requires Shooting 10 or higher. None is vanilla, any height.</VCO_CommandSetHeight_Tip>
 
   <VCO_Section_Wounds>Projectile wounds</VCO_Section_Wounds>
   <VCO_ProjectileWounds>Distinct bullet and arrow wounds</VCO_ProjectileWounds>

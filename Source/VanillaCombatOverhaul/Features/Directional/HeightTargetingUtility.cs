@@ -9,6 +9,8 @@ namespace VanillaCombatOverhaul
     [StaticConstructorOnStartup]
     public static class HeightTargetingUtility
     {
+        public const int MinimumShootingSkill = 10;
+
         public static readonly BodyPartHeight[] Modes =
         {
             BodyPartHeight.Undefined,
@@ -17,10 +19,14 @@ namespace VanillaCombatOverhaul
             BodyPartHeight.Top
         };
 
-        private static readonly Texture2D IconNone = MakeIcon(new Color(0.45f, 0.45f, 0.45f));
-        private static readonly Texture2D IconBottom = MakeIcon(new Color(0.55f, 0.35f, 0.15f));
-        private static readonly Texture2D IconMiddle = MakeIcon(new Color(0.85f, 0.75f, 0.2f));
-        private static readonly Texture2D IconTop = MakeIcon(new Color(0.95f, 0.95f, 0.95f));
+        private static readonly Texture2D IconNone =
+            ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimNone");
+        private static readonly Texture2D IconBottom =
+            ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimLegs");
+        private static readonly Texture2D IconMiddle =
+            ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimTorso");
+        private static readonly Texture2D IconTop =
+            ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimHead");
 
         static HeightTargetingUtility()
         {
@@ -66,7 +72,9 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            if (instigator is Pawn pawn && (pawn.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true))
+            if (instigator is Pawn pawn
+                && (!MeetsShootingRequirement(pawn)
+                    || (pawn.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true)))
             {
                 return false;
             }
@@ -78,11 +86,20 @@ namespace VanillaCombatOverhaul
             return true;
         }
 
+        public static bool MeetsShootingRequirement(Pawn pawn)
+        {
+            var shooting = pawn?.skills?.GetSkill(SkillDefOf.Shooting);
+            return shooting != null
+                   && !shooting.TotallyDisabled
+                   && shooting.Level >= MinimumShootingSkill;
+        }
+
         public static void AssignRandom(Pawn pawn)
         {
             var comp = pawn?.TryGetComp<CompHeightTarget>();
-            if (comp == null)
+            if (comp == null || !MeetsShootingRequirement(pawn))
             {
+                comp?.SetTargetingMode(BodyPartHeight.Undefined);
                 return;
             }
             comp.SetTargetingMode((BodyPartHeight)Rand.RangeInclusive(0, 3));
@@ -219,26 +236,5 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        private static Texture2D MakeIcon(Color fill)
-        {
-            const int size = 32;
-            var tex = new Texture2D(size, size, TextureFormat.ARGB32, false)
-            {
-                name = "VCO_HeightIcon",
-                filterMode = FilterMode.Point
-            };
-            var pixels = new Color[size * size];
-            for (var y = 0; y < size; y++)
-            {
-                for (var x = 0; x < size; x++)
-                {
-                    var edge = x < 2 || y < 2 || x >= size - 2 || y >= size - 2;
-                    pixels[y * size + x] = edge ? new Color(0.1f, 0.1f, 0.1f, 1f) : fill;
-                }
-            }
-            tex.SetPixels(pixels);
-            tex.Apply();
-            return tex;
-        }
     }
 }
