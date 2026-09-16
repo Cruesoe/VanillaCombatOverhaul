@@ -42,15 +42,21 @@ namespace VanillaCombatOverhaul
         private static float rawWeather;
         private static float rawEvasion;
         private static float finalEvasion;
+        private static FireMode shownMode;
+        private static float rawShooter;
+        private static float modeShooter;
 
         public static void Begin(ref ShotReport report)
         {
             stashed = false;
+            shownMode = FireMode.Default;
             var settings = VCOMod.Settings;
             if (settings == null)
             {
                 return;
             }
+
+            NoteFireMode(ref report);
 
             mitigatedEquipment = ShotReportAccess.GetEquipmentFactor(ref report);
             mitigatedWeather = ShotReportAccess.GetWeatherFactor(ref report);
@@ -80,6 +86,12 @@ namespace VanillaCombatOverhaul
             }
 
             var sb = new StringBuilder();
+            if (shownMode != FireMode.Default)
+            {
+                sb.AppendLine("   " + "VCO_FireModeRead".Translate(FireModeUtility.LabelFor(shownMode),
+                              rawShooter.ToStringPercent(), modeShooter.ToStringPercent()));
+                shownMode = FireMode.Default;
+            }
             if (stashed && !Mathf.Approximately(rawEquipment, mitigatedEquipment))
             {
                 sb.AppendLine("      " + "VCO_AdjWeapon".Translate() + ": " + mitigatedEquipment.ToStringPercent());
@@ -130,6 +142,39 @@ namespace VanillaCombatOverhaul
 
             stashed = false;
             return sb.Length == 0 ? null : sb.ToString();
+        }
+
+        /// <summary>
+        /// Notes the shooter factor with and without the fire mode.
+        ///
+        /// Unlike weapon and weather, the report is left holding the moded value: vanilla's
+        /// headline hit chance is computed from it inside GetTextReadout, and swapping the raw
+        /// value in would make the headline ignore the mode. The raw value is recomputed from
+        /// vanilla rather than inverted, so it is exact.
+        /// </summary>
+        private static void NoteFireMode(ref ShotReport report)
+        {
+            if (!FireModeUtility.Enabled || !(Find.Selector.SingleSelectedThing is Pawn pawn))
+            {
+                return;
+            }
+            var verb = pawn.CurrentEffectiveVerb;
+            var distance = ShotReportAccess.GetDistance(ref report);
+            var mode = FireModeUtility.ActiveMode(pawn, verb, distance);
+            if (mode == FireMode.Default || verb?.verbProps == null || !verb.verbProps.canGoWild)
+            {
+                return;
+            }
+
+            var current = ShotReportAccess.GetShooterFactor(ref report);
+            var raw = ShotReport.HitFactorFromShooter(pawn, distance);
+            if (Mathf.Approximately(current, raw))
+            {
+                return;
+            }
+            shownMode = mode;
+            rawShooter = raw;
+            modeShooter = current;
         }
 
         private static bool TryRawFactors(ref ShotReport report, out float equipment, out float weather)

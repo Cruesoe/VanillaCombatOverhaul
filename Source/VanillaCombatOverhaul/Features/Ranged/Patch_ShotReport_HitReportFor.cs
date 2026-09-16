@@ -12,7 +12,10 @@ namespace VanillaCombatOverhaul
         public static void Finalizer(ref CombatContext.Scope __state) =>
             __state.Dispose();
 
-        public static void Postfix(ref ShotReport __result, Thing caster) =>
+        public static void Postfix(ref ShotReport __result, Thing caster, Verb verb)
+        {
             PenaltyMitigationUtility.ApplyToShotReport(ref __result, caster);
+            FireModeUtility.ApplyToShotReport(ref __result, caster, verb);
+        }
     }
 }

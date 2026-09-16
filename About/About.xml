@@ -32,6 +32,8 @@
     <li>Donald.VCR</li>
     <!-- Both mods would otherwise issue competing automatic equip jobs. -->
     <li>Snues.AutoArm</li>
+    <!-- Both mods would change burst size, aim time and hit chance for the same shot. -->
+    <li>Aliza.VanillaFireModes</li>
   </incompatibleWith>
   <description>Adds depth to RimWorld's combat without replacing it.
 
@@ -47,6 +49,7 @@ RANGED
 - Missed shots go wide of the target rather than landing anywhere nearby, and spread further at long range.
 - Bullets and arrows wound differently - bullets by force, arrows by cutting deep.
 - Projectiles leave a short glowing trail, so you can see where fire is coming from.
+- Drafted shooters can pick a fire mode: Precision, Short Burst, Suppression, or Auto by distance. Enemies choose theirs too.
 
 ARMOUR
 - Armour that fails to stop a hit still reduces it, instead of the all-or-nothing vanilla roll.
@@ -61,5 +64,5 @@ CLOTHING
 
 Combat and equipment systems can be configured individually in the mod settings.
 
-Not compatible with Auto Arm, Combat Extended, Yayo's Combat, or Vanilla Combat Reloaded.</description>
+Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, or Vanilla Fire Modes.</description>
 </ModMetaData>

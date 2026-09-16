@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- Fire modes change aim time and cooldown through ordinary stat parts, so the effect
+       shows in the stat explanation. The parts check the setting at runtime, so these
+       patches are unconditional and toggling fire modes needs no restart. Conditional
+       because a StatDef without parts has no list to add to. -->
+  <Operation Class="PatchOperationConditional">
+    <xpath>/Defs/StatDef[defName="AimingDelayFactor"]/parts</xpath>
+    <match Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="AimingDelayFactor"]/parts</xpath>
+      <value>
+        <li Class="VanillaCombatOverhaul.StatPart_FireModeAimTime" />
+      </value>
+    </match>
+    <nomatch Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="AimingDelayFactor"]</xpath>
+      <value>
+        <parts>
+          <li Class="VanillaCombatOverhaul.StatPart_FireModeAimTime" />
+        </parts>
+      </value>
+    </nomatch>
+  </Operation>
+
+  <Operation Class="PatchOperationConditional">
+    <xpath>/Defs/StatDef[defName="RangedCooldownFactor"]/parts</xpath>
+    <match Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="RangedCooldownFactor"]/parts</xpath>
+      <value>
+        <li Class="VanillaCombatOverhaul.StatPart_FireModeCooldown" />
+      </value>
+    </match>
+    <nomatch Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="RangedCooldownFactor"]</xpath>
+      <value>
+        <parts>
+          <li Class="VanillaCombatOverhaul.StatPart_FireModeCooldown" />
+        </parts>
+      </value>
+    </nomatch>
+  </Operation>
+</Patch>
