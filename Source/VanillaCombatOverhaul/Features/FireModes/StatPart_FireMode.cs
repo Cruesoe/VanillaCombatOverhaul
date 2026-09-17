@@ -37,7 +37,9 @@ namespace VanillaCombatOverhaul
         private static FireModeTuning TuningFor(StatRequest req, out FireMode mode)
         {
             mode = FireMode.Default;
-            if (!(req.Thing is Pawn pawn) || !FireModeUtility.Enabled)
+            // Gated before the verb is looked up: these stats are read uncached, for every
+            // pawn, and most are undrafted colonists no mode applies to.
+            if (!(req.Thing is Pawn pawn) || !FireModeUtility.ModesApplyTo(pawn))
             {
                 return null;
             }

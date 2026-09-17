@@ -30,10 +30,32 @@ namespace VanillaCombatOverhaul
         private static readonly Texture2D IconSuppression =
             ContentFinder<Texture2D>.Get("UI/Commands/VCO_FireSuppression");
 
+        // Per-def answers to the reflection-backed checks IsModeVerb needs (IsMeleeAttack,
+        // CausesExplosion, IsRangedWeapon). They run for every AI target score and every aim
+        // and cooldown stat read, and defs do not change after load. Built once here and only
+        // read afterwards, so no locking; anything created later is checked directly.
+        private static readonly Dictionary<VerbProperties, bool> ModeVerbProps =
+            new Dictionary<VerbProperties, bool>();
+        private static readonly Dictionary<ThingDef, bool> RangedWeaponDefs =
+            new Dictionary<ThingDef, bool>();
+
         static FireModeUtility()
         {
+            foreach (var maneuver in DefDatabase<ManeuverDef>.AllDefs)
+            {
+                NoteVerbProps(maneuver.verb);
+            }
             foreach (var def in DefDatabase<ThingDef>.AllDefs)
             {
+                if (def.IsWeapon)
+                {
+                    RangedWeaponDefs[def] = def.IsRangedWeapon;
+                    foreach (var props in def.Verbs)
+                    {
+                        NoteVerbProps(props);
+                    }
+                }
+
                 if (def.race == null || (!def.race.Humanlike && !def.race.ToolUser))
                 {
                     continue;
@@ -50,6 +72,23 @@ namespace VanillaCombatOverhaul
             }
         }
 
+        private static void NoteVerbProps(VerbProperties props)
+        {
+            if (props != null)
+            {
+                ModeVerbProps[props] = ComputeModeVerbProps(props);
+            }
+        }
+
+        private static bool ComputeModeVerbProps(VerbProperties props) =>
+            !props.IsMeleeAttack && !props.CausesExplosion;
+
+        private static bool IsModeVerbProps(VerbProperties props) =>
+            ModeVerbProps.TryGetValue(props, out var result) ? result : ComputeModeVerbProps(props);
+
+        private static bool IsRangedWeapon(ThingDef def) =>
+            RangedWeaponDefs.TryGetValue(def, out var result) ? result : def.IsRangedWeapon;
+
         public static bool Enabled => VCOMod.Settings?.enableFireModes ?? false;
 
         public static Verb PrimaryVerb(Pawn pawn) => pawn?.equipment?.PrimaryEq?.PrimaryVerb;
@@ -65,12 +104,27 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            if (verb.verbProps.IsMeleeAttack || verb.verbProps.CausesExplosion || verb is Verb_ShootOneUse)
+            // Cheapest first: most verbs asked about are not the primary weapon's.
+            var primary = pawn.equipment?.Primary;
+            if (primary == null || verb.EquipmentSource != primary || verb is Verb_ShootOneUse)
             {
                 return false;
             }
-            var primary = pawn.equipment?.Primary;
-            return primary != null && verb.EquipmentSource == primary && primary.def.IsRangedWeapon;
+            return IsModeVerbProps(verb.verbProps) && IsRangedWeapon(primary.def);
+        }
+
+        /// <summary>
+        /// Whether any mode could apply to this pawn right now, before looking at its verb:
+        /// colonists only while drafted, everyone else only with NPC fire modes on.
+        /// </summary>
+        public static bool ModesApplyTo(Pawn pawn)
+        {
+            var settings = VCOMod.Settings;
+            if (pawn == null || settings == null || !settings.enableFireModes)
+            {
+                return false;
+            }
+            return pawn.Faction == Faction.OfPlayer ? pawn.Drafted : settings.fireModesForNpcs;
         }
 
         /// <summary>
@@ -107,34 +161,21 @@ namespace VanillaCombatOverhaul
         /// </summary>
         public static FireMode ActiveMode(Pawn pawn, Verb verb, float? distance = null, int baseBurst = -1)
         {
-            var settings = VCOMod.Settings;
-            if (settings == null || !settings.enableFireModes || !IsModeVerb(pawn, verb))
+            // The draft and NPC gates come first: they are the cheapest checks and turn away
+            // most calls, since an undrafted colonist never has a mode.
+            if (!ModesApplyTo(pawn) || !IsModeVerb(pawn, verb))
             {
                 return FireMode.Default;
             }
-            var comp = pawn.TryGetComp<CompFireMode>();
+            var comp = pawn.GetComp<CompFireMode>();
             if (comp == null)
             {
                 return FireMode.Default;
             }
 
-            FireMode mode;
-            if (pawn.Faction == Faction.OfPlayer)
-            {
-                if (!pawn.Drafted)
-                {
-                    return FireMode.Default;
-                }
-                mode = comp.AutoSelect ? AutoMode(comp, verb, distance) : comp.Mode;
-            }
-            else
-            {
-                if (!settings.fireModesForNpcs)
-                {
-                    return FireMode.Default;
-                }
-                mode = AutoMode(comp, verb, distance);
-            }
+            var mode = pawn.Faction == Faction.OfPlayer && !comp.AutoSelect
+                ? comp.Mode
+                : AutoMode(comp, verb, distance);
 
             if (IsBurstMode(mode) && !CanChangeBurst(verb, baseBurst >= 0 ? baseBurst : verb.BurstShotCount))
             {
@@ -223,7 +264,7 @@ namespace VanillaCombatOverhaul
         /// <summary>Applies the shooter's mode to a freshly built shot report.</summary>
         public static void ApplyToShotReport(ref ShotReport report, Thing caster, Verb verb)
         {
-            if (!(caster is Pawn pawn) || !Enabled)
+            if (!(caster is Pawn pawn) || !ModesApplyTo(pawn))
             {
                 return;
             }
