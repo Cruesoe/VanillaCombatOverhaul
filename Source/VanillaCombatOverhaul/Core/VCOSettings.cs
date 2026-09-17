@@ -38,8 +38,7 @@ namespace VanillaCombatOverhaul
         public int parryBudgetPerWindow = 2;
         public int parryWindowTicks = 60;
         public bool enableCounterAttack = Shipped;
-        // Off and out of the settings screen until the arena suite verifies it.
-        public bool enablePointBlank = false;
+        public bool enablePointBlank = Shipped;
 
         // ---- Damage ------------------------------------------------------------
         public bool enableDirectionalDamage = Shipped;
@@ -121,7 +120,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref parryBudgetPerWindow, nameof(parryBudgetPerWindow), 2);
             Scribe_Values.Look(ref parryWindowTicks, nameof(parryWindowTicks), 60);
             Scribe_Values.Look(ref enableCounterAttack, nameof(enableCounterAttack), Shipped);
-            Scribe_Values.Look(ref enablePointBlank, nameof(enablePointBlank), false);
+            Scribe_Values.Look(ref enablePointBlank, nameof(enablePointBlank), Shipped);
 
             Scribe_Values.Look(ref enableDirectionalDamage, nameof(enableDirectionalDamage), Shipped);
             Scribe_Values.Look(ref enableMeleeFlanking, nameof(enableMeleeFlanking), Shipped);
