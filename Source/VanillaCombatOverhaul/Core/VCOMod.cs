@@ -118,6 +118,11 @@ namespace VanillaCombatOverhaul
                 {
                     Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
                 }
+                // Not verified by the arena suite yet, so only developers see it.
+                if (Prefs.DevMode)
+                {
+                    Toggle(l, "VCO_PointBlank", ref s.enablePointBlank);
+                }
             }
 
             if (Section(l, "VCO_Section_Armor"))

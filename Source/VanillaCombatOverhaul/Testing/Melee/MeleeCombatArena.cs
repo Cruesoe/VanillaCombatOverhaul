@@ -67,6 +67,12 @@ namespace VanillaCombatOverhaul
             {
                 settings.parryBudgetPerWindow = spec.parryBudgetOverride;
             }
+            var restorePointBlank = settings?.enablePointBlank ?? false;
+            if (settings != null && spec.IsPointBlank)
+            {
+                settings.enablePointBlank = spec.pointBlankOverride > 0;
+            }
+            PointBlankUtility.IgnorePlayerForcedForTesting = spec.IsPointBlank && !spec.pointBlankHonourOrders;
 
             try
             {
@@ -88,6 +94,12 @@ namespace VanillaCombatOverhaul
                 // directions and reports their mean.
                 VCODiagnostics.Reset();
                 var underTest = new HashSet<Pawn>(defenders);
+                if (spec.IsPointBlank)
+                {
+                    // Point-blank events belong to the attacker. Defenders hold swords, so
+                    // their own swings never reach the point-blank counters.
+                    underTest.UnionWith(attackers);
+                }
                 VCODiagnostics.SubjectFilter = underTest.Contains;
                 VCODiagnostics.ParryChanceProbe = SampleExpectedChance;
 
@@ -107,6 +119,11 @@ namespace VanillaCombatOverhaul
                 {
                     settings.parryBudgetPerWindow = restoreBudget;
                 }
+                if (settings != null)
+                {
+                    settings.enablePointBlank = restorePointBlank;
+                }
+                PointBlankUtility.IgnorePlayerForcedForTesting = false;
                 Cleanup(attackers);
                 Cleanup(defenders);
                 if (seeded)
@@ -204,7 +221,7 @@ namespace VanillaCombatOverhaul
                 }
 
                 var defender = MakeCombatant(PawnKindDefOf.Colonist, Faction.OfPlayer,
-                                             spec.defenderMeleeSkill, defenderWeapon);
+                                             spec.defenderMeleeSkill, -1, defenderWeapon);
                 if (defender == null)
                 {
                     continue;
@@ -234,7 +251,7 @@ namespace VanillaCombatOverhaul
                     // test; more generally, any difference in pawn kind is a variable the
                     // scenario did not ask for. Only faction and skill separate the two sides.
                     var attacker = MakeCombatant(PawnKindDefOf.Colonist, enemyFaction,
-                                                 spec.attackerMeleeSkill, attackerWeapon);
+                                                 spec.attackerMeleeSkill, spec.attackerShootingSkill, attackerWeapon);
                     if (attacker == null)
                     {
                         continue;
@@ -269,29 +286,30 @@ namespace VanillaCombatOverhaul
         private const int GenerationAttempts = 25;
 
         /// <summary>
-        /// Sets melee skill and confirms it took.
+        /// Sets a skill and confirms it took.
         ///
         /// Assigning SkillRecord.Level is not enough on its own. The getter adds an aptitude
         /// offset from genes on top of the stored value, so a pawn set to 10 can read back as
-        /// 18; and on a pawn whose backstory disables Melee the setter does nothing at all and
-        /// the level stays 0. Both quietly change the matchup a scenario claims to measure, so
-        /// the value is read back and the pawn rejected if it did not land.
+        /// 18; and on a pawn whose backstory disables the skill the setter does nothing at all
+        /// and the level stays 0. Both quietly change the matchup a scenario claims to measure,
+        /// so the value is read back and the pawn rejected if it did not land.
         /// </summary>
-        private static bool TryPinMeleeSkill(Pawn pawn, int meleeSkill)
+        private static bool TryPinSkill(Pawn pawn, SkillDef def, int level)
         {
-            var melee = pawn.skills?.GetSkill(SkillDefOf.Melee);
-            if (melee == null || melee.TotallyDisabled)
+            var skill = pawn.skills?.GetSkill(def);
+            if (skill == null || skill.TotallyDisabled)
             {
                 return false;
             }
 
-            melee.Level = meleeSkill;
-            melee.passion = Passion.None;
-            melee.xpSinceLastLevel = 0;
-            return melee.Level == meleeSkill;
+            skill.Level = level;
+            skill.passion = Passion.None;
+            skill.xpSinceLastLevel = 0;
+            return skill.Level == level;
         }
 
-        private static Pawn MakeCombatant(PawnKindDef kind, Faction faction, int meleeSkill, ThingDef weapon)
+        private static Pawn MakeCombatant(PawnKindDef kind, Faction faction, int meleeSkill, int shootingSkill,
+                                          ThingDef weapon)
         {
             Pawn pawn = null;
 
@@ -313,7 +331,8 @@ namespace VanillaCombatOverhaul
                 candidate.story?.traits?.allTraits?.Clear();
                 candidate.apparel?.DestroyAll();
 
-                if (TryPinMeleeSkill(candidate, meleeSkill))
+                if (TryPinSkill(candidate, SkillDefOf.Melee, meleeSkill)
+                    && (shootingSkill < 0 || TryPinSkill(candidate, SkillDefOf.Shooting, shootingSkill)))
                 {
                     pawn = candidate;
                     break;
@@ -325,6 +344,7 @@ namespace VanillaCombatOverhaul
             if (pawn == null)
             {
                 Log.Error($"[VCO] Arena could not generate a pawn pinned to melee {meleeSkill} " +
+                          (shootingSkill >= 0 ? $"and shooting {shootingSkill} " : "") +
                           $"in {GenerationAttempts} attempts.");
                 return null;
             }
@@ -362,7 +382,7 @@ namespace VanillaCombatOverhaul
         {
             var tickManager = Find.TickManager;
             Refresh(attackers, attackerTarget, defenders, attackerWeapon, defenderWeapon,
-                    spec.attackerMeleeSkill, spec.defenderMeleeSkill);
+                    spec.attackerMeleeSkill, spec.defenderMeleeSkill, spec.attackerShootingSkill);
 
             for (var i = 0; i < spec.ticks; i++)
             {
@@ -371,7 +391,7 @@ namespace VanillaCombatOverhaul
                 if (spec.refreshEveryTicks > 0 && i % spec.refreshEveryTicks == 0)
                 {
                     Refresh(attackers, attackerTarget, defenders, attackerWeapon, defenderWeapon,
-                            spec.attackerMeleeSkill, spec.defenderMeleeSkill);
+                            spec.attackerMeleeSkill, spec.defenderMeleeSkill, spec.attackerShootingSkill);
                 }
             }
         }
@@ -387,7 +407,7 @@ namespace VanillaCombatOverhaul
         /// </summary>
         private static void Refresh(List<Pawn> attackers, List<int> attackerTarget, List<Pawn> defenders,
                                     ThingDef attackerWeapon, ThingDef defenderWeapon,
-                                    int attackerSkill, int defenderSkill)
+                                    int attackerSkill, int defenderSkill, int attackerShootingSkill)
         {
             foreach (var defender in defenders)
             {
@@ -400,7 +420,7 @@ namespace VanillaCombatOverhaul
                 var attacker = attackers[i];
                 var defender = defenders[attackerTarget[i]];
 
-                Revive(attacker, attackerWeapon, attackerSkill);
+                Revive(attacker, attackerWeapon, attackerSkill, attackerShootingSkill);
 
                 // Record the inputs the formula actually saw. The idealised skill curve is not
                 // the whole story: Ideology light-level offsets and manipulation lost to
@@ -437,8 +457,9 @@ namespace VanillaCombatOverhaul
             // other than the one it names. A pawn with no skills tracker records -1 rather
             // than being skipped, because "this combatant has no skills" is exactly the
             // condition worth failing on.
-            VCODiagnostics.Sample("measured.attackerSkill", SkillLevel(attacker));
-            VCODiagnostics.Sample("measured.defenderSkill", SkillLevel(defender));
+            VCODiagnostics.Sample("measured.attackerSkill", SkillLevel(attacker, SkillDefOf.Melee));
+            VCODiagnostics.Sample("measured.defenderSkill", SkillLevel(defender, SkillDefOf.Melee));
+            VCODiagnostics.Sample("measured.attackerShootingSkill", SkillLevel(attacker, SkillDefOf.Shooting));
 
         }
 
@@ -464,13 +485,13 @@ namespace VanillaCombatOverhaul
                 (float)MeleeAssertions.FormulaFor(aptitude, attackerMelee, directionFactor));
         }
 
-        private static float SkillLevel(Pawn pawn)
+        private static float SkillLevel(Pawn pawn, SkillDef def)
         {
-            var skill = pawn.skills?.GetSkill(SkillDefOf.Melee);
+            var skill = pawn.skills?.GetSkill(def);
             return skill == null ? -1f : skill.Level;
         }
 
-        private static void Revive(Pawn pawn, ThingDef weapon, int meleeSkill)
+        private static void Revive(Pawn pawn, ThingDef weapon, int meleeSkill, int shootingSkill = -1)
         {
             if (pawn == null || pawn.Dead || !pawn.Spawned)
             {
@@ -486,7 +507,15 @@ namespace VanillaCombatOverhaul
             if (melee != null && melee.Level != meleeSkill)
             {
                 VCODiagnostics.Count("arena.skillRepinned");
-                TryPinMeleeSkill(pawn, meleeSkill);
+                TryPinSkill(pawn, SkillDefOf.Melee, meleeSkill);
+            }
+
+            // Point-blank shots earn shooting XP the same way, and the table is keyed on it.
+            var shooting = pawn.skills?.GetSkill(SkillDefOf.Shooting);
+            if (shootingSkill >= 0 && shooting != null && shooting.Level != shootingSkill)
+            {
+                VCODiagnostics.Count("arena.skillRepinned");
+                TryPinSkill(pawn, SkillDefOf.Shooting, shootingSkill);
             }
 
             // Weapons get dropped when a pawn goes down, which silently turns an armed

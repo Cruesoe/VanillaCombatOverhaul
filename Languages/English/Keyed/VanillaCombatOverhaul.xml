@@ -35,6 +35,10 @@
   <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
   <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
 
+  <VCO_PointBlank>Enable Point-Blank Shots</VCO_PointBlank>
+  <VCO_PointBlank_Tip>A skilled shooter stuck in melee sometimes fires their gun instead of swinging it.\n\nOnly pawns with Shooting 10 or higher can do this. The chance is 5% at Shooting 10 and rises to 50% at Shooting 20. The shot fires instantly at the pawn they were fighting, and otherwise works like any other shot from that weapon. It applies to everyone, including enemies.\n\nSocial fights, duels, finishing blows on downed pawns, and melee attacks you order directly always stay melee.</VCO_PointBlank_Tip>
+  <VCO_PointBlankShot>Point-blank shot!</VCO_PointBlankShot>
+
   <!-- Armor -->
   <VCO_AdvancedArmor>Good leftover armor stops hits</VCO_AdvancedArmor>
   <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nThe gun's shown armor penetration is raised to keep weapons that already beat a plate beating it.</VCO_AdvancedArmor_Tip>

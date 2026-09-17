@@ -36,6 +36,24 @@ namespace VanillaCombatOverhaul
         /// <summary>Give the defender nothing to hold, to confirm the no-weapon gate.</summary>
         public bool defenderUnarmed = false;
 
+        /// <summary>Shooting skill pinned on attackers; -1 leaves whatever was generated.</summary>
+        public int attackerShootingSkill = -1;
+
+        /// <summary>
+        /// Point-blank shooting for this run only: 1 forces it on, -1 forces it off, 0 leaves
+        /// the configured value and marks the run as not a point-blank scenario.
+        /// </summary>
+        public int pointBlankOverride = 0;
+
+        /// <summary>
+        /// Arena attacks are ordered jobs, which RimWorld always marks player-forced, and
+        /// point-blank shooting never replaces an ordered melee attack. Off, the arena waives
+        /// that rule so the roll can be measured; on, the run tests the rule itself.
+        /// </summary>
+        public bool pointBlankHonourOrders = false;
+
+        public bool IsPointBlank => pointBlankOverride != 0;
+
         public int ticks = 4000;
 
         /// <summary>
@@ -60,6 +78,12 @@ namespace VanillaCombatOverhaul
             yield return new KeyValuePair<string, string>("defenderMeleeSkill", defenderMeleeSkill.ToString());
             yield return new KeyValuePair<string, string>("attackerWeapon", attackerWeapon ?? "none");
             yield return new KeyValuePair<string, string>("defenderWeapon", defenderUnarmed ? "none" : (defenderWeapon ?? "none"));
+            if (IsPointBlank)
+            {
+                yield return new KeyValuePair<string, string>("attackerShootingSkill", attackerShootingSkill.ToString());
+                yield return new KeyValuePair<string, string>("pointBlankOverride", pointBlankOverride.ToString());
+                yield return new KeyValuePair<string, string>("pointBlankHonourOrders", pointBlankHonourOrders.ToString());
+            }
             yield return new KeyValuePair<string, string>("ticks", ticks.ToString());
             yield return new KeyValuePair<string, string>("seed", seed.ToString());
         }

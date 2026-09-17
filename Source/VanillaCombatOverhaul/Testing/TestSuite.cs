@@ -46,6 +46,42 @@ namespace VanillaCombatOverhaul
             yield return new MeleeArenaSpec { label = "outnumbered-6v1-nobudget", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 6, pairs = 14, refreshEveryTicks = 15, ticks = 16000,
                                          parryBudgetOverride = 9999 };
+
+            foreach (var spec in PointBlankMatrix())
+            {
+                yield return spec;
+            }
+        }
+
+        /// <summary>
+        /// Point-blank shooting: the skill threshold from both sides, the table at its low,
+        /// middle and top, burst and bow weapons, and the two cases that must never shoot.
+        /// Skill 10 runs longest because a 5% chance needs the most rolls to pin down.
+        /// </summary>
+        public static IEnumerable<MeleeArenaSpec> PointBlankMatrix()
+        {
+            MeleeArenaSpec Shooter(string label, int shooting, string weapon = "Gun_Autopistol", int ticks = 6000) =>
+                new MeleeArenaSpec
+                {
+                    label = label, attackerMeleeSkill = 10, defenderMeleeSkill = 10,
+                    attackerWeapon = weapon, attackerShootingSkill = shooting,
+                    pointBlankOverride = 1, ticks = ticks
+                };
+
+            yield return Shooter("pointblank-shoot9", 9);
+            yield return Shooter("pointblank-shoot10", 10, ticks: 16000);
+            yield return Shooter("pointblank-shoot15", 15);
+            yield return Shooter("pointblank-shoot20", 20);
+            yield return Shooter("pointblank-shoot20-burst", 20, "Gun_AssaultRifle");
+            yield return Shooter("pointblank-shoot20-bow", 20, "Bow_Short");
+
+            var disabled = Shooter("pointblank-disabled", 20);
+            disabled.pointBlankOverride = -1;
+            yield return disabled;
+
+            var ordered = Shooter("pointblank-player-orders", 20);
+            ordered.pointBlankHonourOrders = true;
+            yield return ordered;
         }
 
         public static List<MeleeArenaResult> RunMatrix(Map map, int seed = 0)
@@ -115,6 +151,14 @@ namespace VanillaCombatOverhaul
                 sb.AppendLine($"  chance: curve predicts {MeleeAssertions.PredictParryChance(r.Spec):P1}, " +
                               $"measured inputs predict {MeleeAssertions.ExpectedFromMeasuredInputs(r):P1}, " +
                               $"rolled {r.ReadingAverage("parry.chanceRolled"):P1}");
+                if (r.Spec.IsPointBlank)
+                {
+                    sb.AppendLine($"  point-blank: {r.Spec.attackerWeapon}, shooting {r.Spec.attackerShootingSkill}, " +
+                                  $"{r.Counter("pointblank.success"):N0} shots from {r.Counter("pointblank.roll"):N0} rolls, " +
+                                  $"table {PointBlankAssertions.ExpectedChance(r.Spec.attackerShootingSkill):P0}; " +
+                                  $"cooldown ticks ranged {r.ReadingAverage("pointblank.rangedCooldownTicks"):0} " +
+                                  $"vs melee {r.ReadingAverage("pointblank.meleeCooldownTicks"):0}");
+                }
 
                 sb.AppendLine("  counters:");
                 foreach (var kv in r.Counters)
