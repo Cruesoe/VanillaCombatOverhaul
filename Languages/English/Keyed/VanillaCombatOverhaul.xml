@@ -35,6 +35,10 @@
   <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
   <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
 
+  <VCO_PointBlank>Enable Point-Blank Shots</VCO_PointBlank>
+  <VCO_PointBlank_Tip>A skilled shooter stuck in melee sometimes fires their gun instead of swinging it.\n\nOnly pawns with Shooting 10 or higher can do this. The chance is 5% at Shooting 10 and rises to 50% at Shooting 20. The shot fires instantly at the pawn they were fighting, and otherwise works like any other shot from that weapon. It applies to everyone, including enemies.\n\nSocial fights, duels, finishing blows on downed pawns, and melee attacks you order directly always stay melee.</VCO_PointBlank_Tip>
+  <VCO_PointBlankShot>Point-blank shot!</VCO_PointBlankShot>
+
   <!-- Armor -->
   <VCO_AdvancedArmor>Good leftover armor stops hits</VCO_AdvancedArmor>
   <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nThe gun's shown armor penetration is raised to keep weapons that already beat a plate beating it.</VCO_AdvancedArmor_Tip>
@@ -98,6 +102,36 @@
   <VCO_TracerScale>Tracer size: {0}x</VCO_TracerScale>
   <VCO_TracerScale_Tip>How big the streak is, as a multiple of the default. Length and thickness scale together.\n\nLeave this at 1 unless the streaks read too heavy or too faint at the zoom you play at.</VCO_TracerScale_Tip>
 
+  <!-- Fire modes -->
+  <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>
+  <VCO_FireModes>Drafted pawns can choose a fire mode</VCO_FireModes>
+  <VCO_FireModes_Tip>Drafted colonists with a gun get a fire mode button.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim, quicker to fire.\nSuppression: many more rounds, much worse aim, fast to aim but slow to recover.\nAuto: picks one of those by distance to the target.\n\nThe mode only applies while drafted, so hunting and undrafted self-defence fire normally. Explosives, one-use launchers and abilities are never affected, and single-shot and beam weapons only offer Default and Precision.</VCO_FireModes_Tip>
+  <VCO_FireModesNpc>Other factions use fire modes too</VCO_FireModesNpc>
+  <VCO_FireModesNpc_Tip>Raiders, visitors and allies pick a fire mode by distance, the same way a colonist on Auto does.</VCO_FireModesNpc_Tip>
+  <VCO_FireModeShortBurstRange>Auto uses Short Burst from {0} cells</VCO_FireModeShortBurstRange>
+  <VCO_FireModeShortBurstRange_Tip>Targets closer than this get Suppression. Default 12.</VCO_FireModeShortBurstRange_Tip>
+  <VCO_FireModePrecisionRange>Auto uses Precision from {0} cells</VCO_FireModePrecisionRange>
+  <VCO_FireModePrecisionRange_Tip>Targets at least this far away get Precision. It can never be closer than the Short Burst distance. Default 25.</VCO_FireModePrecisionRange_Tip>
+  <VCO_FireModeAccuracy>Accuracy: ×{0}</VCO_FireModeAccuracy>
+  <VCO_FireModeAccuracy_Tip>Changes the shooter part of the hit chance as if the target were this many times closer. Above 1 aims better and below 1 aims worse.\n\nIt never raises a shot above certain, and it matters most at long range.</VCO_FireModeAccuracy_Tip>
+  <VCO_FireModeAimTime>Aiming time: ×{0}</VCO_FireModeAimTime>
+  <VCO_FireModeAimTime_Tip>Multiplies how long the pawn aims before the first shot.</VCO_FireModeAimTime_Tip>
+  <VCO_FireModeCooldown>Cooldown: ×{0}</VCO_FireModeCooldown>
+  <VCO_FireModeCooldown_Tip>Multiplies the pause after a burst before the pawn can aim again.</VCO_FireModeCooldown_Tip>
+  <VCO_FireModeBurst>Burst size: ×{0}</VCO_FireModeBurst>
+  <VCO_FireModeBurst_Tip>Multiplies the number of rounds in a burst, rounded to the nearest whole round. Single-shot and beam weapons are unaffected.</VCO_FireModeBurst_Tip>
+  <VCO_FireModeBurstLimit>Most rounds added or removed: {0}</VCO_FireModeBurstLimit>
+  <VCO_FireModeBurstLimit_Tip>Caps the change to a burst, so a weapon that already fires long bursts is not doubled.</VCO_FireModeBurstLimit_Tip>
+  <VCO_FireModeReset>Reset fire mode settings</VCO_FireModeReset>
+  <VCO_FireMode_Default>Default</VCO_FireMode_Default>
+  <VCO_FireMode_Precision>Precision</VCO_FireMode_Precision>
+  <VCO_FireMode_ShortBurst>Short Burst</VCO_FireMode_ShortBurst>
+  <VCO_FireMode_Suppression>Suppression</VCO_FireMode_Suppression>
+  <VCO_FireMode_Auto>Auto</VCO_FireMode_Auto>
+  <VCO_CommandSetFireMode>Fire: {0}</VCO_CommandSetFireMode>
+  <VCO_CommandSetFireMode_Tip>Choose how this pawn fires while drafted.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim.\nSuppression: many more rounds, much worse aim.\nAuto: Suppression up close, Short Burst at medium range, Precision at long range.</VCO_CommandSetFireMode_Tip>
+  <VCO_FireModeRead>Fire mode ({0}): shooter {1} → {2}</VCO_FireModeRead>
+
   <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
   <VCO_ApparelCoverage>Improved apparel coverage and layering</VCO_ApparelCoverage>
   <VCO_ApparelCoverage_Tip>Applies the complete coverage pack: sensible protection for hands, feet and faces; corrected acid and thump armour types; and improved layering for glasses, masks, helmets and headsets.</VCO_ApparelCoverage_Tip>
@@ -149,6 +183,7 @@
   <VCO_StatPart_ShootingAbility>Shooting ability</VCO_StatPart_ShootingAbility>
   <VCO_StatPart_Moving>While moving</VCO_StatPart_Moving>
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
+  <VCO_StatPart_FireMode>Fire mode ({0})</VCO_StatPart_FireMode>
 
   <!-- In-world text -->
   <VCO_Mote_Parried>Parried!</VCO_Mote_Parried>

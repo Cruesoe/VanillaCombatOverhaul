@@ -207,7 +207,7 @@ namespace VanillaCombatOverhaul
             return null;
         }
 
-        private static Pawn SpawnShooter(Map map, IntVec3 cell, int skill, ThingDef weapon)
+        internal static Pawn SpawnShooter(Map map, IntVec3 cell, int skill, ThingDef weapon)
         {
             var pawn = MakeCleanPawn(skill, requireSkill: true);
             if (pawn == null)
@@ -221,7 +221,7 @@ namespace VanillaCombatOverhaul
             return pawn;
         }
 
-        private static Pawn SpawnTarget(Map map, IntVec3 cell, bool moving)
+        internal static Pawn SpawnTarget(Map map, IntVec3 cell, bool moving)
         {
             var pawn = MakeCleanPawn(0, requireSkill: false);
             if (pawn == null)

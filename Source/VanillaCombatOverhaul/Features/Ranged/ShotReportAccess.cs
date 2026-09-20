@@ -25,6 +25,12 @@ namespace VanillaCombatOverhaul
         private static readonly AccessTools.StructFieldRef<ShotReport, float> WeatherRef =
             AccessTools.StructFieldRefAccess<ShotReport, float>("factorFromWeather");
 
+        private static readonly AccessTools.StructFieldRef<ShotReport, float> ShooterRef =
+            AccessTools.StructFieldRefAccess<ShotReport, float>("factorFromShooterAndDist");
+
+        private static readonly AccessTools.StructFieldRef<ShotReport, float> DistanceRef =
+            AccessTools.StructFieldRefAccess<ShotReport, float>("distance");
+
         private static readonly AccessTools.StructFieldRef<ShotReport, TargetInfo> TargetRef =
             AccessTools.StructFieldRefAccess<ShotReport, TargetInfo>("target");
 
@@ -37,6 +43,13 @@ namespace VanillaCombatOverhaul
 
         public static void SetWeatherFactor(ref ShotReport report, float value) =>
             WeatherRef(ref report) = value;
+
+        public static float GetShooterFactor(ref ShotReport report) => ShooterRef(ref report);
+
+        public static void SetShooterFactor(ref ShotReport report, float value) =>
+            ShooterRef(ref report) = value;
+
+        public static float GetDistance(ref ShotReport report) => DistanceRef(ref report);
 
         public static TargetInfo GetTarget(ref ShotReport report) => TargetRef(ref report);
     }

@@ -32,6 +32,14 @@ namespace VanillaCombatOverhaul
 
         public static void Evaluate(MeleeArenaResult r)
         {
+            if (r.Spec.IsPointBlank)
+            {
+                // Gun-butt attackers and shots in the mix make the parry predictions the
+                // wrong question; these scenarios answer point-blank questions only.
+                PointBlankAssertions.Evaluate(r);
+                return;
+            }
+
             var attempts = r.Counter("parry.attempt");
 
             r.Assertions.Add(Check(

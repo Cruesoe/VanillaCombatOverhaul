@@ -32,6 +32,9 @@ namespace VanillaCombatOverhaul
         // triggering another counter, indefinitely. Counters never chain.
         [ThreadStatic] private static bool resolvingCounter;
 
+        /// <summary>True while a counter-attack is being made, so other features can leave it alone.</summary>
+        internal static bool ResolvingCounter => resolvingCounter;
+
         /// <summary>
         /// Decides whether the defender parries this attack, and applies the effects if so.
         /// Called before vanilla resolves hit/miss, so parry is a first line of defence and

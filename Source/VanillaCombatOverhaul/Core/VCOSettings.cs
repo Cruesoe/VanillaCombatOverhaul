@@ -38,6 +38,7 @@ namespace VanillaCombatOverhaul
         public int parryBudgetPerWindow = 2;
         public int parryWindowTicks = 60;
         public bool enableCounterAttack = Shipped;
+        public bool enablePointBlank = Shipped;
 
         // ---- Damage ------------------------------------------------------------
         public bool enableDirectionalDamage = Shipped;
@@ -66,6 +67,18 @@ namespace VanillaCombatOverhaul
         // wanted to move together. 1 is the shipped size, and the range is the useful span
         // either side of it rather than everything the draw code can survive.
         public float tracerScale = 1f;
+
+        // ---- Fire modes --------------------------------------------------------
+        public bool enableFireModes = Shipped;
+        // Non-player pawns always choose by distance; this turns that off.
+        public bool fireModesForNpcs = true;
+        // Auto selection: Suppression below the short burst range, Short Burst up to the
+        // precision range, Precision beyond it. Matches Vanilla Fire Modes' 12 and 25.
+        public float fireModeShortBurstRange = 12f;
+        public float fireModePrecisionRange = 25f;
+        public FireModeTuning precisionTuning = FireModeTuning.PrecisionDefaults();
+        public FireModeTuning shortBurstTuning = FireModeTuning.ShortBurstDefaults();
+        public FireModeTuning suppressionTuning = FireModeTuning.SuppressionDefaults();
 
         // ---- Armor -------------------------------------------------------------
         // Leftover stretch and AP compensation. Defaults match Vanilla Combat Reloaded:
@@ -107,6 +120,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref parryBudgetPerWindow, nameof(parryBudgetPerWindow), 2);
             Scribe_Values.Look(ref parryWindowTicks, nameof(parryWindowTicks), 60);
             Scribe_Values.Look(ref enableCounterAttack, nameof(enableCounterAttack), Shipped);
+            Scribe_Values.Look(ref enablePointBlank, nameof(enablePointBlank), Shipped);
 
             Scribe_Values.Look(ref enableDirectionalDamage, nameof(enableDirectionalDamage), Shipped);
             Scribe_Values.Look(ref enableMeleeFlanking, nameof(enableMeleeFlanking), Shipped);
@@ -128,6 +142,21 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableVisibleTracers, nameof(enableVisibleTracers), Shipped);
             Scribe_Values.Look(ref tracerScale, nameof(tracerScale), 1f);
 
+            Scribe_Values.Look(ref enableFireModes, nameof(enableFireModes), Shipped);
+            Scribe_Values.Look(ref fireModesForNpcs, nameof(fireModesForNpcs), true);
+            Scribe_Values.Look(ref fireModeShortBurstRange, nameof(fireModeShortBurstRange), 12f);
+            Scribe_Values.Look(ref fireModePrecisionRange, nameof(fireModePrecisionRange), 25f);
+            Scribe_Deep.Look(ref precisionTuning, nameof(precisionTuning));
+            Scribe_Deep.Look(ref shortBurstTuning, nameof(shortBurstTuning));
+            Scribe_Deep.Look(ref suppressionTuning, nameof(suppressionTuning));
+            if (Scribe.mode != LoadSaveMode.Saving)
+            {
+                // A settings file from before fire modes has no tuning nodes, which loads as null.
+                precisionTuning ??= FireModeTuning.PrecisionDefaults();
+                shortBurstTuning ??= FireModeTuning.ShortBurstDefaults();
+                suppressionTuning ??= FireModeTuning.SuppressionDefaults();
+            }
+
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
@@ -148,6 +177,31 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref verboseLogging, nameof(verboseLogging), false);
             Scribe_Values.Look(ref diagnosticDumpIntervalTicks, nameof(diagnosticDumpIntervalTicks), 2500);
 
+        }
+
+        public FireModeTuning TuningFor(FireMode mode)
+        {
+            switch (mode)
+            {
+                case FireMode.Precision:
+                    return precisionTuning;
+                case FireMode.ShortBurst:
+                    return shortBurstTuning;
+                case FireMode.Suppression:
+                    return suppressionTuning;
+                default:
+                    return null;
+            }
+        }
+
+        public void ResetFireModes()
+        {
+            fireModesForNpcs = true;
+            fireModeShortBurstRange = 12f;
+            fireModePrecisionRange = 25f;
+            precisionTuning = FireModeTuning.PrecisionDefaults();
+            shortBurstTuning = FireModeTuning.ShortBurstDefaults();
+            suppressionTuning = FireModeTuning.SuppressionDefaults();
         }
 
         /// <summary>

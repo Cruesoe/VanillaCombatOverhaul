@@ -17,6 +17,7 @@ namespace VanillaCombatOverhaul
             results.AddRange(EvasionFormulaTests());
             results.AddRange(FiringArcFormulaTests());
             results.AddRange(PatchGuardTests());
+            results.AddRange(FireModeAssertions.SelfTests());
             return results;
         }
 

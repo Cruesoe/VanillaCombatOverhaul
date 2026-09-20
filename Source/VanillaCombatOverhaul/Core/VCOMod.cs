@@ -118,6 +118,7 @@ namespace VanillaCombatOverhaul
                 {
                     Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
                 }
+                Toggle(l, "VCO_PointBlank", ref s.enablePointBlank);
             }
 
             if (Section(l, "VCO_Section_Armor"))
@@ -154,6 +155,50 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
             }
+
+            if (Section(l, "VCO_Section_FireModes"))
+            {
+                Toggle(l, "VCO_FireModes", ref s.enableFireModes);
+                if (s.enableFireModes)
+                {
+                    DrawFireModes(l, s);
+                }
+            }
+        }
+
+        private static void DrawFireModes(Listing_Standard l, VCOSettings s)
+        {
+            Toggle(l, "VCO_FireModesNpc", ref s.fireModesForNpcs);
+
+            l.Gap(6f);
+            s.fireModeShortBurstRange = Slider(l, "VCO_FireModeShortBurstRange",
+                                               s.fireModeShortBurstRange, 1f, 40f, 1f, "0");
+            s.fireModePrecisionRange = Slider(l, "VCO_FireModePrecisionRange",
+                                              s.fireModePrecisionRange, 1f, 60f, 1f, "0");
+            // Precision starts where Short Burst does at the earliest, never before it.
+            s.fireModePrecisionRange = Mathf.Max(s.fireModePrecisionRange, s.fireModeShortBurstRange);
+
+            DrawTuning(l, FireMode.Precision, s.precisionTuning);
+            DrawTuning(l, FireMode.ShortBurst, s.shortBurstTuning);
+            DrawTuning(l, FireMode.Suppression, s.suppressionTuning);
+
+            l.Gap(6f);
+            if (l.ButtonText("VCO_FireModeReset".Translate()))
+            {
+                s.ResetFireModes();
+            }
+        }
+
+        private static void DrawTuning(Listing_Standard l, FireMode mode, FireModeTuning t)
+        {
+            l.Gap(8f);
+            l.Label(FireModeUtility.LabelFor(mode).Colorize(ColoredText.SubtleGrayColor));
+            t.accuracy = Slider(l, "VCO_FireModeAccuracy", t.accuracy, 0.25f, 3f, 0.05f, "0.00");
+            t.aimTime = Slider(l, "VCO_FireModeAimTime", t.aimTime, 0.25f, 3f, 0.05f, "0.00");
+            t.cooldown = Slider(l, "VCO_FireModeCooldown", t.cooldown, 0.25f, 3f, 0.05f, "0.00");
+            t.burstFactor = Slider(l, "VCO_FireModeBurst", t.burstFactor, 0.25f, 4f, 0.05f, "0.00");
+            t.burstMaxChange = Mathf.RoundToInt(
+                Slider(l, "VCO_FireModeBurstLimit", t.burstMaxChange, 0f, 30f, 1f, "0"));
         }
 
         private static void DrawEquipment(Listing_Standard l, VCOSettings s)
@@ -248,6 +293,19 @@ namespace VanillaCombatOverhaul
             {
                 Messages.Message("VCO_RestartNeeded".Translate(), MessageTypeDefOf.CautionInput, false);
             }
+        }
+
+        /// <summary>
+        /// A labelled slider snapped to <paramref name="step"/>. The key's text takes the
+        /// current value as {0}, and the key plus "_Tip" is the tooltip.
+        /// </summary>
+        private static float Slider(Listing_Standard l, string key, float value, float min, float max,
+                                    float step, string format)
+        {
+            var label = key.Translate(value.ToString(format)).ToString();
+            var tip = (key + "_Tip").Translate().ToString();
+            var result = l.SliderLabeled(label, value, min, max, 0.6f, tip);
+            return Mathf.Clamp(GenMath.RoundTo(result, step), min, max);
         }
 
     }

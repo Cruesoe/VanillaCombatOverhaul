@@ -12,6 +12,7 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 [*]Skilled shooters handle inaccurate weapons and bad weather more effectively.
 [*]Moving targets are harder to hit, and misses spread further at long range.
 [*]Visible projectile trails make incoming fire easier to read.
+[*]Drafted shooters can switch between Precision, Short Burst and Suppression fire, or let Auto choose by distance. Enemies pick their own.
 [*]Bullets and arrows produce distinct wounds based on how they strike the target.
 [/list]
 
@@ -26,7 +27,7 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 Combat and equipment systems can be configured individually, so you can keep the parts that suit your colony.
 
 [h1]Compatibility[/h1]
-Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded or Auto Arm because they control overlapping combat or equipment systems.
+Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems.
 
 [h1]Thanks and inspiration[/h1]
-Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.
+Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, to [b]Vanilla Fire Modes[/b] for inspiring selectable fire modes, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.
