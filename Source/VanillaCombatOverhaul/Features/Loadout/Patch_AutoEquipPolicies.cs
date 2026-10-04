@@ -92,7 +92,10 @@ namespace VanillaCombatOverhaul
             {
                 yield return value;
             }
+            // Shown only once the forced weapon is in hand, not while the equip job is still walking to it
+            var primary = __instance.equipment?.Primary;
             if (VCOMod.Settings?.enableAutoEquip == true
+                && primary != null
                 && __instance.IsColonistPlayerControlled
                 && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(__instance) == true)
             {
@@ -100,7 +103,7 @@ namespace VanillaCombatOverhaul
                 {
                     defaultLabel = "VCO_AutoEquip_Unlock".Translate(),
                     defaultDesc = "VCO_AutoEquip_Unlock_Tip".Translate(),
-                    icon = __instance.equipment.Primary.def.uiIcon,
+                    icon = primary.def.uiIcon,
                     action = () => AutoEquipPolicyComponent.Current?.ClearForcedWeapon(__instance)
                 };
             }
