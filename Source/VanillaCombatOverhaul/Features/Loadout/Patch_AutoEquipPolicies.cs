@@ -92,7 +92,8 @@ namespace VanillaCombatOverhaul
             {
                 yield return value;
             }
-            if (__instance.IsColonistPlayerControlled
+            if (VCOMod.Settings?.enableAutoEquip == true
+                && __instance.IsColonistPlayerControlled
                 && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(__instance) == true)
             {
                 yield return new Command_Action
