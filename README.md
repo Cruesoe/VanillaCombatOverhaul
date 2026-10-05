@@ -20,7 +20,7 @@ Combat and equipment features can be enabled individually from the mod settings.
 
 ## Compatibility
 
-Designed for RimWorld 1.6 and vanilla-style weapons, apparel, and combat mods.
+Designed for vanilla-style weapons, apparel, and combat mods.
 
 Not compatible with:
 
