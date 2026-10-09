@@ -28,8 +28,16 @@ namespace VanillaCombatOverhaul
             results.Add(Check("falloff is full at the impact and half at the edge",
                 Approx(SuppressionUtility.Falloff(0f, 3f), 1f) && Approx(SuppressionUtility.Falloff(3f, 3f), 0.5f)
                 && Approx(SuppressionUtility.Falloff(3.1f, 3f), 0f), "1 / 0.5 / 0"));
-            results.Add(Check("decay removes 20 a second and stops at zero",
-                Approx(SuppressionUtility.Decay(50f, 60), 30f) && Approx(SuppressionUtility.Decay(5f, 600), 0f), "50 -> 30"));
+            results.Add(Check("decay removes 240 a second and stops at zero",
+                Approx(SuppressionUtility.Decay(150f, 15), 90f) && Approx(SuppressionUtility.Decay(5f, 600), 0f), "150 -> 90 in 15 ticks"));
+            results.Add(Check("no armour leaves suppression whole",
+                Approx(SuppressionUtility.ArmorFactor(0f, 0.16f), 1f), SuppressionUtility.ArmorFactor(0f, 0.16f).ToString("F2")));
+            results.Add(Check("more armour resists more, more penetration resists less",
+                SuppressionUtility.ArmorFactor(1f, 0.16f) < SuppressionUtility.ArmorFactor(0.5f, 0.16f)
+                && SuppressionUtility.ArmorFactor(1f, 0.35f) > SuppressionUtility.ArmorFactor(1f, 0.16f),
+                $"{SuppressionUtility.ArmorFactor(0.5f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.35f):F2}"));
+            results.Add(Check("armour can stop suppression entirely, and no penetration suppresses nothing",
+                Approx(SuppressionUtility.ArmorFactor(2f, 0.1f), 0f) && Approx(SuppressionUtility.ArmorFactor(0f, 0f), 0f), "0 / 0"));
 
             var calm = StatPart_SuppressabilityFromMind.FactorFor(0.35f, 0.5f);
             var ironWilled = StatPart_SuppressabilityFromMind.FactorFor(0.17f, 0.5f);
@@ -129,6 +137,8 @@ namespace VanillaCombatOverhaul
                 }
                 results.Add(Check("suppression fades once the shooting stops", (targetComp?.Level ?? 1f) == 0f,
                     (targetComp?.Level ?? -1f).ToString("F1")));
+
+                results.AddRange(ArmorTests(map, origin + IntVec3.North * 6, spawned));
             }
             catch (Exception e)
             {
@@ -151,12 +161,59 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>An unarmed hostile pawn, so it cannot fire back while the test ticks the game.</summary>
+        /// <summary>Armour factor for real apparel sets against real bullets, reported for tuning against Combat Extended.</summary>
+        private static List<AssertionResult> ArmorTests(Map map, IntVec3 cell, List<Pawn> spawned)
+        {
+            var results = new List<AssertionResult>();
+            var rifle = RawPenetrationOf("Bullet_AssaultRifle");
+            var charge = RawPenetrationOf("Bullet_ChargeRifle");
+            var none = ArmorOf(map, cell, spawned);
+            var flak = ArmorOf(map, cell + IntVec3.East * 2, spawned, "Apparel_FlakVest", "Apparel_FlakPants", "Apparel_AdvancedHelmet");
+            var marine = ArmorOf(map, cell + IntVec3.East * 4, spawned, "Apparel_PowerArmor", "Apparel_PowerArmorHelmet");
+
+            var rifleNone = SuppressionUtility.ArmorFactor(none, rifle);
+            var rifleFlak = SuppressionUtility.ArmorFactor(flak, rifle);
+            var rifleMarine = SuppressionUtility.ArmorFactor(marine, rifle);
+            var chargeMarine = SuppressionUtility.ArmorFactor(marine, charge);
+            var detail = $"armour {none:F2}/{flak:F2}/{marine:F2}; assault rifle (pen {rifle:F2}) x{rifleNone:F2} none, "
+                         + $"x{rifleFlak:F2} flak, x{rifleMarine:F2} marine; charge rifle (pen {charge:F2}) x{chargeMarine:F2} marine";
+            results.Add(Check("an unarmoured pawn takes full suppression", Math.Abs(rifleNone - 1f) <= Tolerance, detail));
+            results.Add(Check("flak gear resists part of a rifle's suppression", rifleFlak > 0.4f && rifleFlak < 0.85f, detail));
+            results.Add(Check("marine armour resists most of a rifle's suppression", rifleMarine < rifleFlak && rifleMarine < 0.5f, detail));
+            results.Add(Check("higher penetration suppresses armour more", chargeMarine > rifleMarine, detail));
+            return results;
+        }
+
+        private static float RawPenetrationOf(string bulletDefName)
+        {
+            var def = DefDatabase<ThingDef>.GetNamedSilentFail(bulletDefName);
+            return def?.projectile == null ? 0f : SuppressionUtility.RawPenetration(def.projectile.GetArmorPenetration((Thing)null));
+        }
+
+        private static float ArmorOf(Map map, IntVec3 cell, List<Pawn> spawned, params string[] apparel)
+        {
+            var pawn = RangedCombatArena.SpawnTarget(map, cell, false);
+            spawned.Add(pawn);
+            foreach (var defName in apparel)
+            {
+                var def = DefDatabase<ThingDef>.GetNamedSilentFail(defName);
+                if (def == null)
+                {
+                    continue;
+                }
+                var stuff = def.MadeFromStuff ? GenStuff.DefaultStuffFor(def) : null;
+                pawn.apparel.Wear((Apparel)ThingMaker.MakeThing(def, stuff), false);
+            }
+            return SuppressionUtility.OverallSharpArmor(pawn);
+        }
+
         private static Pawn SpawnHostile(Map map, IntVec3 cell, Faction faction)
         {
             var kind = faction.def.basicMemberKind ?? PawnKindDefOf.Villager;
             var pawn = PawnGenerator.GeneratePawn(kind, faction);
             pawn.health.RemoveAllHediffs();
             pawn.equipment?.DestroyAllEquipment();
+            pawn.apparel?.DestroyAll();
             GenSpawn.Spawn(pawn, cell, map);
             return pawn;
         }

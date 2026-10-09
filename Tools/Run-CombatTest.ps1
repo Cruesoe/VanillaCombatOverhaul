@@ -79,7 +79,7 @@ Write-Host 'Launching RimWorld...'
 
 $exitCode = 2
 try {
-    $proc = Start-Process -FilePath $exe -ArgumentList "-savedatafolder=`"$sandbox`"", '-logFile', "`"$logPath`"" -WindowStyle Hidden -PassThru
+    $proc = Start-Process -FilePath $exe -ArgumentList "-savedatafolder=`"$sandbox`"", '-logFile', "`"$logPath`"" -WindowStyle Minimized -PassThru
     if (-not $proc.WaitForExit($TimeoutMinutes * 60 * 1000)) {
         Write-Warning "Timed out after $TimeoutMinutes minutes; terminating."
         try { $proc.Kill() } catch { }

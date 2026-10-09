@@ -9,7 +9,7 @@ namespace VanillaCombatOverhaul
     /// <summary>
     /// Incoming fire builds suppression on nearby hostile humanlikes. Suppressed pawns aim worse and
     /// slower; pinned non-player pawns take cover. Works from any projectile's damage, so modded
-    /// weapons need no patches.
+    /// weapons need no patches. Amount, armour reduction and fading follow Combat Extended's rules.
     /// </summary>
     [StaticConstructorOnStartup]
     public static class SuppressionUtility
@@ -20,16 +20,23 @@ namespace VanillaCombatOverhaul
         public const float BaseRadius = 2.9f;
         public const float ExplosionRadiusBonus = 2f;
         public const float EdgeFalloff = 0.5f;
+        // Combat Extended's per-hit multiplier on damage.
+        public const float DamageFactor = 2f;
         public const float ExplosionFactor = 2f;
         public const float SuppressionModeFactor = 1.5f;
-        public const int DecayDelayTicks = 60;
-        public const float DecayPerSecond = 20f;
+        // Combat Extended's fading: starts 30 ticks after the last hit, 4 per tick.
+        public const int DecayDelayTicks = 30;
+        public const float DecayPerSecond = 240f;
+        // Weight of overall sharp armour against raw armour penetration; Combat Extended's 0.5 rescaled for vanilla's units.
+        public const float ArmorWeight = 0.1f;
+        public const int ArmorCacheTicks = 60;
         public const float MinAccuracy = 0.5f;
         public const float SuppressedAccuracy = 0.85f;
         public const float SuppressedAimTime = 1.15f;
         public const float MaxAimTime = 1.5f;
 
         private static readonly HashSet<Pawn> HitThisImpact = new HashSet<Pawn>();
+        private static readonly Dictionary<int, KeyValuePair<int, float>> ArmorCache = new Dictionary<int, KeyValuePair<int, float>>();
 
         public static bool Enabled => VCOMod.Settings?.enableSuppression ?? false;
 
@@ -62,6 +69,73 @@ namespace VanillaCombatOverhaul
 
         public static float Decay(float level, int ticks) =>
             Mathf.Max(0f, level - DecayPerSecond * ticks / 60f);
+
+        /// <summary>Combat Extended's armour reduction: 1 - clamp(armour * weight / penetration); no penetration means no suppression.</summary>
+        public static float ArmorFactor(float overallSharpArmor, float rawPenetration)
+        {
+            if (rawPenetration <= 0f)
+            {
+                return 0f;
+            }
+            return 1f - Mathf.Clamp01(overallSharpArmor * ArmorWeight / rawPenetration);
+        }
+
+        /// <summary>Overall sharp armour as the Gear tab shows it (0 to 2), cached briefly per pawn.</summary>
+        public static float OverallSharpArmor(Pawn pawn)
+        {
+            var now = Find.TickManager.TicksGame;
+            if (ArmorCache.TryGetValue(pawn.thingIDNumber, out var cached) && now - cached.Key < ArmorCacheTicks)
+            {
+                return cached.Value;
+            }
+            var value = ComputeOverallSharpArmor(pawn);
+            if (ArmorCache.Count > 1024)
+            {
+                ArmorCache.Clear();
+            }
+            ArmorCache[pawn.thingIDNumber] = new KeyValuePair<int, float>(now, value);
+            return value;
+        }
+
+        // Matches ITab_Pawn_Gear.TryDrawOverallArmor.
+        private static float ComputeOverallSharpArmor(Pawn pawn)
+        {
+            var stat = StatDefOf.ArmorRating_Sharp;
+            var natural = Mathf.Clamp01(pawn.GetStatValue(stat) / 2f);
+            var parts = pawn.RaceProps.body.AllParts;
+            var worn = pawn.apparel?.WornApparel;
+            var total = 0f;
+            for (var i = 0; i < parts.Count; i++)
+            {
+                var unprotected = 1f - natural;
+                if (worn != null)
+                {
+                    for (var j = 0; j < worn.Count; j++)
+                    {
+                        if (worn[j].def.apparel.CoversBodyPart(parts[i]))
+                        {
+                            unprotected *= 1f - Mathf.Clamp01(worn[j].GetStatValue(stat) / 2f);
+                        }
+                    }
+                }
+                total += parts[i].coverageAbs * (1f - unprotected);
+            }
+            return Mathf.Clamp(total * 2f, 0f, 2f);
+        }
+
+        /// <summary>The projectile's armour penetration before this mod's penetrationScale.</summary>
+        public static float RawPenetration(Projectile projectile) => RawPenetration(projectile.ArmorPenetration);
+
+        /// <summary>Armour penetration as shown on the weapon, with penetrationScale removed.</summary>
+        public static float RawPenetration(float shown)
+        {
+            var settings = VCOMod.Settings;
+            if (settings != null && settings.enableAdvancedArmor && settings.penetrationScale > 0f)
+            {
+                return shown / settings.penetrationScale;
+            }
+            return shown;
+        }
 
         public static CompSuppression CompFor(Pawn pawn) => pawn?.TryGetComp<CompSuppression>();
 
@@ -100,7 +174,9 @@ namespace VanillaCombatOverhaul
                 damage *= ExplosionFactor;
                 radius = Mathf.Max(radius, props.explosionRadius + ExplosionRadiusBonus);
             }
-            damage *= settings.suppressionStrength * FireModeFactor(launcher);
+            damage *= DamageFactor * settings.suppressionStrength * FireModeFactor(launcher);
+            // Armour only resists bullets, as in Combat Extended.
+            var penetration = explosion ? 0f : RawPenetration(projectile);
 
             var center = position.ToIntVec3();
             var source = launcher.Position;
@@ -122,6 +198,10 @@ namespace VanillaCombatOverhaul
                     }
                     var falloff = Falloff((pawn.DrawPos - position).MagnitudeHorizontal(), radius);
                     var amount = damage * falloff * pawn.GetStatValue(VCO_StatDefOf.VCO_Suppressability, true, 60);
+                    if (!explosion)
+                    {
+                        amount *= ArmorFactor(OverallSharpArmor(pawn), penetration);
+                    }
                     if (amount > 0f)
                     {
                         CompFor(pawn)?.AddSuppression(amount, source);

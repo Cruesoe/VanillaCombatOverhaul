@@ -69,7 +69,7 @@
   <!-- Fire modes -->
   <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
   <VCO_Suppression>Incoming fire suppresses</VCO_Suppression>
-  <VCO_Suppression_Tip>Bullets and explosions landing near an enemy of the shooter build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it lands, and the target's nerves and mood. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nSuppression fades a second after the shooting stops.</VCO_Suppression_Tip>
+  <VCO_Suppression_Tip>Bullets and explosions landing near an enemy of the shooter build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it lands, and the target's nerves and mood. Armour resists bullets that cannot match its rating, so weak rounds barely trouble a power-armoured trooper. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nPinning takes sustained fire: suppression starts fading half a second after the last nearby hit.</VCO_Suppression_Tip>
   <VCO_SuppressionPinning>Pinned enemies take cover</VCO_SuppressionPinning>
   <VCO_SuppressionPinning_Tip>When an enemy or ally is pinned, it stops what it is doing and moves to nearby cover for a few seconds before carrying on.\n\nYour own colonists are never taken out of your control: they only aim worse.</VCO_SuppressionPinning_Tip>
   <VCO_SuppressionStrength>Suppression strength: x{0}</VCO_SuppressionStrength>
