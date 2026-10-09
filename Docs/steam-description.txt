@@ -1,36 +1,45 @@
-Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven while keeping RimWorld's familiar combat at its core.
+[b]Deeper, more tactical combat that keeps RimWorld's own weapons, armour and rules.[/b]
 
-[h1]Melee with momentum[/h1]
+The depth of Combat Extended without its ammo, calibres or compatibility patches: every system reads vanilla stats, so modded weapons and apparel work as they are.
+
+[h2]Melee[/h2]
 [list]
-[*]Armed pawns can parry attacks and answer a successful parry with a counter-attack.
-[*]Attacking from the side or rear matters, while surrounded defenders become easier to overwhelm.
-[*]Attack direction and height influence where blows land.
+[*]Armed pawns parry incoming blows, and a successful parry earns a counter-attack.
+[*]Flanking matters: attacks from behind cannot be parried, and a surrounded defender is soon overwhelmed.
+[*]Skilled shooters caught in melee sometimes fire point-blank instead of swinging.
 [/list]
 
-[h1]More expressive firefights[/h1]
+[h2]Shooting[/h2]
 [list]
-[*]Skilled shooters handle inaccurate weapons and bad weather more effectively.
-[*]Moving targets are harder to hit, and misses spread further at long range.
-[*]Visible projectile trails make incoming fire easier to read.
-[*]Drafted shooters can switch between Precision, Short Burst and Suppression fire, or let Auto choose by distance. Enemies pick their own.
-[*]Incoming fire suppresses: pawns under sustained fire aim worse and slower, and pinned enemies dive for cover. Bullets flying past count too, armour shrugs off rounds that cannot match it, and being under fire hurts mood. Works with any modded gun, no patches needed.
-[*]Bullets and arrows produce distinct wounds based on how they strike the target.
+[*]Shooting skill counts for more, overcoming bad weapons and weather, while moving targets are harder to hit.
+[*]Misses spread realistically around the target, and glowing tracers show where fire is coming from.
+[*]Drafted shooters choose Precision, Short Burst or Suppression fire, or let Auto pick by distance.
+[*]Skilled marksmen can aim for the head, torso or legs, and hits land on the side the shot came from.
+[*]Bullets and arrows wound differently: rounds fragment, pass through or mushroom, and arrows cut deep.
 [/list]
 
-[h1]Armour and equipment[/h1]
+[h2]Suppression[/h2]
 [list]
-[*]Strong armour can stop weak hits outright, while partial protection still reduces their impact.
-[*]Loadouts, assigned in their own Assign tab column, set which weapons each colonist uses, whether they carry a backup melee weapon (or one you pick with a right-click), how much medicine they carry, and which other items they keep in their inventory.
-[*]With Progression: Ammunition, loadouts carry the refill each colonist's weapon needs: arrows for bows, ammo for guns, charge packs for charge weapons.
-[*]Colonists choose and upgrade their primary weapon by skill, switch to their melee sidearm when an enemy reaches them, and switch back afterwards.
-[*]Manual weapon choices remain locked until you allow automatic upgrades again.
-[*]Improved apparel coverage gives gloves, boots, masks, helmets and glasses more sensible protection and layering.
+[*]Bullets landing near or flying past a pawn suppress them, making them aim worse and slower.
+[*]Sustained fire pins enemies, sending them diving for cover.
+[*]Armour shrugs off rounds that cannot match it, and being under fire hurts mood.
 [/list]
 
-Combat and equipment systems can be configured individually, so you can keep the parts that suit your colony.
+[h2]Armour and gear[/h2]
+[list]
+[*]Good armour stops weak hits outright instead of turning them into bruises.
+[*]Gloves, boots, masks, helmets and glasses protect the parts they cover and layer sensibly.
+[*]Loadouts in the Assign tab set each colonist's weapons, a backup melee weapon, medicine and other supplies.
+[*]Colonists upgrade their weapons by skill and draw their sidearm when an enemy reaches them.
+[/list]
 
-[h1]Compatibility[/h1]
-Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.
+[h2]Settings[/h2]
+Every system can be switched on or off individually, so you keep only the parts that suit your colony.
 
-[h1]Thanks and inspiration[/h1]
-Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, to [b]Vanilla Fire Modes[/b] for inspiring selectable fire modes, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.
+[h2]Compatibility[/h2]
+Works with vanilla-style weapon, apparel and race mods without patches. With [b]Progression: Ammunition[/b], loadouts carry the refills each colonist's weapon needs. With [b]Simple Sidearms[/b], it handles backup weapons and loadouts handle the rest; with another loadout mod, turn Loadouts off.
+Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm, because they control the same systems.
+Safe to add to an existing save.
+
+[h2]Credits[/h2]
+Thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems that inspired much of this mod, [b]Combat Extended[/b] for its suppression rules, [b]Vanilla Fire Modes[/b] for fire modes, and [b]Auto Arm[/b] for automatic weapon selection.
