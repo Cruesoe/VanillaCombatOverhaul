@@ -44,5 +44,8 @@ Safe to add to an existing save, though a new game is recommended (see below).
 [h2]New game recommended[/h2]
 Existing saves load fine: old weapon policies become loadouts and colonists keep their medicine settings. But combat plays very differently, and a colony armed and armoured for vanilla fights will feel the change, so a fresh start gives the best experience.
 
+[h2]Feedback[/h2]
+This mod is still being tuned, and your feedback is needed and much appreciated. If a fight feels off, a number seems wrong or something breaks, please leave a comment with what happened and, for errors, the red text from the log.
+
 [h2]Credits[/h2]
 Thanks to the [b]Combat Extended[/b] team, whose mod showed how deep RimWorld combat can go and whose suppression rules this mod follows. Thanks also to [b]Vanilla Combat Reloaded[/b] for the combat systems that inspired much of this mod, [b]Vanilla Fire Modes[/b] for fire modes, and [b]Auto Arm[/b] for automatic weapon selection.
