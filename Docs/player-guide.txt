@@ -118,9 +118,10 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*]Loadout supplies, the sidearm and a stowed gun stay in the inventory when colonists unload after a caravan.
 [/list]
 
-[h3]Existing saves[/h3]
+[h2]New game recommended[/h2]
 [list]
-[*]Each apparel policy's old weapon settings become a loadout with the same name, assigned to the same colonists, and colonists keep their current medicine settings.
+[*]The mod can be added to an existing save. Each apparel policy's old weapon settings become a loadout with the same name, assigned to the same colonists, and colonists keep their current medicine settings.
+[*]Even so, a new game is recommended. Armour, accuracy, suppression and loadouts change how fights play out, and a colony armed and armoured for vanilla combat will feel it. Starting fresh lets you build around the new rules from the first raid.
 [/list]
 
 [h2]Other mods[/h2]
@@ -129,4 +130,11 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is greyed out. Loadouts still handle weapons and supplies.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
 [*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm, which control the same systems.
+[/list]
+
+[h2]Thanks[/h2]
+[list]
+[*]The [b]Combat Extended[/b] team, whose mod showed how deep RimWorld combat can go. Suppression here follows its rules: the amount per hit, armour against penetration, rounds flying past, how quickly it fades, and the mood penalties.
+[*][b]Vanilla Combat Reloaded[/b], for parrying, directional damage, accuracy, evasion, armour and wound systems that inspired much of this mod.
+[*][b]Vanilla Fire Modes[/b], for selectable fire modes, and [b]Auto Arm[/b], for automatic weapon selection.
 [/list]
