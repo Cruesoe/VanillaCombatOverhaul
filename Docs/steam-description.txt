@@ -13,13 +13,15 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 [*]Moving targets are harder to hit, and misses spread further at long range.
 [*]Visible projectile trails make incoming fire easier to read.
 [*]Drafted shooters can switch between Precision, Short Burst and Suppression fire, or let Auto choose by distance. Enemies pick their own.
+[*]Incoming fire suppresses: pawns under fire aim worse and slower, and pinned enemies dive for cover. Works with any modded gun, no patches needed.
 [*]Bullets and arrows produce distinct wounds based on how they strike the target.
 [/list]
 
 [h1]Armour and equipment[/h1]
 [list]
 [*]Strong armour can stop weak hits outright, while partial protection still reduces their impact.
-[*]Colonists automatically choose and upgrade primary weapons according to their skills and assigned weapon policy.
+[*]Loadouts, assigned in their own Assign tab column, set which weapons each colonist uses, whether they carry a backup melee weapon, and which items they keep in their inventory.
+[*]Colonists choose and upgrade their primary weapon by skill, switch to their melee sidearm when an enemy reaches them, and switch back afterwards.
 [*]Manual weapon choices remain locked until you allow automatic upgrades again.
 [*]Improved apparel coverage gives gloves, boots, masks, helmets and glasses more sensible protection and layering.
 [/list]
@@ -27,7 +29,7 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 Combat and equipment systems can be configured individually, so you can keep the parts that suit your colony.
 
 [h1]Compatibility[/h1]
-Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems.
+Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems. If you use Simple Sidearms or another loadout mod, turn Loadouts off in the settings.
 
 [h1]Thanks and inspiration[/h1]
 Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, to [b]Vanilla Fire Modes[/b] for inspiring selectable fire modes, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.

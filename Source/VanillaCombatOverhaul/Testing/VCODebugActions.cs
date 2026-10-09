@@ -71,6 +71,15 @@ namespace VanillaCombatOverhaul
             Log.Message(TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
         }
 
+        [DebugAction(Category, "Suppression and loadout checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void RunSuppressionAndLoadoutChecks()
+        {
+            var suppression = SuppressionAssertions.SelfTests();
+            suppression.AddRange(SuppressionAssertions.MapTests(Find.CurrentMap));
+            Log.Message(TestSuite.FormatChecks("suppression checks", suppression)
+                        + "\n" + TestSuite.FormatChecks("loadout checks", LoadoutAssertions.MapTests(Find.CurrentMap)));
+        }
+
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void WriteCounters() => VCODiagnostics.WriteReport();
 

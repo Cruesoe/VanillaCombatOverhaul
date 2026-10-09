@@ -103,6 +103,21 @@
   <VCO_TracerScale_Tip>How big the streak is, as a multiple of the default. Length and thickness scale together.\n\nLeave this at 1 unless the streaks read too heavy or too faint at the zoom you play at.</VCO_TracerScale_Tip>
 
   <!-- Fire modes -->
+  <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
+  <VCO_Suppression>Incoming fire suppresses</VCO_Suppression>
+  <VCO_Suppression_Tip>Bullets and explosions landing near an enemy of the shooter build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it lands, and the target's nerves and mood. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nSuppression fades a second after the shooting stops.</VCO_Suppression_Tip>
+  <VCO_SuppressionPinning>Pinned enemies take cover</VCO_SuppressionPinning>
+  <VCO_SuppressionPinning_Tip>When an enemy or ally is pinned, it stops what it is doing and moves to nearby cover for a few seconds before carrying on.\n\nYour own colonists are never taken out of your control: they only aim worse.</VCO_SuppressionPinning_Tip>
+  <VCO_SuppressionStrength>Suppression strength: x{0}</VCO_SuppressionStrength>
+  <VCO_SuppressionStrength_Tip>Multiplies how much suppression each shot causes. Higher pins pawns sooner.</VCO_SuppressionStrength_Tip>
+  <VCO_Suppression_SuppressedMote>Suppressed</VCO_Suppression_SuppressedMote>
+  <VCO_Suppression_PinnedMote>Pinned!</VCO_Suppression_PinnedMote>
+  <VCO_Suppression_SuppressedInspect>Suppressed ({0})</VCO_Suppression_SuppressedInspect>
+  <VCO_Suppression_PinnedInspect>Pinned by incoming fire</VCO_Suppression_PinnedInspect>
+  <VCO_SuppressionRead>Suppressed: {0}</VCO_SuppressionRead>
+  <VCO_StatPart_Suppressed>Suppressed</VCO_StatPart_Suppressed>
+  <VCO_StatPart_NerveAndMood>Nerves and mood</VCO_StatPart_NerveAndMood>
+
   <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>
   <VCO_FireModes>Drafted pawns can choose a fire mode</VCO_FireModes>
   <VCO_FireModes_Tip>Drafted colonists with a gun get a fire mode button.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim, quicker to fire.\nSuppression: many more rounds, much worse aim, fast to aim but slow to recover.\nAuto: picks one of those by distance to the target.\n\nThe mode only applies while drafted, so hunting and undrafted self-defence fire normally. Explosives, one-use launchers and abilities are never affected, and single-shot and beam weapons only offer Default and Precision.</VCO_FireModes_Tip>
@@ -155,16 +170,40 @@
   <VCO_ApparelTweaks>Improved headgear layering</VCO_ApparelTweaks>
   <VCO_ApparelTweaks_Tip>Treats eye and mouth apparel as headgear for pawn generation, so pawns can spawn wearing glasses or masks with a helmet. Does not need a restart.</VCO_ApparelTweaks_Tip>
 
-  <VCO_Section_AutoEquip>Automatic weapons</VCO_Section_AutoEquip>
-  <VCO_AutoEquip_Intro>Colonists automatically equip a suitable primary weapon and replace it when a clearly better allowed weapon becomes available. Configure allowed weapons in Assign → Manage apparel policies → Weapons.</VCO_AutoEquip_Intro>
-  <VCO_AutoEquip>Automatically equip and upgrade primary weapons</VCO_AutoEquip>
-  <VCO_AutoEquip_Tip>Uses each pawn's apparel policy to decide which weapons are allowed. Selection considers damage, accuracy, armour penetration, condition, and the pawn's shooting or melee skill. Drafted pawns are never interrupted.\n\nManually equipping a weapon locks that choice until you use the pawn's Allow automatic weapon upgrades command.</VCO_AutoEquip_Tip>
+  <VCO_Section_AutoEquip>Loadouts</VCO_Section_AutoEquip>
+  <VCO_AutoEquip_Intro>Each colonist follows a loadout, chosen in the Loadout column of the Assign tab. A loadout sets which weapons the colonist may use, whether it carries a backup melee weapon, and which items it keeps in its inventory.</VCO_AutoEquip_Intro>
+  <VCO_AutoEquip>Loadouts</VCO_AutoEquip>
+  <VCO_AutoEquip_Tip>Colonists equip and upgrade their primary weapon, carry a melee sidearm and stock items as their loadout says. Selection considers damage, accuracy, armour penetration, condition, and the colonist's shooting or melee skill. Drafted colonists are never sent to fetch gear.\n\nManually equipping a weapon locks that choice until you use the colonist's Allow weapon upgrades command.\n\nTurn this off to use another mod's loadout or sidearm system. The Assign tab column needs a restart to appear or disappear.</VCO_AutoEquip_Tip>
   <VCO_AutoEquipUpgradeMargin>Minimum improvement before upgrading: {0}%</VCO_AutoEquipUpgradeMargin>
   <VCO_AutoEquipUpgradeMargin_Tip>How much better a replacement must score before a pawn changes an already-allowed weapon. A margin prevents repeated swaps between nearly identical weapons. Disallowed weapons can always be replaced.</VCO_AutoEquipUpgradeMargin_Tip>
-  <VCO_Policy_Apparel>Apparel</VCO_Policy_Apparel>
-  <VCO_Policy_Weapons>Weapons</VCO_Policy_Weapons>
   <VCO_AutoEquip_Unlock>Allow weapon upgrades</VCO_AutoEquip_Unlock>
   <VCO_AutoEquip_Unlock_Tip>This weapon was equipped manually. Remove that lock and allow automatic upgrades again.</VCO_AutoEquip_Unlock_Tip>
+
+  <VCO_Loadout_Title>Manage loadouts</VCO_Loadout_Title>
+  <VCO_Loadout_TitleTip>Loadouts set which weapons colonists use and what they carry. Assign them in the Assign tab.</VCO_Loadout_TitleTip>
+  <VCO_Loadout_Manage>Manage loadouts</VCO_Loadout_Manage>
+  <VCO_Loadout_TabWeapons>Weapons</VCO_Loadout_TabWeapons>
+  <VCO_Loadout_TabSidearm>Sidearm</VCO_Loadout_TabSidearm>
+  <VCO_Loadout_TabItems>Items</VCO_Loadout_TabItems>
+  <VCO_Loadout_AutoPrimary>Choose primary weapon automatically</VCO_Loadout_AutoPrimary>
+  <VCO_Loadout_AutoPrimary_Tip>Colonists equip the best allowed weapon they can reach, and swap to a clearly better one when it turns up. Off: they keep whatever weapon you give them.</VCO_Loadout_AutoPrimary_Tip>
+  <VCO_Loadout_CarrySidearm>Carry a backup melee weapon</VCO_Loadout_CarrySidearm>
+  <VCO_Loadout_CarrySidearm_Tip>Colonists with a ranged weapon carry the best allowed melee weapon in their inventory. When an enemy reaches them in a fight they switch to it, and switch back once the enemy is gone.\n\nDrafted colonists also get a button to switch by hand.</VCO_Loadout_CarrySidearm_Tip>
+  <VCO_Loadout_SidearmOff>Colonists with this loadout do not carry a backup weapon.</VCO_Loadout_SidearmOff>
+  <VCO_Loadout_ItemsIntro>Colonists keep these items in their inventory, fetching more when they run low. They stop picking up items that would leave them over-encumbered.</VCO_Loadout_ItemsIntro>
+  <VCO_Loadout_AddItem>Add item</VCO_Loadout_AddItem>
+  <VCO_Loadout_ItemCount_Tip>How many to carry.</VCO_Loadout_ItemCount_Tip>
+  <VCO_Loadout_RemoveItem>Stop carrying this item.</VCO_Loadout_RemoveItem>
+  <VCO_Loadout_New>Loadout {0}</VCO_Loadout_New>
+  <VCO_Loadout_InUse>{0} is using this loadout.</VCO_Loadout_InUse>
+  <VCO_Loadout_Anything>Anything</VCO_Loadout_Anything>
+  <VCO_Loadout_Ranged>Ranged with sidearm</VCO_Loadout_Ranged>
+  <VCO_Loadout_Melee>Melee</VCO_Loadout_Melee>
+  <VCO_Loadout_Manual>Manual weapons</VCO_Loadout_Manual>
+  <VCO_Loadout_Disabled>Loadouts off</VCO_Loadout_Disabled>
+  <VCO_Loadout_Disabled_Tip>Loadouts are turned off in the Vanilla Combat Overhaul settings. Restart to remove this column.</VCO_Loadout_Disabled_Tip>
+  <VCO_Loadout_Switch>Switch to {0}</VCO_Loadout_Switch>
+  <VCO_Loadout_Switch_Tip>Swap between the primary weapon and the backup weapon carried in the inventory.</VCO_Loadout_Switch_Tip>
 
   <VCO_AdjWeapon>Weapon w/ skill</VCO_AdjWeapon>
   <VCO_AdjWeather>Weather w/ skill</VCO_AdjWeather>

@@ -1,0 +1,197 @@
+using System;
+using System.Collections.Generic;
+using RimWorld;
+using Verse;
+using Verse.AI;
+
+namespace VanillaCombatOverhaul
+{
+    public static class SuppressionAssertions
+    {
+        private const float Tolerance = 0.0005f;
+        private const int MaxShots = 30;
+        private const int MaxFlightTicks = 600;
+
+        public static List<AssertionResult> SelfTests()
+        {
+            var results = new List<AssertionResult>();
+            results.Add(Check("below the suppressed level has no effect",
+                Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel - 1f), 1f)
+                && Approx(SuppressionUtility.AimTimeFor(SuppressionUtility.SuppressedLevel - 1f), 1f), "1.0"));
+            results.Add(Check("suppressed level starts the light penalty",
+                Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel), SuppressionUtility.SuppressedAccuracy),
+                SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel).ToString("F3")));
+            results.Add(Check("pinned level reaches the full penalty",
+                Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.PinnedLevel), SuppressionUtility.MinAccuracy)
+                && Approx(SuppressionUtility.AimTimeFor(SuppressionUtility.MaxLevel), SuppressionUtility.MaxAimTime),
+                SuppressionUtility.AccuracyFor(SuppressionUtility.PinnedLevel).ToString("F3")));
+            results.Add(Check("falloff is full at the impact and half at the edge",
+                Approx(SuppressionUtility.Falloff(0f, 3f), 1f) && Approx(SuppressionUtility.Falloff(3f, 3f), 0.5f)
+                && Approx(SuppressionUtility.Falloff(3.1f, 3f), 0f), "1 / 0.5 / 0"));
+            results.Add(Check("decay removes 20 a second and stops at zero",
+                Approx(SuppressionUtility.Decay(50f, 60), 30f) && Approx(SuppressionUtility.Decay(5f, 600), 0f), "50 -> 30"));
+
+            var calm = StatPart_SuppressabilityFromMind.FactorFor(0.35f, 0.5f);
+            var ironWilled = StatPart_SuppressabilityFromMind.FactorFor(0.17f, 0.5f);
+            var volatileNerves = StatPart_SuppressabilityFromMind.FactorFor(0.5f, 0.5f);
+            var happy = StatPart_SuppressabilityFromMind.FactorFor(0.35f, 0.9f);
+            results.Add(Check("default nerves and mood leave suppressability at 1",
+                Approx(calm, 1f), calm.ToString("F3")));
+            results.Add(Check("steadier nerves resist suppression",
+                ironWilled < calm && calm < volatileNerves, $"{ironWilled:F2} < {calm:F2} < {volatileNerves:F2}"));
+            results.Add(Check("good mood resists suppression", happy < calm, $"{happy:F2} < {calm:F2}"));
+            results.Add(Check("suppressability stays within its limits",
+                StatPart_SuppressabilityFromMind.FactorFor(0.01f, 1f) >= StatPart_SuppressabilityFromMind.Min
+                && StatPart_SuppressabilityFromMind.FactorFor(0.5f, 0f) <= StatPart_SuppressabilityFromMind.Max,
+                "0.5 to 1.5"));
+            return results;
+        }
+
+        /// <summary>Fires real bullets near a hostile pawn and checks the build-up, pinning, penalties and decay.</summary>
+        public static List<AssertionResult> MapTests(Map map)
+        {
+            var results = new List<AssertionResult>();
+            var settings = VCOMod.Settings;
+            var rifle = DefDatabase<ThingDef>.GetNamedSilentFail("Gun_AssaultRifle");
+            var enemyFaction = Find.FactionManager.RandomEnemyFaction(allowNonHumanlike: false);
+            if (map == null || settings == null || rifle == null || enemyFaction == null)
+            {
+                results.Add(Check("suppression arena set up", false, "needs a map, the assault rifle and an enemy faction"));
+                return results;
+            }
+
+            var wasEnabled = settings.enableSuppression;
+            var wasPinning = settings.enableSuppressionPinning;
+            var wasStrength = settings.suppressionStrength;
+            settings.enableSuppression = true;
+            settings.enableSuppressionPinning = true;
+            settings.suppressionStrength = 1f;
+
+            var spawned = new List<Pawn>();
+            try
+            {
+                var origin = map.Center;
+                var shooter = RangedCombatArena.SpawnShooter(map, origin + IntVec3.West * 8, 10, rifle);
+                var target = SpawnHostile(map, origin + IntVec3.East * 4, enemyFaction);
+                var ally = RangedCombatArena.SpawnTarget(map, origin + IntVec3.East * 4 + IntVec3.North, false);
+                spawned.Add(shooter);
+                spawned.Add(target);
+                spawned.Add(ally);
+                if (shooter == null || target == null || ally == null)
+                {
+                    results.Add(Check("suppression arena set up", false, "could not spawn the pawns"));
+                    return results;
+                }
+
+                var targetComp = SuppressionUtility.CompFor(target);
+                // Held in place so every shot lands beside it; pinning replaces this job.
+                var hold = JobMaker.MakeJob(JobDefOf.Wait, 99999);
+                target.jobs.StartJob(hold, JobCondition.InterruptForced);
+
+                var missCell = target.Position + IntVec3.South;
+                FireAt(shooter, rifle, missCell);
+                var afterOne = targetComp?.Level ?? 0f;
+                results.Add(Check("a near miss suppresses the hostile target", afterOne > 0f, afterOne.ToString("F1")));
+                results.Add(Check("the shooter's allies are not suppressed",
+                    (SuppressionUtility.CompFor(ally)?.Level ?? 0f) == 0f && (SuppressionUtility.CompFor(shooter)?.Level ?? 0f) == 0f,
+                    (SuppressionUtility.CompFor(ally)?.Level ?? 0f).ToString("F1")));
+
+                var shots = 1;
+                while (targetComp != null && !targetComp.Pinned && shots < MaxShots)
+                {
+                    FireAt(shooter, rifle, missCell);
+                    shots++;
+                }
+                results.Add(Check("sustained fire pins the target", targetComp?.Pinned == true,
+                    $"{shots} shots, level {targetComp?.Level:F1}"));
+                var job = target.CurJobDef;
+                results.Add(Check("a pinned enemy takes cover",
+                    job == JobDefOf.Goto || job == JobDefOf.Wait_Combat, job?.defName ?? "no job"));
+
+                // Compared with suppression switched off at the same moment and position.
+                var aimPinned = StatDefOf.AimingDelayFactor.Worker.GetValue(StatRequest.For(target), false);
+                var hitPinned = ShooterFactor(target, rifle, shooter);
+                settings.enableSuppression = false;
+                var aimClear = StatDefOf.AimingDelayFactor.Worker.GetValue(StatRequest.For(target), false);
+                var hitClear = ShooterFactor(target, rifle, shooter);
+                settings.enableSuppression = true;
+                results.Add(Check("suppression slows aiming", aimPinned > aimClear, $"{aimClear:F2} -> {aimPinned:F2}"));
+                results.Add(Check("suppression lowers the shooter's hit factor", hitPinned < hitClear,
+                    $"{hitClear:F3} -> {hitPinned:F3}"));
+
+                // Nothing left to fight while the level decays.
+                shooter.Destroy(DestroyMode.Vanish);
+                ally.Destroy(DestroyMode.Vanish);
+                HealthUtility.DamageUntilDowned(target, allowBleedingWounds: false);
+                for (var i = 0; i < 600; i++)
+                {
+                    Find.TickManager.DoSingleTick();
+                }
+                results.Add(Check("suppression fades once the shooting stops", (targetComp?.Level ?? 1f) == 0f,
+                    (targetComp?.Level ?? -1f).ToString("F1")));
+            }
+            catch (Exception e)
+            {
+                results.Add(Check("suppression arena ran", false, e.ToString()));
+            }
+            finally
+            {
+                foreach (var pawn in spawned)
+                {
+                    if (pawn != null && !pawn.Destroyed)
+                    {
+                        pawn.Destroy(DestroyMode.Vanish);
+                    }
+                }
+                settings.enableSuppression = wasEnabled;
+                settings.enableSuppressionPinning = wasPinning;
+                settings.suppressionStrength = wasStrength;
+            }
+            return results;
+        }
+
+        /// <summary>An unarmed hostile pawn, so it cannot fire back while the test ticks the game.</summary>
+        private static Pawn SpawnHostile(Map map, IntVec3 cell, Faction faction)
+        {
+            var kind = faction.def.basicMemberKind ?? PawnKindDefOf.Villager;
+            var pawn = PawnGenerator.GeneratePawn(kind, faction);
+            pawn.health.RemoveAllHediffs();
+            pawn.equipment?.DestroyAllEquipment();
+            GenSpawn.Spawn(pawn, cell, map);
+            return pawn;
+        }
+
+        /// <summary>The pawn's shooter factor against a target with the weapon briefly in hand.</summary>
+        private static float ShooterFactor(Pawn pawn, ThingDef weapon, Thing target)
+        {
+            var gun = (ThingWithComps)ThingMaker.MakeThing(weapon);
+            pawn.equipment.AddEquipment(gun);
+            try
+            {
+                var report = ShotReport.HitReportFor(pawn, pawn.equipment.PrimaryEq.PrimaryVerb, target);
+                return ShotReportAccess.GetShooterFactor(ref report);
+            }
+            finally
+            {
+                pawn.equipment.DestroyEquipment(gun);
+            }
+        }
+
+        /// <summary>Launches one bullet from the shooter's weapon at a cell and ticks until it lands.</summary>
+        private static void FireAt(Pawn shooter, ThingDef weaponDef, IntVec3 cell)
+        {
+            var bulletDef = weaponDef.Verbs[0].defaultProjectile;
+            var bullet = (Projectile)GenSpawn.Spawn(bulletDef, shooter.Position, shooter.Map);
+            bullet.Launch(shooter, shooter.DrawPos, cell, cell, ProjectileHitFlags.None, false, shooter.equipment.Primary);
+            for (var i = 0; i < MaxFlightTicks && !bullet.Destroyed; i++)
+            {
+                Find.TickManager.DoSingleTick();
+            }
+        }
+
+        private static bool Approx(float actual, float expected) => Math.Abs(actual - expected) <= Tolerance;
+
+        private static AssertionResult Check(string name, bool passed, string detail) =>
+            new AssertionResult { Name = name, Passed = passed, Detail = detail };
+    }
+}

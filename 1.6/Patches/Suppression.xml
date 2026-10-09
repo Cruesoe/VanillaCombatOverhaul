@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- The part checks the setting at runtime, so toggling suppression needs no restart. Conditional because a StatDef without parts has no list to add to. -->
+  <Operation Class="PatchOperationConditional">
+    <xpath>/Defs/StatDef[defName="AimingDelayFactor"]/parts</xpath>
+    <match Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="AimingDelayFactor"]/parts</xpath>
+      <value>
+        <li Class="VanillaCombatOverhaul.StatPart_SuppressionAimTime" />
+      </value>
+    </match>
+    <nomatch Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="AimingDelayFactor"]</xpath>
+      <value>
+        <parts>
+          <li Class="VanillaCombatOverhaul.StatPart_SuppressionAimTime" />
+        </parts>
+      </value>
+    </nomatch>
+  </Operation>
+</Patch>

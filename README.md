@@ -11,10 +11,11 @@ game's familiar systems and broad mod compatibility.
 - Stronger influence from shooting skill, weather, movement, and distance.
 - More natural missed-shot spread and visible projectile trails.
 - Selectable fire modes for drafted shooters: Precision, Short Burst, Suppression, or Auto by distance.
+- Suppression: incoming fire makes pawns aim worse and slower, and pins enemies into cover.
 - Distinct bullet and arrow wounds.
 - Armour that can reduce damage even when it does not stop a hit completely.
 - Improved coverage for gloves, boots, masks, helmets, glasses, and similar apparel.
-- Automatic primary-weapon selection based on pawn skills and assigned apparel policy.
+- Loadouts in the Assign tab: allowed weapons, a backup melee weapon swapped in when enemies close in, and items to carry.
 
 Combat and equipment features can be enabled individually from the mod settings.
 

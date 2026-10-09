@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <PawnColumnDef>
+    <defName>VCO_Loadout</defName>
+    <label>loadout</label>
+    <workerClass>VanillaCombatOverhaul.PawnColumnWorker_Loadout</workerClass>
+    <sortable>true</sortable>
+  </PawnColumnDef>
+</Defs>

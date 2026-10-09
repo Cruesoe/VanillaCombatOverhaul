@@ -80,6 +80,12 @@ namespace VanillaCombatOverhaul
         public FireModeTuning shortBurstTuning = FireModeTuning.ShortBurstDefaults();
         public FireModeTuning suppressionTuning = FireModeTuning.SuppressionDefaults();
 
+        // ---- Suppression -------------------------------------------------------
+        public bool enableSuppression = Shipped;
+        public float suppressionStrength = 1f;
+        // Non-player pawns take cover when pinned; player pawns only take the penalties.
+        public bool enableSuppressionPinning = Shipped;
+
         // ---- Armor -------------------------------------------------------------
         // Leftover stretch and AP compensation. Defaults match Vanilla Combat Reloaded:
         // always-block at 100% leftover (armorScale 2), weapons show 2x AP.
@@ -87,7 +93,8 @@ namespace VanillaCombatOverhaul
         public float armorScale = 2f;
         public float penetrationScale = 2f;
 
-        // ---- Automatic primary weapons ---------------------------------------
+        // ---- Loadouts ----------------------------------------------------------
+        // Saved under its original name so existing settings files keep their choice.
         public bool enableAutoEquip = Shipped;
         // A replacement must be this much better than an allowed current weapon.
         // The margin prevents pawns oscillating between near-identical choices.
@@ -157,6 +164,10 @@ namespace VanillaCombatOverhaul
                 suppressionTuning ??= FireModeTuning.SuppressionDefaults();
             }
 
+            Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Shipped);
+            Scribe_Values.Look(ref suppressionStrength, nameof(suppressionStrength), 1f);
+            Scribe_Values.Look(ref enableSuppressionPinning, nameof(enableSuppressionPinning), Shipped);
+
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
@@ -213,6 +224,10 @@ namespace VanillaCombatOverhaul
             if (enableDirectionalDamage)
             {
                 yield return "DirectionalDamage";
+            }
+            if (enableAutoEquip)
+            {
+                yield return "Loadouts";
             }
             if (enableHandFeetPatch)
             {

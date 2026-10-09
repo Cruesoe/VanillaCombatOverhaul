@@ -92,6 +92,12 @@ namespace VanillaCombatOverhaul
                               rawShooter.ToStringPercent(), modeShooter.ToStringPercent()));
                 shownMode = FireMode.Default;
             }
+            var suppression = SuppressionUtility.LevelOf(Find.Selector.SingleSelectedThing as Pawn);
+            if (suppression >= SuppressionUtility.SuppressedLevel)
+            {
+                sb.AppendLine("   " + "VCO_SuppressionRead".Translate(
+                    Mathf.Min(1f, suppression / SuppressionUtility.PinnedLevel).ToStringPercent()));
+            }
             if (stashed && !Mathf.Approximately(rawEquipment, mitigatedEquipment))
             {
                 sb.AppendLine("      " + "VCO_AdjWeapon".Translate() + ": " + mitigatedEquipment.ToStringPercent());
@@ -166,8 +172,8 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var current = ShotReportAccess.GetShooterFactor(ref report);
             var raw = ShotReport.HitFactorFromShooter(pawn, distance);
+            var current = FireModeUtility.AdjustHitFactor(raw, FireModeUtility.TuningFor(mode)?.accuracy ?? 1f);
             if (Mathf.Approximately(current, raw))
             {
                 return;

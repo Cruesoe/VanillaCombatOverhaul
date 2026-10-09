@@ -155,6 +155,9 @@ namespace VanillaCombatOverhaul
                 var rangedResults = TestSuite.RunRangedMatrix(map, Seed);
 
                 var autoEquip = AutoEquipAssertions.SelfTests();
+                var suppression = SuppressionAssertions.SelfTests();
+                suppression.AddRange(SuppressionAssertions.MapTests(map));
+                var loadouts = LoadoutAssertions.MapTests(map);
 
                 report = Environment.NewLine + fingerprint + Environment.NewLine
                          + TestSuite.FormatReport(results, facing, armor)
@@ -165,7 +168,11 @@ namespace VanillaCombatOverhaul
                          + Environment.NewLine
                          + TestSuite.FormatRangedReport(rangedResults, rangedSelf)
                          + Environment.NewLine
-                         + TestSuite.FormatChecks("automatic weapon checks", autoEquip);
+                         + TestSuite.FormatChecks("automatic weapon checks", autoEquip)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("suppression checks", suppression)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("loadout checks", loadouts);
 
                 allPassed = !facing.Exists(a => !a.Passed)
                             && !armor.Exists(a => !a.Passed)
@@ -174,7 +181,9 @@ namespace VanillaCombatOverhaul
                             && results.TrueForAll(r => r.AllAssertionsPassed)
                             && !rangedSelf.Exists(a => !a.Passed)
                             && rangedResults.TrueForAll(r => r.AllAssertionsPassed)
-                            && !autoEquip.Exists(a => !a.Passed);
+                            && !autoEquip.Exists(a => !a.Passed)
+                            && !suppression.Exists(a => !a.Passed)
+                            && !loadouts.Exists(a => !a.Passed);
             }
             catch (Exception e)
             {

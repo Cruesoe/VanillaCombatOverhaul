@@ -16,6 +16,7 @@ namespace VanillaCombatOverhaul
         {
             PenaltyMitigationUtility.ApplyToShotReport(ref __result, caster);
             FireModeUtility.ApplyToShotReport(ref __result, caster, verb);
+            SuppressionUtility.ApplyToShotReport(ref __result, caster);
         }
     }
 }

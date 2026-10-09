@@ -156,6 +156,17 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
             }
 
+            if (Section(l, "VCO_Section_Suppression"))
+            {
+                Toggle(l, "VCO_Suppression", ref s.enableSuppression);
+                if (s.enableSuppression)
+                {
+                    Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
+                    s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
+                                                   0.25f, 3f, 0.05f, "0.00");
+                }
+            }
+
             if (Section(l, "VCO_Section_FireModes"))
             {
                 Toggle(l, "VCO_FireModes", ref s.enableFireModes);
@@ -207,7 +218,7 @@ namespace VanillaCombatOverhaul
             {
                 l.Label("VCO_AutoEquip_Intro".Translate());
                 l.Gap(6f);
-                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip);
+                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true);
             }
 
             if (Section(l, "VCO_Section_Apparel"))
