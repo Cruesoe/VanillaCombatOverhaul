@@ -31,22 +31,6 @@ namespace VanillaCombatOverhaul
 
         private static readonly HashSet<Pawn> HitThisImpact = new HashSet<Pawn>();
 
-        static SuppressionUtility()
-        {
-            foreach (var def in DefDatabase<ThingDef>.AllDefs)
-            {
-                if (def.race == null || !def.race.Humanlike || def.HasComp(typeof(CompSuppression)))
-                {
-                    continue;
-                }
-                if (def.comps == null)
-                {
-                    def.comps = new List<CompProperties>();
-                }
-                def.comps.Add(new CompProperties_Suppression());
-            }
-        }
-
         public static bool Enabled => VCOMod.Settings?.enableSuppression ?? false;
 
         /// <summary>0 below the suppressed level, rising to 1 at the pinned level.</summary>

@@ -37,8 +37,18 @@ namespace VanillaCombatOverhaul
 
         public override void CompTickInterval(int delta)
         {
-            if (!parent.IsHashIntervalTick(CheckIntervalTicks, delta) || !LoadoutUtility.Enabled)
+            if (!parent.IsHashIntervalTick(CheckIntervalTicks, delta))
             {
+                return;
+            }
+            // Sidearms switched off with a primary still stowed: put the primary back in hand.
+            if (!LoadoutUtility.SidearmsEnabled)
+            {
+                if (swappedPrimary != null && Pawn?.inventory != null
+                    && (!Pawn.inventory.innerContainer.Contains(swappedPrimary) || LoadoutUtility.Swap(Pawn, swappedPrimary)))
+                {
+                    ClearSwap();
+                }
                 return;
             }
             var pawn = Pawn;
@@ -147,7 +157,7 @@ namespace VanillaCombatOverhaul
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
             var pawn = Pawn;
-            if (!LoadoutUtility.Enabled || pawn == null || !pawn.Drafted || !pawn.IsColonistPlayerControlled)
+            if (!LoadoutUtility.SidearmsEnabled || pawn == null || !pawn.Drafted || !pawn.IsColonistPlayerControlled)
             {
                 yield break;
             }

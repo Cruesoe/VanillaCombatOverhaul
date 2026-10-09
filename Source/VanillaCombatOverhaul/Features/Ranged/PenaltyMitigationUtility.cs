@@ -4,16 +4,10 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Skilled shooters partially overcome multiplicative penalties (bad weapons at range,
-    /// bad weather, evasion). Vanilla Combat Reloaded's statBump curve, kept for calibration.
-    /// </summary>
+    /// <summary>Skilled shooters partly overcome weapon, weather and evasion penalties (Vanilla Combat Reloaded's statBump curve).</summary>
     public static class PenaltyMitigationUtility
     {
-        /// <summary>
-        /// Raises a penalty factor toward 1.0 based on shooter skill.
-        /// At skill factor 1 the factor is unchanged; higher skill shrinks the penalty.
-        /// </summary>
+        /// <summary>Raises a penalty factor toward 1 by shooter skill; skill factor 1 leaves it unchanged.</summary>
         public static float MitigatePenalty(float factor, Thing shooter, float scale)
         {
             if (factor >= 1f || shooter == null || scale <= 0f)

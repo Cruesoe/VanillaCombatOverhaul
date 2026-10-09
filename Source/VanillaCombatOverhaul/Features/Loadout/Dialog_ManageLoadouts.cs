@@ -95,9 +95,17 @@ namespace VanillaCombatOverhaul
         private void DoSidearm(Rect rect, LoadoutPolicy policy)
         {
             var check = new Rect(rect.x, rect.y, rect.width, CheckboxHeight);
-            Widgets.CheckboxLabeled(check, "VCO_Loadout_CarrySidearm".Translate(), ref policy.carrySidearm);
-            TooltipHandler.TipRegion(check, "VCO_Loadout_CarrySidearm_Tip".Translate());
+            var byOtherMod = LoadoutUtility.SidearmsByOtherMod;
+            Widgets.CheckboxLabeled(check, "VCO_Loadout_CarrySidearm".Translate(), ref policy.carrySidearm, byOtherMod);
+            TooltipHandler.TipRegion(check, (byOtherMod ? "VCO_Loadout_SidearmsByOtherMod" : "VCO_Loadout_CarrySidearm_Tip").Translate());
             rect.yMin += CheckboxHeight + 4f;
+            if (byOtherMod)
+            {
+                GUI.color = Color.gray;
+                Widgets.Label(rect, "VCO_Loadout_SidearmsByOtherMod".Translate());
+                GUI.color = Color.white;
+                return;
+            }
             if (!policy.carrySidearm)
             {
                 GUI.color = Color.gray;

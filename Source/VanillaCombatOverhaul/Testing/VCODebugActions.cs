@@ -3,10 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Tier 1: manual entry points in the dev-mode debug menu, under "Vanilla Combat Overhaul".
-    /// Results go to the log; the same code path is what the headless runner drives.
-    /// </summary>
+    /// <summary>Dev-mode debug actions that run the checks on the current map and log the results.</summary>
     public static class VCODebugActions
     {
         private const string Category = "Vanilla Combat Overhaul";

@@ -3,12 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Body part groups used to resolve which side of a target an attack can reach.
-    ///
-    /// Prefixed, unlike the bare Left/Right/Center names Vanilla Combat Reloaded used, because
-    /// unprefixed group defNames that generic are liable to collide with another mod's.
-    /// </summary>
+    /// <summary>Body part groups marking which side of a target an attack can reach.</summary>
     [DefOf]
     public static class VCO_BodyPartGroupDefOf
     {

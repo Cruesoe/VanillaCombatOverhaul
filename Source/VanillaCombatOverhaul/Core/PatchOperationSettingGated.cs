@@ -5,15 +5,8 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// A PatchOperation that only applies when a named feature flag is active in mod settings,
-    /// letting XML patches be toggled from the settings menu like C# features are.
-    ///
-    /// Adapted from the same idea in Vanilla Combat Reloaded by Donald (DonaldKar), which is
-    /// the neatest solution to settings-gated XML patching in the RimWorld ecosystem.
-    ///
-    /// Def patching runs before [StaticConstructorOnStartup], so the flag snapshot is taken
-    /// lazily on first use -- Mod instances are constructed before def loading, so settings
-    /// are already available by then.
+    /// Runs <c>match</c> when the named settings flag is on, otherwise <c>nomatch</c>. Adapted from
+    /// Vanilla Combat Reloaded by Donald (DonaldKar). Flags are snapshotted on first use during def load.
     /// </summary>
     public class PatchOperationSettingGated : PatchOperation
     {
@@ -52,9 +45,7 @@ namespace VanillaCombatOverhaul
                 return false;
             }
 
-            // A branch with nothing to run is a no-op, and a no-op succeeded. Returning false
-            // here instead makes RimWorld report a failed patch operation every time a feature
-            // is simply switched off, which is the overwhelmingly common case for this mod.
+            // A missing branch succeeds, so a feature switched off is not reported as a failed patch.
             return ActiveFlags.Contains(setting)
                 ? match == null || match.Apply(xml)
                 : nomatch == null || nomatch.Apply(xml);

@@ -10,15 +10,11 @@ namespace VanillaCombatOverhaul
 {
     public static class ParryUtility
     {
-        // Built once at startup; see VCODiagnostics.KeyTable. Concatenating at the call site
-        // costs a reflective Enum.ToString on every eligible melee attack, even when
-        // counting is switched off.
+        // Built once; see VCODiagnostics.KeyTable.
         private static readonly string[] FacingKeys =
             VCODiagnostics.KeyTable<AttackFacing>("parry.facing.");
 
-        // Private members of Verb_MeleeAttack we need to respect. Resolved once; if RimWorld
-        // renames either, Harmony's AccessTools throws at startup rather than silently
-        // returning defaults, which is the failure mode we want.
+        // Private Verb_MeleeAttack members; a rename throws at startup.
         private static readonly AccessTools.FieldRef<Verb_MeleeAttack, bool> SurpriseAttackRef =
             AccessTools.FieldRefAccess<Verb_MeleeAttack, bool>("surpriseAttack");
 
@@ -28,18 +24,13 @@ namespace VanillaCombatOverhaul
             AccessTools.MethodDelegate<IsTargetImmobileDel>(
                 AccessTools.Method(typeof(Verb_MeleeAttack), "IsTargetImmobile"));
 
-        // A counter-attack is itself a melee attack, so without this it can be parried,
-        // triggering another counter, indefinitely. Counters never chain.
+        // Set during a counter-attack so it cannot be parried into another counter.
         [ThreadStatic] private static bool resolvingCounter;
 
         /// <summary>True while a counter-attack is being made, so other features can leave it alone.</summary>
         internal static bool ResolvingCounter => resolvingCounter;
 
-        /// <summary>
-        /// Decides whether the defender parries this attack, and applies the effects if so.
-        /// Called before vanilla resolves hit/miss, so parry is a first line of defence and
-        /// anything it does not stop still has to get past the normal miss and dodge rolls.
-        /// </summary>
+        /// <summary>Rolls a parry before vanilla's hit and dodge rolls, applying its effects if it succeeds.</summary>
         public static bool TryParry(Verb_MeleeAttack verb)
         {
             var settings = VCOMod.Settings;
@@ -54,8 +45,7 @@ namespace VanillaCombatOverhaul
                 return false;   // Not pawn-vs-pawn; not an eligible attack, so not counted.
             }
 
-            // From here on the attack is eligible, so every exit is worth counting: knowing
-            // which gate rejects most parries is the whole point of the instrumentation.
+            // Eligible from here; each rejection is counted.
             VCODiagnostics.CountFor(defender, "parry.attempt");
 
             if (!defender.Spawned || defender.Dead || defender.Downed)
@@ -64,22 +54,21 @@ namespace VanillaCombatOverhaul
                 return false;
             }
 
-            // An attack the defender never saw cannot be answered.
+            // Surprise attacks and immobile targets cannot parry.
             if (SurpriseAttackRef(verb) || IsTargetImmobile(verb, verb.CurrentTarget))
             {
                 VCODiagnostics.CountFor(defender, "parry.reject.surpriseOrImmobile");
                 return false;
             }
 
-            // Something has to be in hand to parry with. The stat enforces this too, but
-            // checking here avoids the stat lookup on the common unarmed case.
+            // Needs a weapon in hand (also enforced by the stat; checked first to skip the lookup).
             if (defender.equipment?.Primary == null)
             {
                 VCODiagnostics.CountFor(defender, "parry.reject.noWeapon");
                 return false;
             }
 
-            // A pawn mid-way through a ranged attack is not in a stance to deflect anything.
+            // No parry while busy with a ranged attack.
             if (defender.stances?.curStance is Stance_Busy busy
                 && busy.verb != null
                 && !busy.verb.verbProps.IsMeleeAttack)
@@ -100,7 +89,6 @@ namespace VanillaCombatOverhaul
             var tracker = Current.Game?.GetComponent<ParryTracker>();
             if (tracker != null && !tracker.CanParry(defender))
             {
-                // If this one climbs, the budget is binding more than intended.
                 VCODiagnostics.CountFor(defender, "parry.reject.budgetSpent");
                 return false;
             }
@@ -121,24 +109,17 @@ namespace VanillaCombatOverhaul
 
             if (settings.enableCounterAttack)
             {
-                TryCounterAttack(attacker, defender);
+                pendingCounterVerb = verb;
+                pendingCounterAttacker = attacker;
+                pendingCounterDefender = defender;
             }
 
             return true;
         }
 
         /// <summary>
-        /// Contested parry chance: <c>aptitude ^ ((1/d) / (1 - attackerMelee))</c>.
-        ///
-        /// This is Vanilla Combat Reloaded's curve, kept deliberately. It is the only
-        /// field-tested shape available, and it captures something a defender-only stat
-        /// cannot: a skilled attacker beats a parry. At stock values a skill-20 defender turns
-        /// about 87% of attacks from an unskilled attacker and about 50% from another
-        /// skill-20 fighter.
-        ///
-        /// The defender's side lives in the VCO_ParryChance stat so it stays inspectable and
-        /// moddable; only the contest against the attacker happens here, because it is
-        /// situational and has no place in a per-pawn stat.
+        /// Contested parry chance, Vanilla Combat Reloaded's curve: <c>aptitude ^ ((1/d) / (1 - attackerMelee))</c>,
+        /// with aptitude from the VCO_ParryChance stat and d the facing factor.
         /// </summary>
         public static float ParryChanceAgainst(Pawn defender, Pawn attacker, float directionFactor)
         {
@@ -161,12 +142,7 @@ namespace VanillaCombatOverhaul
             return Mathf.Clamp01(Mathf.Pow(aptitude, exponent));
         }
 
-        /// <summary>
-        /// Front and side default to the same value, matching Vanilla Combat Reloaded, so out
-        /// of the box only getting behind someone denies a parry outright. Lowering the side
-        /// value is the knob for making a flank meaningful on its own; note that directional
-        /// damage already makes flanking matter through hit location.
-        /// </summary>
+        /// <summary>Facing factor from the settings; attacks from behind cannot be parried.</summary>
         private static float FacingFactor(AttackFacing facing, VCOSettings settings)
         {
             switch (facing)
@@ -201,11 +177,35 @@ namespace VanillaCombatOverhaul
             MoteMaker.ThrowText(defender.DrawPos, defender.Map, "VCO_Mote_Parried".Translate(), 1.9f);
             ParrySound(verb, defender)?.PlayOneShot(new TargetInfo(defender.Position, defender.Map));
 
-            // Without this the player gets no explanation for an attack that did nothing.
+            // Combat log entry for the deflected attack.
             verb.CreateCombatLog(m => m.combatLogRulesDeflect, alwaysShow: false);
 
-            // Reading an attack well enough to turn it is how you get better at melee.
+            // Melee XP for the defender.
             defender.skills?.Learn(SkillDefOf.Melee, 35f);
+        }
+
+        // The counter runs once the parried swing has finished: a counter that kills the attacker
+        // mid-swing leaves vanilla finishing a cast for a pawn with no stance tracker.
+        private static Verb pendingCounterVerb;
+        private static Pawn pendingCounterAttacker;
+        private static Pawn pendingCounterDefender;
+
+        /// <summary>Makes the counter-attack queued by a parry of this verb's swing.</summary>
+        internal static void ResolvePendingCounter(Verb verb)
+        {
+            if (pendingCounterVerb == null || pendingCounterVerb != verb)
+            {
+                return;
+            }
+            var attacker = pendingCounterAttacker;
+            var defender = pendingCounterDefender;
+            pendingCounterVerb = null;
+            pendingCounterAttacker = null;
+            pendingCounterDefender = null;
+            if (defender.Spawned && !defender.Dead && !defender.Downed)
+            {
+                TryCounterAttack(attacker, defender);
+            }
         }
 
         private static void TryCounterAttack(Pawn attacker, Pawn defender)

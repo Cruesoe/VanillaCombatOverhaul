@@ -2,30 +2,17 @@ using System.Collections.Generic;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Parameters for one controlled melee test.
-    ///
-    /// The point of fixing skills and weapons is that it lets a run verify a *specific cell*
-    /// of the balance table rather than an aggregate that averages several matchups together.
-    /// </summary>
+    /// <summary>Parameters for one melee arena scenario, with fixed skills and weapons.</summary>
     public class MeleeArenaSpec
     {
         public string label = "default";
 
         public int pairs = 20;
 
-        /// <summary>
-        /// Attackers set on each defender. One is a duel; more than one is the case the parry
-        /// budget exists for, and the only way to exercise it -- a lone attacker swings far too
-        /// slowly to ever spend a budget of two per window.
-        /// </summary>
+        /// <summary>Attackers per defender; more than one exercises the parry budget.</summary>
         public int attackersPerDefender = 1;
 
-        /// <summary>
-        /// Overrides the parry budget for this run only; 0 leaves the configured value alone.
-        /// Running the same crowd twice, once with the cap lifted, is the only way to separate
-        /// what the budget contributes from what the facing gate was already doing.
-        /// </summary>
+        /// <summary>Parry budget for this run only; 0 keeps the configured value.</summary>
         public int parryBudgetOverride = 0;
         public int attackerMeleeSkill = 10;
         public int defenderMeleeSkill = 10;
@@ -39,28 +26,17 @@ namespace VanillaCombatOverhaul
         /// <summary>Shooting skill pinned on attackers; -1 leaves whatever was generated.</summary>
         public int attackerShootingSkill = -1;
 
-        /// <summary>
-        /// Point-blank shooting for this run only: 1 forces it on, -1 forces it off, 0 leaves
-        /// the configured value and marks the run as not a point-blank scenario.
-        /// </summary>
+        /// <summary>Point-blank for this run: 1 on, -1 off, 0 configured value and not a point-blank scenario.</summary>
         public int pointBlankOverride = 0;
 
-        /// <summary>
-        /// Arena attacks are ordered jobs, which RimWorld always marks player-forced, and
-        /// point-blank shooting never replaces an ordered melee attack. Off, the arena waives
-        /// that rule so the roll can be measured; on, the run tests the rule itself.
-        /// </summary>
+        /// <summary>On, the player-order exclusion applies to the arena's ordered attacks; off, it is waived so rolls can be measured.</summary>
         public bool pointBlankHonourOrders = false;
 
         public bool IsPointBlank => pointBlankOverride != 0;
 
         public int ticks = 4000;
 
-        /// <summary>
-        /// How often combatants are healed and re-ordered to attack. Without this they die and
-        /// the sample stops growing; a short interval keeps volume up, which is the whole
-        /// reason for automating this.
-        /// </summary>
+        /// <summary>Ticks between healing and re-ordering the combatants.</summary>
         public int refreshEveryTicks = 120;
 
         /// <summary>Non-zero pins the RNG, making a run reproducible for regression checks.</summary>

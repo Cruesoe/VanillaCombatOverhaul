@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -60,6 +59,30 @@ namespace VanillaCombatOverhaul
             return true;
         }
 
+        // Reused part list; a nested damage call while it is in use gets its own list.
+        private static readonly List<BodyPartRecord> PartsBuffer = new List<BodyPartRecord>(16);
+        private static bool partsBufferInUse;
+
+        private static List<BodyPartRecord> RentParts()
+        {
+            if (partsBufferInUse)
+            {
+                return new List<BodyPartRecord>(16);
+            }
+            partsBufferInUse = true;
+            PartsBuffer.Clear();
+            return PartsBuffer;
+        }
+
+        private static void ReturnParts(List<BodyPartRecord> parts)
+        {
+            if (parts == PartsBuffer)
+            {
+                PartsBuffer.Clear();
+                partsBufferInUse = false;
+            }
+        }
+
         private static void ApplyBullet(DamageWorker_AddInjury worker, Pawn pawn, float totalDamage,
                                         DamageInfo dinfo, DamageWorker.DamageResult result, float cap)
         {
@@ -68,64 +91,54 @@ namespace VanillaCombatOverhaul
 
             var stoppingPower = ProjectileWoundUtility.StoppingPowerFor(dinfo);
             var kind = ProjectileWoundUtility.KindFor(stoppingPower);
-            var parts = new List<BodyPartRecord>();
-
-            if (kind == BulletWoundKind.Fragment)
+            var parts = RentParts();
+            try
             {
-                var extra = GenMath.RoundRandom(ProjectileWoundUtility.FragmentTargets.Evaluate(Rand.Value));
-                if (extra > 0)
+                if (kind == BulletWoundKind.Fragment)
                 {
-                    IEnumerable<BodyPartRecord> nearby = dinfo.HitPart.GetDirectChildParts();
-                    if (dinfo.HitPart.parent != null)
+                    var extra = GenMath.RoundRandom(ProjectileWoundUtility.FragmentTargets.Evaluate(Rand.Value));
+                    if (extra > 0)
                     {
-                        nearby = nearby.Concat(dinfo.HitPart.parent);
-                        if (dinfo.HitPart.parent.parent != null)
+                        ProjectileWoundUtility.AddNearbyParts(dinfo.HitPart, parts);
+                        ProjectileWoundUtility.ShuffleFront(parts, extra);
+                        if (parts.Count > extra)
                         {
-                            nearby = nearby.Concat(dinfo.HitPart.parent.GetDirectChildParts());
+                            parts.RemoveRange(extra, parts.Count - extra);
                         }
                     }
-
-                    parts.AddRange(nearby.Except(dinfo.HitPart)
-                        .InRandomOrder()
-                        .Where(p => !p.def.conceptual)
-                        .Take(extra));
-                }
-
-                VCODiagnostics.Count("wound.bullet.fragment");
-            }
-            else
-            {
-                totalDamage *= Mathf.Min(stoppingPower, Mathf.Max(cap, 1f));
-                if (kind == BulletWoundKind.PassThrough)
-                {
-                    parts.AddRange(ProjectileWoundUtility.PassThroughChain(dinfo.HitPart));
-                    totalDamage *= parts.Count;
-                    VCODiagnostics.Count("wound.bullet.passThrough");
+                    VCODiagnostics.Count("wound.bullet.fragment");
                 }
                 else
                 {
-                    VCODiagnostics.Count("wound.bullet.mushroom");
+                    totalDamage *= Mathf.Min(stoppingPower, Mathf.Max(cap, 1f));
+                    if (kind == BulletWoundKind.PassThrough)
+                    {
+                        ProjectileWoundUtility.AddPassThroughChain(dinfo.HitPart, parts);
+                        totalDamage *= parts.Count;
+                        VCODiagnostics.Count("wound.bullet.passThrough");
+                    }
+                    else
+                    {
+                        VCODiagnostics.Count("wound.bullet.mushroom");
+                    }
                 }
-            }
 
-            if (!parts.Contains(dinfo.HitPart))
-            {
-                parts.Add(dinfo.HitPart);
-            }
-
-            var share = totalDamage / parts.Count;
-            for (var i = 0; i < parts.Count; i++)
-            {
-                var slice = dinfo;
-                slice.SetHitPart(parts[i]);
-                if (slice.HitPart.depth == BodyPartDepth.Outside)
+                if (!parts.Contains(dinfo.HitPart))
                 {
+                    parts.Add(dinfo.HitPart);
+                }
+
+                var share = totalDamage / parts.Count;
+                for (var i = 0; i < parts.Count; i++)
+                {
+                    var slice = dinfo;
+                    slice.SetHitPart(parts[i]);
                     FinalizeAndAddInjury(worker, pawn, share, slice, result);
                 }
-                else
-                {
-                    FinalizeAndAddInjury(worker, pawn, share, slice, result);
-                }
+            }
+            finally
+            {
+                ReturnParts(parts);
             }
         }
 
@@ -139,8 +152,21 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var neighbor = ProjectileWoundUtility.NearbyExternalParts(pawn, dinfo.HitPart)
-                .RandomElementWithFallback();
+            BodyPartRecord neighbor = null;
+            var parts = RentParts();
+            try
+            {
+                ProjectileWoundUtility.AddNearbyExternalParts(pawn, dinfo.HitPart, parts);
+                if (parts.Count > 0)
+                {
+                    neighbor = parts[Rand.Range(0, parts.Count)];
+                }
+            }
+            finally
+            {
+                ReturnParts(parts);
+            }
+
             if (neighbor == null)
             {
                 FinalizeAndAddInjury(worker, pawn,

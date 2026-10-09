@@ -11,16 +11,13 @@ namespace VanillaCombatOverhaul
         Rear
     }
 
-    /// <summary>
-    /// Which side of a target an attack arrives from. Shared by parrying and directional
-    /// damage so both agree on what "flanked" means.
-    /// </summary>
+    /// <summary>Which side of a target an attack arrives from, shared by parrying and directional damage.</summary>
     public static class FacingUtility
     {
         /// <summary>Facing of an attack travelling from <paramref name="origin"/> onto <paramref name="target"/>.</summary>
         public static AttackFacing Relative(IntVec3 origin, Thing target)
         {
-            // A downed pawn has no meaningful facing and cannot answer anything.
+            // Downed pawns count every attack as frontal.
             if (target is Pawn p && p.Downed)
             {
                 return AttackFacing.Front;
@@ -34,10 +31,7 @@ namespace VanillaCombatOverhaul
             return FromTravelAngle(Quaternion.LookRotation(offset).eulerAngles.y, target);
         }
 
-        /// <summary>
-        /// Facing derived from a projectile's direction of travel, for damage whose instigator
-        /// is gone or unspawned by the time it resolves.
-        /// </summary>
+        /// <summary>Facing from a direction of travel, for damage whose instigator is gone or unspawned.</summary>
         public static AttackFacing FromTravelAngle(float travelAngle, Thing target)
         {
             if (target is Pawn p && p.Downed)
@@ -47,10 +41,7 @@ namespace VanillaCombatOverhaul
             return FromTravelAngleFor(travelAngle, target.Rotation);
         }
 
-        /// <summary>
-        /// The facing calculation itself, taking a bare rotation rather than a Thing so it can
-        /// be exercised directly by the test harness without spawning anything.
-        /// </summary>
+        /// <summary>Facing for a travel angle against a target rotation.</summary>
         public static AttackFacing FromTravelAngleFor(float travelAngle, Rot4 targetRotation)
         {
             var incoming = Rot4.FromAngleFlat(travelAngle);

@@ -1,10 +1,6 @@
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// One named claim a test run makes, shared by every suite -- melee, ranged, armor,
-    /// wound and height. A harness that only prints numbers cannot regress, so each of
-    /// these is something that can fail rather than something that merely gets reported.
-    /// </summary>
+    /// <summary>One named pass/fail check in a test report.</summary>
     public class AssertionResult
     {
         public string Name;

@@ -12,7 +12,6 @@
   <VCO_Section_Armor>Armor</VCO_Section_Armor>
   <VCO_Section_Damage>Damage and hit location</VCO_Section_Damage>
   <VCO_Section_Ranged>Ranged</VCO_Section_Ranged>
-  <VCO_Section_Tracers>Tracers</VCO_Section_Tracers>
 
   <!-- Badges -->
   <VCO_RestartTag>[needs restart]</VCO_RestartTag>
@@ -22,15 +21,6 @@
   <!-- Melee -->
   <VCO_Parry>Pawns can parry melee attacks</VCO_Parry>
   <VCO_Parry_Tip>When someone swings at your pawn in melee, your pawn can turn the blow aside with the weapon they are holding and take no damage.\n\nThey must have a weapon in hand. Better melee fighters parry more often, and a strong attacker is harder to parry. Attacks from directly behind can never be parried.</VCO_Parry_Tip>
-
-  <VCO_ParryFrontFactor>Parrying attacks from the front: {0}</VCO_ParryFrontFactor>
-  <VCO_ParryFrontFactor_Tip>How easy it is to parry someone attacking you face to face.\n\nHigher means more parries. Lower means fewer.</VCO_ParryFrontFactor_Tip>
-
-  <VCO_ParrySideFactor>Parrying attacks from the side: {0}</VCO_ParrySideFactor>
-  <VCO_ParrySideFactor_Tip>How easy it is to parry someone attacking from your left or right.\n\nThe default is 1.25, lower than the frontal value of 1.5, so gaining a flank weakens parries without preventing them outright.</VCO_ParrySideFactor_Tip>
-
-  <VCO_ParryBudget>Most parries per second: {0}</VCO_ParryBudget>
-  <VCO_ParryBudget_Tip>The most attacks one pawn can parry in a single second, no matter how skilled they are.\n\nThis stops one great fighter from holding off a whole crowd forever. It only starts to matter at roughly five or more attackers at once.</VCO_ParryBudget_Tip>
 
   <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
   <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
@@ -42,12 +32,6 @@
   <!-- Armor -->
   <VCO_AdvancedArmor>Good leftover armor stops hits</VCO_AdvancedArmor>
   <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nThe gun's shown armor penetration is raised to keep weapons that already beat a plate beating it.</VCO_AdvancedArmor_Tip>
-
-  <VCO_ArmorThreshold>Hits always bounce when leftover armor is {0}%</VCO_ArmorThreshold>
-  <VCO_ArmorThreshold_Tip>Leftover is your armor percent minus the gun's armor penetration percent.\n\nVanilla always stops a hit at 200% leftover. Default 100% matches Vanilla Combat Reloaded: if the plate wins by that much, the shot does not go through.</VCO_ArmorThreshold_Tip>
-
-  <VCO_PenetrationScale>Weapon armor penetration: ×{0}</VCO_PenetrationScale>
-  <VCO_PenetrationScale_Tip>Because leftover now stops hits sooner, ordinary penetration would bounce off plates it used to threaten. This multiplier is applied to the armor penetration shown on weapons and used in the armor roll.\n\nDefault 2 matches Vanilla Combat Reloaded. Raise it if guns feel too weak; lower it if armor feels too weak.</VCO_PenetrationScale_Tip>
 
   <!-- Damage / hit location -->
   <VCO_DirectionalDamage>Where you get hit depends on the angle</VCO_DirectionalDamage>
@@ -68,39 +52,19 @@
   <VCO_Section_Wounds>Projectile wounds</VCO_Section_Wounds>
   <VCO_ProjectileWounds>Distinct bullet and arrow wounds</VCO_ProjectileWounds>
   <VCO_ProjectileWounds_Tip>Bullets fragment, pass through or mushroom according to their stopping power. Arrows can stab inward or slice across adjacent outer parts.</VCO_ProjectileWounds_Tip>
-  <VCO_BulletWorker>Bullets fragment, pass through or mushroom</VCO_BulletWorker>
-  <VCO_BulletWorker_Tip>Stopping power shapes the wound instead of only staggering small pawns.\n\nBelow 1 (pistols): the round fragments across nearby parts.\n1 to 1.5 (rifles): it passes through from the organ to the outer part covering it.\nAbove 1.5: it mushrooms, dumping extra damage into one part.\n\nA vest that already reduced the hit cancels all of this, so armor that catches the round also stops the extra trick.</VCO_BulletWorker_Tip>
-  <VCO_BulletStoppingPowerCap>Stopping power cap: {0}</VCO_BulletStoppingPowerCap>
-  <VCO_BulletStoppingPowerCap_Tip>Mushrooming multiplies damage by stopping power. This is the ceiling, so an outlier stat cannot one-shot everything. Default 10 matches Vanilla Combat Reloaded.</VCO_BulletStoppingPowerCap_Tip>
-  <VCO_ArrowWorker>Arrows stab through or slice across</VCO_ArrowWorker>
-  <VCO_ArrowWorker_Tip>Arrows get a stab's chance to force an internal hit. If they stay external they split most of the damage across two adjacent outer parts, so a graze is a slice rather than a single puncture.</VCO_ArrowWorker_Tip>
 
   <!-- Ranged -->
   <VCO_AdvancedAccuracy>Skilled shooters overcome bad weapons and weather</VCO_AdvancedAccuracy>
   <VCO_AdvancedAccuracy_Tip>A good shooter partially overcomes penalties from a poor weapon at range and from bad weather.\n\nCover, smoke and target size are not affected — only equipment and weather factors.</VCO_AdvancedAccuracy_Tip>
-  <VCO_AccuracyScale>Skill scaling: {0}</VCO_AccuracyScale>
-  <VCO_AccuracyScale_Tip>How strongly shooting skill mitigates weapon and weather penalties.\n\nLower values make each point of skill matter more. Default 5 matches Vanilla Combat Reloaded.</VCO_AccuracyScale_Tip>
 
   <VCO_Evasion>Moving pawns are harder to shoot</VCO_Evasion>
   <VCO_Evasion_Tip>A pawn who is running is harder to hit than one standing still.\n\nStanding still gives no benefit, so this is a trade: move and be safer, or stand and shoot back.</VCO_Evasion_Tip>
-  <VCO_EvasionFactor>Movement evasion per speed step: {0}</VCO_EvasionFactor>
-  <VCO_EvasionFactor_Tip>Each step of movement speed above the minimum multiplies hit chance by this value.\n\nLower means running pawns are harder to hit. Default 0.8 matches Vanilla Combat Reloaded.</VCO_EvasionFactor_Tip>
-  <VCO_EvasionMinSpeed>Minimum speed before evasion applies: {0}</VCO_EvasionMinSpeed>
-  <VCO_EvasionMinSpeed_Tip>Movement speed below this gives no evasion benefit. Default 2.5.</VCO_EvasionMinSpeed_Tip>
-  <VCO_EvasionSkillContest>Skilled shooters track runners better</VCO_EvasionSkillContest>
-  <VCO_EvasionSkillContest_Tip>When advanced accuracy is on, a skilled shooter's evasion mitigation also applies against moving targets.\n\nRequires skilled shooters overcome bad weapons and weather to be enabled.</VCO_EvasionSkillContest_Tip>
 
   <VCO_FiringArc>Missed shots spread out with distance</VCO_FiringArc>
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
-  <VCO_FiringArcDegrees>Width of the spread: {0} degrees</VCO_FiringArcDegrees>
-  <VCO_FiringArcDegrees_Tip>How wide the cone of missed shots is. Bigger numbers mean misses land further from the target.</VCO_FiringArcDegrees_Tip>
-  <VCO_FiringArcType>Miss spread type: {0}</VCO_FiringArcType>
-  <VCO_FiringArcType_Tip>How the cone is applied. Type 0 (default) widens freely with distance, matching Vanilla Combat Reloaded's stock setting.\n\n1: same, but the miss radius never exceeds 10.\n2: stops growing once the cone is as wide as a vanilla miss.\n3–5: various caps on the near and far radius. Leave this at 0 unless you know you want a tighter long-range miss.</VCO_FiringArcType_Tip>
 
   <VCO_VisibleTracers>Show vibrant tracers on shots</VCO_VisibleTracers>
   <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells and grenades are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
-  <VCO_TracerScale>Tracer size: {0}x</VCO_TracerScale>
-  <VCO_TracerScale_Tip>How big the streak is, as a multiple of the default. Length and thickness scale together.\n\nLeave this at 1 unless the streaks read too heavy or too faint at the zoom you play at.</VCO_TracerScale_Tip>
 
   <!-- Fire modes -->
   <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
@@ -150,32 +114,11 @@
   <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
   <VCO_ApparelCoverage>Improved apparel coverage and layering</VCO_ApparelCoverage>
   <VCO_ApparelCoverage_Tip>Applies the complete coverage pack: sensible protection for hands, feet and faces; corrected acid and thump armour types; and improved layering for glasses, masks, helmets and headsets.</VCO_ApparelCoverage_Tip>
-  <VCO_Apparel_Intro>These are Vanilla Combat Reloaded's coverage and layering patches. They change how vanilla and DLC apparel sits on the body. Each one needs a restart except improved headgear layering.</VCO_Apparel_Intro>
-  <VCO_HandFeetPatch>Armour on arms or legs also covers hands or feet</VCO_HandFeetPatch>
-  <VCO_HandFeetPatch_Tip>Arm and leg armour also covers hands and feet. Gloves and boots that only cover those parts move to a layer that can be worn with the armour. Needs a restart.</VCO_HandFeetPatch_Tip>
-  <VCO_AcidHeatPatch>Acid is Heat</VCO_AcidHeatPatch>
-  <VCO_AcidHeatPatch_Tip>Biotech acid damage is resisted by heat armour instead of sharp. Needs a restart.</VCO_AcidHeatPatch_Tip>
-  <VCO_ThumpBluntPatch>Thump is Blunt</VCO_ThumpBluntPatch>
-  <VCO_ThumpBluntPatch_Tip>Vanilla thump damage is resisted by blunt armour instead of sharp. Needs a restart.</VCO_ThumpBluntPatch_Tip>
-  <VCO_GlassesHelmetPatch>Glasses are not helmets</VCO_GlassesHelmetPatch>
-  <VCO_GlassesHelmetPatch_Tip>Glasses can be worn with helmets that only cover the upper head. Needs a restart.</VCO_GlassesHelmetPatch_Tip>
-  <VCO_NoseMouthPatch>Mouth covers the nose</VCO_NoseMouthPatch>
-  <VCO_NoseMouthPatch_Tip>The nose is protected by anything that covers the mouth. Needs a restart.</VCO_NoseMouthPatch_Tip>
-  <VCO_MaskPatch>Masks cover what they look like they cover</VCO_MaskPatch>
-  <VCO_MaskPatch_Tip>Gas masks, visage masks, war masks and similar pick up the face coverage their graphics imply. Needs a restart.</VCO_MaskPatch_Tip>
-  <VCO_HeadsetPatch>Headsets are not helmets</VCO_HeadsetPatch>
-  <VCO_HeadsetPatch_Tip>Gunlink, airwire and integrator headsets can be worn with a helmet. Needs a restart.</VCO_HeadsetPatch_Tip>
-  <VCO_ArrayHeadsetPatch>Array headset is glasses</VCO_ArrayHeadsetPatch>
-  <VCO_ArrayHeadsetPatch_Tip>The array headset sits on the eyes, and the mech commander helmet is treated as upper head, so they can be worn together. Needs a restart.</VCO_ArrayHeadsetPatch_Tip>
-  <VCO_ApparelTweaks>Improved headgear layering</VCO_ApparelTweaks>
-  <VCO_ApparelTweaks_Tip>Treats eye and mouth apparel as headgear for pawn generation, so pawns can spawn wearing glasses or masks with a helmet. Does not need a restart.</VCO_ApparelTweaks_Tip>
 
   <VCO_Section_AutoEquip>Loadouts</VCO_Section_AutoEquip>
   <VCO_AutoEquip_Intro>Each colonist follows a loadout, chosen in the Loadout column of the Assign tab. A loadout sets which weapons the colonist may use, whether it carries a backup melee weapon, and which items it keeps in its inventory.</VCO_AutoEquip_Intro>
   <VCO_AutoEquip>Loadouts</VCO_AutoEquip>
   <VCO_AutoEquip_Tip>Colonists equip and upgrade their primary weapon, carry a melee sidearm and stock items as their loadout says. Selection considers damage, accuracy, armour penetration, condition, and the colonist's shooting or melee skill. Drafted colonists are never sent to fetch gear.\n\nManually equipping a weapon locks that choice until you use the colonist's Allow weapon upgrades command.\n\nTurn this off to use another mod's loadout or sidearm system. The Assign tab column needs a restart to appear or disappear.</VCO_AutoEquip_Tip>
-  <VCO_AutoEquipUpgradeMargin>Minimum improvement before upgrading: {0}%</VCO_AutoEquipUpgradeMargin>
-  <VCO_AutoEquipUpgradeMargin_Tip>How much better a replacement must score before a pawn changes an already-allowed weapon. A margin prevents repeated swaps between nearly identical weapons. Disallowed weapons can always be replaced.</VCO_AutoEquipUpgradeMargin_Tip>
   <VCO_AutoEquip_Unlock>Allow weapon upgrades</VCO_AutoEquip_Unlock>
   <VCO_AutoEquip_Unlock_Tip>This weapon was equipped manually. Remove that lock and allow automatic upgrades again.</VCO_AutoEquip_Unlock_Tip>
 
@@ -189,6 +132,7 @@
   <VCO_Loadout_AutoPrimary_Tip>Colonists equip the best allowed weapon they can reach, and swap to a clearly better one when it turns up. Off: they keep whatever weapon you give them.</VCO_Loadout_AutoPrimary_Tip>
   <VCO_Loadout_CarrySidearm>Carry a backup melee weapon</VCO_Loadout_CarrySidearm>
   <VCO_Loadout_CarrySidearm_Tip>Colonists with a ranged weapon carry the best allowed melee weapon in their inventory. When an enemy reaches them in a fight they switch to it, and switch back once the enemy is gone.\n\nDrafted colonists also get a button to switch by hand.</VCO_Loadout_CarrySidearm_Tip>
+  <VCO_Loadout_SidearmsByOtherMod>Simple Sidearms is active, so it handles backup weapons. Loadouts still choose the primary weapon and carried items.</VCO_Loadout_SidearmsByOtherMod>
   <VCO_Loadout_SidearmOff>Colonists with this loadout do not carry a backup weapon.</VCO_Loadout_SidearmOff>
   <VCO_Loadout_ItemsIntro>Colonists keep these items in their inventory, fetching more when they run low. They stop picking up items that would leave them over-encumbered.</VCO_Loadout_ItemsIntro>
   <VCO_Loadout_AddItem>Add item</VCO_Loadout_AddItem>

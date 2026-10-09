@@ -12,23 +12,15 @@ namespace VanillaCombatOverhaul
         private static ThingFilter weaponParentFilter;
         private static ThingFilter meleeParentFilter;
 
-        static LoadoutUtility()
-        {
-            foreach (var def in DefDatabase<ThingDef>.AllDefs)
-            {
-                if (def.race == null || !def.race.Humanlike || def.HasComp(typeof(CompLoadout)))
-                {
-                    continue;
-                }
-                if (def.comps == null)
-                {
-                    def.comps = new List<CompProperties>();
-                }
-                def.comps.Add(new CompProperties_Loadout());
-            }
-        }
-
         public static bool Enabled => VCOMod.Settings?.enableAutoEquip ?? false;
+
+        public const string SimpleSidearmsPackageId = "PeteTimesSix.SimpleSidearms";
+
+        /// <summary>Simple Sidearms carries and swaps weapons itself, so loadout sidearms stay off.</summary>
+        public static readonly bool SidearmsByOtherMod = ModsConfig.IsActive(SimpleSidearmsPackageId);
+
+        /// <summary>Whether loadouts carry and swap a melee sidearm.</summary>
+        public static bool SidearmsEnabled => Enabled && !SidearmsByOtherMod;
 
         public static ThingFilter WeaponParentFilter => weaponParentFilter ??= NewWeaponFilter(ranged: true, melee: true);
 
@@ -103,7 +95,7 @@ namespace VanillaCombatOverhaul
                     kept.Add(new ThingDefCount(item.thingDef, item.count));
                 }
             }
-            var sidearm = loadout.carrySidearm ? CarriedSidearm(pawn) : null;
+            var sidearm = loadout.carrySidearm && SidearmsEnabled ? CarriedSidearm(pawn) : null;
             if (sidearm != null)
             {
                 kept.Add(new ThingDefCount(sidearm.def, 1));

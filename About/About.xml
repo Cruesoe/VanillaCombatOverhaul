@@ -4,7 +4,7 @@
   <author>cruesoe</author>
   <packageId>cruesoe.vanillacombatoverhaul</packageId>
   <modVersion>261005</modVersion>
-  <url></url>
+  <url>https://github.com/Cruesoe/VanillaCombatOverhaul</url>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
@@ -66,5 +66,5 @@ CLOTHING
 
 Combat and equipment systems can be configured individually in the mod settings.
 
-Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, or Vanilla Fire Modes. If you use Simple Sidearms or another loadout mod, turn Loadouts off in the settings.</description>
+Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, or Vanilla Fire Modes. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.</description>
 </ModMetaData>

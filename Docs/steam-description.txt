@@ -29,7 +29,7 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 Combat and equipment systems can be configured individually, so you can keep the parts that suit your colony.
 
 [h1]Compatibility[/h1]
-Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems. If you use Simple Sidearms or another loadout mod, turn Loadouts off in the settings.
+Designed for vanilla-style combat and standard weapon and apparel content. Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm because they control overlapping combat or equipment systems. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.
 
 [h1]Thanks and inspiration[/h1]
 Special thanks to [b]Vanilla Combat Reloaded[/b] for the combat systems and ideas that inspired much of this overhaul, to [b]Vanilla Fire Modes[/b] for inspiring selectable fire modes, and to [b]Auto Arm[/b] for inspiring automatic primary-weapon selection.

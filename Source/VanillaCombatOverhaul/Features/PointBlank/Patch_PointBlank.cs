@@ -4,10 +4,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Marks the span of a real melee attack, so a melee verb starting inside it is known to
-    /// be that attack and not some other caller's.
-    /// </summary>
+    /// <summary>Marks the span of a TryMeleeAttack call, so the melee cast inside it is recognised.</summary>
     [HarmonyPatch(typeof(Pawn_MeleeVerbs), nameof(Pawn_MeleeVerbs.TryMeleeAttack))]
     public static class Patch_Pawn_MeleeVerbs_TryMeleeAttack
     {
@@ -22,11 +19,7 @@ namespace VanillaCombatOverhaul
         public static void Finalizer(PointBlankUtility.MeleeAttackScope __state) => __state.Dispose();
     }
 
-    /// <summary>
-    /// Replaces the melee cast with a point-blank shot when the roll succeeds. Returning false
-    /// skips the melee verb entirely, so it grants no melee XP and cannot be parried; the
-    /// caller ignores this method's result, so the attack still counts as made.
-    /// </summary>
+    /// <summary>Replaces the melee cast with a point-blank shot when the roll succeeds; the melee verb then does not run.</summary>
     [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[]
     {
         typeof(LocalTargetInfo), typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool)
@@ -48,11 +41,7 @@ namespace VanillaCombatOverhaul
         }
     }
 
-    /// <summary>
-    /// A point-blank shot has no aiming period. Scoped to the one cast, so info cards, AI and
-    /// other mods keep reading the weapon's real warmup. Verb_LaunchProjectile multiplies the
-    /// base value, so zero here stays zero there.
-    /// </summary>
+    /// <summary>Zero warmup for a point-blank cast only; everything else reads the weapon's real warmup.</summary>
     [HarmonyPatch(typeof(Verb), nameof(Verb.WarmupTime), MethodType.Getter)]
     public static class Patch_Verb_WarmupTime
     {
@@ -65,12 +54,7 @@ namespace VanillaCombatOverhaul
         }
     }
 
-    /// <summary>
-    /// First half of vanilla's melee lock: no pawn may fire a projectile at an adjacent,
-    /// standing hostile, enforced as a 1.421-cell minimum range. A point-blank shot is the
-    /// exception to exactly that rule, so only the adjacency part is lifted; the weapon's own
-    /// minimum range still applies.
-    /// </summary>
+    /// <summary>Lifts vanilla's adjacent-target minimum range for point-blank casts; the weapon's own minimum range still applies.</summary>
     [HarmonyPatch(typeof(Verb), nameof(Verb.OutOfRange))]
     public static class Patch_Verb_OutOfRange
     {
@@ -87,12 +71,7 @@ namespace VanillaCombatOverhaul
         }
     }
 
-    /// <summary>
-    /// Second half of the melee lock: a non-player pawn with an adjacent melee threat cannot
-    /// launch projectiles at all. Lifted for point-blank casts by re-running the rest of
-    /// Available without that clause, so fuel, charges, roles and a missing projectile still
-    /// make the weapon unusable.
-    /// </summary>
+    /// <summary>Lifts the adjacent-threat block on launching projectiles for point-blank casts; fuel, charges and roles still apply.</summary>
     [HarmonyPatch(typeof(Verb_LaunchProjectile), nameof(Verb_LaunchProjectile.Available))]
     public static class Patch_Verb_LaunchProjectile_Available
     {

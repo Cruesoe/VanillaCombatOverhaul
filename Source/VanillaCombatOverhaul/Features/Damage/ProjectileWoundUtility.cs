@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace VanillaCombatOverhaul
@@ -14,19 +12,12 @@ namespace VanillaCombatOverhaul
     }
 
     /// <summary>
-    /// Vanilla Combat Reloaded's bullet and arrow damage workers, applied as a Harmony
-    /// intercept on <see cref="DamageWorker_AddInjury"/> rather than by replacing the
-    /// DamageDef workerClass. Gameplay is the same; any other mod can still own Bullet/Arrow.
-    ///
-    /// Armor that already reduced the hit (<c>result.diminished</c>) cancels the extra
-    /// behaviour, matching Reloaded: a vest that catches the round also stops fragmentation,
-    /// pass-through and mushrooming.
+    /// Vanilla Combat Reloaded's bullet and arrow wounds, applied by intercepting
+    /// <see cref="DamageWorker_AddInjury"/>. Armour that reduced the hit cancels them.
     /// </summary>
     public static class ProjectileWoundUtility
     {
-        /// <summary>
-        /// Reloaded's cut-extra-targets curve, used when stopping power is below 1.
-        /// </summary>
+        /// <summary>Reloaded's cut-extra-targets curve, used when stopping power is below 1.</summary>
         public static readonly SimpleCurve FragmentTargets = new SimpleCurve
         {
             new CurvePoint(0f, 0f),
@@ -37,6 +28,11 @@ namespace VanillaCombatOverhaul
 
         public const float ArrowScratchSplit = 0.67f;
         public const float PassThroughCeiling = 1.5f;
+
+        private static readonly Dictionary<ThingDef, float> WeaponStoppingPower = new Dictionary<ThingDef, float>();
+        private static DamageDef arrowDef;
+        private static DamageDef rangedStabDef;
+        private static bool arrowDefsResolved;
 
         public static BulletWoundKind KindFor(float stoppingPower)
         {
@@ -50,64 +46,116 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>
-        /// Stopping power of the round that produced this <see cref="DamageInfo"/>.
-        /// Multi-projectile weapons only expose the first verb's projectile, same as Reloaded.
+        /// Stopping power of the round that produced this <see cref="DamageInfo"/>, cached per weapon.
+        /// Multi-projectile weapons only expose the first verb's projectile.
         /// </summary>
         public static float StoppingPowerFor(DamageInfo dinfo)
         {
-            var fromWeapon = dinfo.Weapon?.Verbs?
-                .FirstOrDefault()?.defaultProjectile?.projectile?.stoppingPower;
-            if (fromWeapon.HasValue && fromWeapon.Value > 0f)
+            var weapon = dinfo.Weapon;
+            if (weapon != null)
             {
-                return fromWeapon.Value;
+                if (!WeaponStoppingPower.TryGetValue(weapon, out var cached))
+                {
+                    var verbs = weapon.Verbs;
+                    cached = verbs != null && verbs.Count > 0
+                        ? verbs[0].defaultProjectile?.projectile?.stoppingPower ?? 0f
+                        : 0f;
+                    WeaponStoppingPower[weapon] = cached;
+                }
+                if (cached > 0f)
+                {
+                    return cached;
+                }
             }
             return dinfo.Def?.defaultStoppingPower ?? 0f;
         }
 
-        public static bool IsBulletDef(DamageDef def) =>
-            def != null && (def == DamageDefOf.Bullet || def.defName == "Bullet");
+        public static bool IsBulletDef(DamageDef def) => def != null && def == DamageDefOf.Bullet;
 
-        public static bool IsArrowDef(DamageDef def) =>
-            def != null && (def.defName == "Arrow" || def.defName == "RangedStab");
-
-        public static IEnumerable<BodyPartRecord> NearbyExternalParts(Pawn pawn, BodyPartRecord hit)
+        public static bool IsArrowDef(DamageDef def)
         {
-            if (pawn?.health?.hediffSet == null || hit == null)
+            if (def == null)
             {
-                yield break;
+                return false;
             }
-
-            IEnumerable<BodyPartRecord> nearby = hit.GetDirectChildParts();
-            if (hit.parent != null)
+            if (!arrowDefsResolved)
             {
-                nearby = nearby.Concat(hit.parent);
-                if (hit.parent.parent != null)
-                {
-                    nearby = nearby.Concat(hit.parent.GetDirectChildParts());
-                }
+                arrowDef = DefDatabase<DamageDef>.GetNamedSilentFail("Arrow");
+                rangedStabDef = DefDatabase<DamageDef>.GetNamedSilentFail("RangedStab");
+                arrowDefsResolved = true;
             }
+            return def == arrowDef || def == rangedStabDef;
+        }
 
-            foreach (var part in nearby)
+        /// <summary>Adds the hit part's children, parent and siblings, excluding the hit part and conceptual parts.</summary>
+        public static void AddNearbyParts(BodyPartRecord hit, List<BodyPartRecord> into)
+        {
+            AddChildren(hit, hit, into);
+            var parent = hit.parent;
+            if (parent == null)
             {
-                if (part != hit
-                    && !part.def.conceptual
-                    && part.depth == BodyPartDepth.Outside
-                    && !pawn.health.hediffSet.PartIsMissing(part))
+                return;
+            }
+            if (!parent.def.conceptual)
+            {
+                into.Add(parent);
+            }
+            if (parent.parent != null)
+            {
+                AddChildren(parent, hit, into);
+            }
+        }
+
+        private static void AddChildren(BodyPartRecord part, BodyPartRecord hit, List<BodyPartRecord> into)
+        {
+            var children = part.parts;
+            for (var i = 0; i < children.Count; i++)
+            {
+                var child = children[i];
+                if (child != hit && !child.def.conceptual && !into.Contains(child))
                 {
-                    yield return part;
+                    into.Add(child);
                 }
             }
         }
 
-        public static IEnumerable<BodyPartRecord> PassThroughChain(BodyPartRecord hit)
+        /// <summary>Adds nearby outside parts the pawn still has, for an arrow's second wound.</summary>
+        public static void AddNearbyExternalParts(Pawn pawn, BodyPartRecord hit, List<BodyPartRecord> into)
+        {
+            var start = into.Count;
+            AddNearbyParts(hit, into);
+            for (var i = into.Count - 1; i >= start; i--)
+            {
+                var part = into[i];
+                if (part.depth != BodyPartDepth.Outside || pawn.health.hediffSet.PartIsMissing(part))
+                {
+                    into.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>Adds the hit part and its parents out to the first outside part.</summary>
+        public static void AddPassThroughChain(BodyPartRecord hit, List<BodyPartRecord> into)
         {
             for (var part = hit; part != null; part = part.parent)
             {
-                yield return part;
+                into.Add(part);
                 if (part.depth == BodyPartDepth.Outside)
                 {
-                    yield break;
+                    return;
                 }
+            }
+        }
+
+        /// <summary>Moves <paramref name="count"/> randomly chosen entries to the front of the list.</summary>
+        public static void ShuffleFront(List<BodyPartRecord> list, int count)
+        {
+            for (var i = 0; i < count && i < list.Count; i++)
+            {
+                var j = Rand.RangeInclusive(i, list.Count - 1);
+                var swap = list[i];
+                list[i] = list[j];
+                list[j] = swap;
             }
         }
     }

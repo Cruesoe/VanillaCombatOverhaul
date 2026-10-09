@@ -2,13 +2,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Fires the suite once the map is live.
-    ///
-    /// Hooked to FinalizeInit rather than GameComponentTick deliberately: a map that starts
-    /// paused never ticks, so a tick-driven trigger would wait forever. The arena drives
-    /// DoSingleTick itself, so it does not need the game's own tick loop running at all.
-    /// </summary>
+    /// <summary>Starts the headless suite once the map has loaded; the arenas drive ticks themselves.</summary>
     public class AutoTestGameComponent : GameComponent
     {
         public AutoTestGameComponent(Game game)
@@ -24,8 +18,7 @@ namespace VanillaCombatOverhaul
 
             Log.Message("[VCO] Map ready; queueing autotest run.");
 
-            // Deferred until loading finishes so the arena is not spawning into a map that is
-            // still being set up behind a loading screen.
+            // Deferred until loading has finished.
             LongEventHandler.ExecuteWhenFinished(delegate
             {
                 var map = Find.CurrentMap;

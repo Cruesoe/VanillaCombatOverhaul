@@ -9,13 +9,7 @@ namespace VanillaCombatOverhaul
         public CompProperties_FireMode() => compClass = typeof(CompFireMode);
     }
 
-    /// <summary>
-    /// A pawn's chosen fire mode.
-    ///
-    /// The choice outlives the draft: undrafting only stops it applying, so a player who set
-    /// a sniper to Precision does not have to set it again next raid. Auto mode keeps the
-    /// distance-picked mode separately so turning auto off returns to the manual choice.
-    /// </summary>
+    /// <summary>A pawn's chosen fire mode, kept across drafts; Auto stores its distance-picked mode separately.</summary>
     public class CompFireMode : ThingComp
     {
         private FireMode mode = FireMode.Default;

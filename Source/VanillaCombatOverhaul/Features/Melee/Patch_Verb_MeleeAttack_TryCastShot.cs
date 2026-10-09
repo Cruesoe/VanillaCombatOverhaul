@@ -4,18 +4,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Resolves parrying ahead of vanilla's hit roll.
-    ///
-    /// Vanilla Combat Reloaded spliced this in with a transpiler keyed on a local variable
-    /// index, because it wanted to parry only attacks that would otherwise have landed. That
-    /// buys very little -- a parried attack and a missed attack both deal no damage -- and it
-    /// costs a patch that silently stops working whenever Ludeon touches the method.
-    ///
-    /// Resolving first instead makes a plain prefix sufficient. The model a player sees is
-    /// "you parry some attacks; the rest resolve normally", and total mitigation stacks
-    /// multiplicatively with vanilla's existing miss and dodge chances.
-    /// </summary>
+    /// <summary>Rolls the parry before vanilla's hit roll; a parried attack ends as a miss.</summary>
     [HarmonyPatch(typeof(Verb_MeleeAttack), "TryCastShot")]
     public static class Patch_Verb_MeleeAttack_TryCastShot
     {
@@ -26,18 +15,13 @@ namespace VanillaCombatOverhaul
                 return true;   // Nothing parried; let vanilla resolve the attack.
             }
 
-            // The attack happened and did nothing, which is exactly what vanilla's own miss
-            // path reports, so the caller's cooldown and stance handling stay correct.
+            // Reported as a miss, so cooldown and stance handling stay vanilla's.
             GrantAttackerExperience(__instance);
             __result = false;
             return false;
         }
 
-        /// <summary>
-        /// Skipping the original also skips the melee XP it would have granted the attacker.
-        /// Swinging at someone is practice whether or not it connects, so it is granted here
-        /// on the same terms vanilla uses.
-        /// </summary>
+        /// <summary>Grants the attacker the melee XP vanilla would have, since the original is skipped.</summary>
         private static void GrantAttackerExperience(Verb_MeleeAttack verb)
         {
             var attacker = verb.CasterPawn;

@@ -16,12 +16,7 @@ namespace VanillaCombatOverhaul
         private static readonly Dictionary<int, int> WeaponRetryAfterTick = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> NextItemCheckTick = new Dictionary<int, int>();
 
-        /// <summary>
-        /// MainColonistBehaviorCore places this node under a ThinkNode_PrioritySorter. Every
-        /// direct child of that sorter must report a priority or RimWorld discards it without
-        /// calling TryGiveJob. Keep loadout jobs just above ordinary scheduled work
-        /// (which reaches 9), but below urgent food (9.5).
-        /// </summary>
+        /// <summary>Priority under the colonist priority sorter: above scheduled work (9), below urgent food (9.5).</summary>
         public override float GetPriority(Pawn pawn) =>
             LoadoutUtility.Enabled && CanConsider(pawn) ? 9.25f : 0f;
 
@@ -66,7 +61,7 @@ namespace VanillaCombatOverhaul
             var current = pawn.equipment.Primary;
             var autoPrimary = policy.autoPrimary
                               && !(current != null && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(pawn) == true);
-            var wantSidearm = policy.carrySidearm;
+            var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled;
             if (wantSidearm)
             {
                 DropSurplusSidearms(pawn);

@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Mechanics are exposed as ordinary stats so they appear on the pawn's Stats tab,
-       can be retuned in XML, and can be modified by apparel, hediffs, genes, traits and
-       other mods without anyone needing to patch our C#. -->
-
   <StatDef>
     <defName>VCO_ParryChance</defName>
     <label>parry aptitude</label>
@@ -17,8 +13,7 @@
     <showIfUndefined>false</showIfUndefined>
     <displayPriorityInCategory>2100</displayPriorityInCategory>
     <parts>
-      <!-- Order matters: aptitude is seeded from melee ability, then adjusted, then
-           zeroed outright if there is nothing in hand to parry with. -->
+      <!-- Order matters: the melee part sets the value, darkness adjusts it, no weapon zeroes it. -->
       <li Class="VanillaCombatOverhaul.StatPart_ParryAptitudeFromMelee" />
       <li Class="VanillaCombatOverhaul.StatPart_ParryDarkness" />
       <li Class="VanillaCombatOverhaul.StatPart_ParryRequiresWeapon" />

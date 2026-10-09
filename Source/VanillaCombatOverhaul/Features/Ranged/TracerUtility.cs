@@ -5,15 +5,10 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Short glowing streak behind in-flight projectiles. Vibrant Tracers for Combat Extended
-    /// does this by swapping CE ammo graphics to <c>TransparentPostLight</c> textures keyed on
-    /// calibre; vanilla has no ammo types, so a Harmony draw of a MoteGlow quad along the
-    /// projectile's path is the equivalent that works for every gun and bow.
-    /// </summary>
+    /// <summary>Draws a short glowing streak behind in-flight projectiles, coloured by damage type.</summary>
     public static class TracerUtility
     {
-        // The streak at 1x, in cells. Both dimensions move together off tracerScale.
+        // Streak size at tracerScale 1, in cells.
         private const float BaseLength = 1.1f;
         private const float BaseWidth = 0.07f;
 
@@ -51,8 +46,7 @@ namespace VanillaCombatOverhaul
             var scale = new Vector3(width, 1f, length);
             var rotation = Quaternion.LookRotation(dir);
 
-            // One lookup for both quads: MatFor runs the damage-type colour switch and a
-            // MaterialPool dictionary hit, and this is per projectile per frame.
+            // One material lookup for both quads.
             var material = MatFor(projectile);
 
             Graphics.DrawMesh(MeshPool.plane10, Matrix4x4.TRS(mid, rotation, scale),

@@ -5,12 +5,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Records the distance-picked mode before warmup is read, and pushes shot context so
-    /// the aim time stat part knows which verb is being cast. Context is pushed for every
-    /// pawn cast, not just gun shots: without it an ability would be judged by the primary
-    /// weapon and slowed by its mode.
-    /// </summary>
+    /// <summary>Records the Auto mode for the target and pushes shot context for every pawn cast, so stat parts see the verb being cast.</summary>
     [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[]
     {
         typeof(LocalTargetInfo), typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool)
@@ -35,10 +30,7 @@ namespace VanillaCombatOverhaul
         public static void Finalizer(ref CombatContext.Scope __state) => __state.Dispose();
     }
 
-    /// <summary>
-    /// Pushes shot context around each shot, so the cooldown stat read at the end of a burst
-    /// knows which verb fired.
-    /// </summary>
+    /// <summary>Pushes shot context around each shot, for the cooldown stat read at the end of a burst.</summary>
     [HarmonyPatch(typeof(Verb), "TryCastNextBurstShot")]
     public static class Patch_Verb_TryCastNextBurstShot
     {
@@ -56,11 +48,7 @@ namespace VanillaCombatOverhaul
         public static void Finalizer(ref CombatContext.Scope __state) => __state.Dispose();
     }
 
-    /// <summary>
-    /// Marks the one moment a burst is sized. Vanilla reads the shot count once, here, into
-    /// burstShotsLeft; scoping the change to it leaves weapon info cards, DPS readouts and
-    /// other mods reading BurstShotCount untouched.
-    /// </summary>
+    /// <summary>Marks the warmup, where vanilla sizes the burst, so only that read of BurstShotCount is changed.</summary>
     [HarmonyPatch(typeof(Verb), nameof(Verb.WarmupComplete))]
     public static class Patch_Verb_WarmupComplete
     {
