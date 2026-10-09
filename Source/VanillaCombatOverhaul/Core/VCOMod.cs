@@ -149,6 +149,7 @@ namespace VanillaCombatOverhaul
                 if (s.enableSuppression)
                 {
                     Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
+                    Toggle(l, "VCO_SuppressionMood", ref s.enableSuppressionMood);
                     s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
                                                    0.25f, 3f, 0.05f, "0.00");
                 }

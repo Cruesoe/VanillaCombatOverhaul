@@ -36,6 +36,16 @@ namespace VanillaCombatOverhaul
                 SuppressionUtility.ArmorFactor(1f, 0.16f) < SuppressionUtility.ArmorFactor(0.5f, 0.16f)
                 && SuppressionUtility.ArmorFactor(1f, 0.35f) > SuppressionUtility.ArmorFactor(1f, 0.16f),
                 $"{SuppressionUtility.ArmorFactor(0.5f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.35f):F2}"));
+            var along = SuppressionUtility.DistanceToSegment(new UnityEngine.Vector3(5f, 0f, 2f), UnityEngine.Vector3.zero,
+                new UnityEngine.Vector3(10f, 0f, 0f), 100f);
+            var past = SuppressionUtility.DistanceToSegment(new UnityEngine.Vector3(13f, 0f, 4f), UnityEngine.Vector3.zero,
+                new UnityEngine.Vector3(10f, 0f, 0f), 100f);
+            results.Add(Check("fly-by distance is measured to the bullet's path, not past its end",
+                Approx(along, 2f) && Approx(past, 5f), $"{along:F2} / {past:F2}"));
+            results.Add(Check("mood stages follow the suppression level",
+                ThoughtWorker_UnderFire.StageFor(0f) == -1 && ThoughtWorker_UnderFire.StageFor(1f) == 0
+                && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.SuppressedLevel) == 1
+                && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.PinnedLevel) == 2, "-1 / 0 / 1 / 2"));
             results.Add(Check("armour can stop suppression entirely, and no penetration suppresses nothing",
                 Approx(SuppressionUtility.ArmorFactor(2f, 0.1f), 0f) && Approx(SuppressionUtility.ArmorFactor(0f, 0f), 0f), "0 / 0"));
 
@@ -115,6 +125,10 @@ namespace VanillaCombatOverhaul
                 var job = target.CurJobDef;
                 results.Add(Check("a pinned enemy takes cover",
                     job == JobDefOf.Goto || job == JobDefOf.Wait_Combat, job?.defName ?? "no job"));
+                var thought = DefDatabase<ThoughtDef>.GetNamedSilentFail("VCO_UnderFire");
+                var state = thought?.Worker.CurrentState(target) ?? ThoughtState.Inactive;
+                results.Add(Check("a pinned pawn feels pinned down", state.Active && state.StageIndex == 2,
+                    thought == null ? "thought def missing" : $"stage {state.StageIndex}"));
 
                 // Compared with suppression switched off at the same moment and position.
                 var aimPinned = StatDefOf.AimingDelayFactor.Worker.GetValue(StatRequest.For(target), false);
@@ -139,6 +153,7 @@ namespace VanillaCombatOverhaul
                     (targetComp?.Level ?? -1f).ToString("F1")));
 
                 results.AddRange(ArmorTests(map, origin + IntVec3.North * 6, spawned));
+                results.AddRange(FlybyTests(map, origin + IntVec3.South * 8, rifle, enemyFaction, spawned));
             }
             catch (Exception e)
             {
@@ -181,6 +196,31 @@ namespace VanillaCombatOverhaul
             results.Add(Check("flak gear resists part of a rifle's suppression", rifleFlak > 0.4f && rifleFlak < 0.85f, detail));
             results.Add(Check("marine armour resists most of a rifle's suppression", rifleMarine < rifleFlak && rifleMarine < 0.5f, detail));
             results.Add(Check("higher penetration suppresses armour more", chargeMarine > rifleMarine, detail));
+            return results;
+        }
+
+        /// <summary>A bullet flying past a hostile far from where it lands suppresses it; one beside the shooter is left alone.</summary>
+        private static List<AssertionResult> FlybyTests(Map map, IntVec3 cell, ThingDef rifle, Faction enemy, List<Pawn> spawned)
+        {
+            var results = new List<AssertionResult>();
+            var shooter = RangedCombatArena.SpawnShooter(map, cell + IntVec3.West * 8, 10, rifle);
+            var passed = SpawnHostile(map, cell + IntVec3.North, enemy);
+            var nearShooter = SpawnHostile(map, cell + IntVec3.West * 8 + IntVec3.North, enemy);
+            spawned.Add(shooter);
+            spawned.Add(passed);
+            spawned.Add(nearShooter);
+            if (shooter == null || passed == null || nearShooter == null)
+            {
+                results.Add(Check("fly-by arena set up", false, "could not spawn the pawns"));
+                return results;
+            }
+            FireAt(shooter, rifle, cell + IntVec3.East * 8);
+            var passedLevel = SuppressionUtility.CompFor(passed)?.Level ?? 0f;
+            var nearLevel = SuppressionUtility.CompFor(nearShooter)?.Level ?? 0f;
+            results.Add(Check("a bullet flying past suppresses a hostile it misses by a cell", passedLevel > 0f,
+                passedLevel.ToString("F1")));
+            results.Add(Check("pawns beside the shooter are not suppressed by its own shots", nearLevel == 0f,
+                nearLevel.ToString("F1")));
             return results;
         }
 

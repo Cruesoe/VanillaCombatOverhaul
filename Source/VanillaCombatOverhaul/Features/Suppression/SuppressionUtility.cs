@@ -20,6 +20,9 @@ namespace VanillaCombatOverhaul
         public const float BaseRadius = 2.9f;
         public const float ExplosionRadiusBonus = 2f;
         public const float EdgeFalloff = 0.5f;
+        // Combat Extended's fly-by distance, and the radius around the shooter where fly-bys do not count.
+        public const float FlybyRadius = 3f;
+        public const float MuzzleExclusionRadius = 3f;
         // Combat Extended's per-hit multiplier on damage.
         public const float DamageFactor = 2f;
         public const float ExplosionFactor = 2f;
@@ -163,20 +166,21 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var damage = (float)projectile.DamageAmount;
-            if (damage <= 0f)
+            var baseDamage = (float)projectile.DamageAmount;
+            if (baseDamage <= 0f)
             {
                 return;
             }
+            baseDamage *= DamageFactor * settings.suppressionStrength * FireModeFactor(launcher);
+            var damage = baseDamage;
             var radius = BaseRadius;
             if (explosion)
             {
                 damage *= ExplosionFactor;
                 radius = Mathf.Max(radius, props.explosionRadius + ExplosionRadiusBonus);
             }
-            damage *= DamageFactor * settings.suppressionStrength * FireModeFactor(launcher);
             // Armour only resists bullets, as in Combat Extended.
-            var penetration = explosion ? 0f : RawPenetration(projectile);
+            var penetration = RawPenetration(projectile);
 
             var center = position.ToIntVec3();
             var source = launcher.Position;
@@ -208,7 +212,65 @@ namespace VanillaCombatOverhaul
                     }
                 }
             }
+            if (!props.flyOverhead)
+            {
+                ApplyFlyby(map, ProjectileAccess.Origin(projectile), position, baseDamage, penetration, launcher);
+            }
             HitThisImpact.Clear();
+        }
+
+        /// <summary>
+        /// Suppresses pawns the projectile passed within FlybyRadius of, as Combat Extended does, except
+        /// pawns near the shooter or already suppressed by the impact.
+        /// </summary>
+        private static void ApplyFlyby(Map map, Vector3 origin, Vector3 end, float damage, float penetration, Thing launcher)
+        {
+            var path = (end - origin).Yto0();
+            var lengthSquared = path.sqrMagnitude;
+            if (lengthSquared <= MuzzleExclusionRadius * MuzzleExclusionRadius)
+            {
+                return;
+            }
+            var minX = Mathf.Min(origin.x, end.x) - FlybyRadius;
+            var maxX = Mathf.Max(origin.x, end.x) + FlybyRadius;
+            var minZ = Mathf.Min(origin.z, end.z) - FlybyRadius;
+            var maxZ = Mathf.Max(origin.z, end.z) + FlybyRadius;
+            var source = launcher.Position;
+            var pawns = map.mapPawns.AllPawnsSpawned;
+            for (var i = 0; i < pawns.Count; i++)
+            {
+                var pawn = pawns[i];
+                var pos = pawn.DrawPos;
+                if (pos.x < minX || pos.x > maxX || pos.z < minZ || pos.z > maxZ || HitThisImpact.Contains(pawn))
+                {
+                    continue;
+                }
+                if ((pos - origin).MagnitudeHorizontalSquared() <= MuzzleExclusionRadius * MuzzleExclusionRadius)
+                {
+                    continue;
+                }
+                var distance = DistanceToSegment(pos, origin, path, lengthSquared);
+                if (distance > FlybyRadius || !CanBeSuppressedBy(pawn, launcher))
+                {
+                    continue;
+                }
+                var amount = damage * Falloff(distance, FlybyRadius)
+                             * pawn.GetStatValue(VCO_StatDefOf.VCO_Suppressability, true, 60)
+                             * ArmorFactor(OverallSharpArmor(pawn), penetration);
+                if (amount > 0f)
+                {
+                    VCODiagnostics.CountFor(pawn, "suppression.flyby");
+                    CompFor(pawn)?.AddSuppression(amount, source);
+                }
+            }
+        }
+
+        /// <summary>Horizontal distance from a point to the segment starting at origin along path.</summary>
+        public static float DistanceToSegment(Vector3 point, Vector3 origin, Vector3 path, float lengthSquared)
+        {
+            var offset = (point - origin).Yto0();
+            var t = lengthSquared > 0f ? Mathf.Clamp01(Vector3.Dot(offset, path) / lengthSquared) : 0f;
+            return (offset - path * t).MagnitudeHorizontal();
         }
 
         public static bool CanBeSuppressedBy(Pawn pawn, Thing launcher)

@@ -70,6 +70,7 @@ namespace VanillaCombatOverhaul
         public float suppressionStrength = 1f;
         // Non-player pawns take cover when pinned; player pawns only take the penalties.
         public bool enableSuppressionPinning = Shipped;
+        public bool enableSuppressionMood = Shipped;
 
         // ---- Armor -------------------------------------------------------------
         // armorScale 2 always blocks at 100% leftover armour; penetrationScale multiplies weapon AP.
@@ -149,6 +150,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Shipped);
             Scribe_Values.Look(ref suppressionStrength, nameof(suppressionStrength), 1f);
             Scribe_Values.Look(ref enableSuppressionPinning, nameof(enableSuppressionPinning), Shipped);
+            Scribe_Values.Look(ref enableSuppressionMood, nameof(enableSuppressionMood), Shipped);
 
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);

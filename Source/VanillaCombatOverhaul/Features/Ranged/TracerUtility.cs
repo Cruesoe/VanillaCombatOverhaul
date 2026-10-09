@@ -1,4 +1,3 @@
-using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -12,12 +11,6 @@ namespace VanillaCombatOverhaul
         private const float BaseLength = 1.1f;
         private const float BaseWidth = 0.07f;
 
-        private static readonly AccessTools.FieldRef<Projectile, Vector3> Origin =
-            AccessTools.FieldRefAccess<Projectile, Vector3>("origin");
-
-        private static readonly AccessTools.FieldRef<Projectile, Vector3> Destination =
-            AccessTools.FieldRefAccess<Projectile, Vector3>("destination");
-
         public static void Draw(Projectile projectile, Vector3 drawLoc)
         {
             var settings = VCOMod.Settings;
@@ -30,7 +23,7 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var travel = Destination(projectile) - Origin(projectile);
+            var travel = ProjectileAccess.Destination(projectile) - ProjectileAccess.Origin(projectile);
             if (travel.sqrMagnitude < 0.0001f)
             {
                 return;

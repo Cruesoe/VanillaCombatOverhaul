@@ -55,7 +55,7 @@
   <StatDef>
     <defName>VCO_Suppressability</defName>
     <label>suppressability</label>
-    <description>How strongly incoming fire suppresses this pawn. Bullets and explosions landing nearby build suppression, which makes a pawn aim worse and slower, and pins enemies in cover.\n\nSteady nerves and good mood lower it. Armour also resists suppression from bullets, depending on their armour penetration.</description>
+    <description>How strongly incoming fire suppresses this pawn. Bullets and explosions landing nearby, and bullets flying past, build suppression, which makes a pawn aim worse and slower, and pins enemies in cover.\n\nSteady nerves and good mood lower it. Armour also resists suppression from bullets, depending on their armour penetration.</description>
     <category>PawnCombat</category>
     <defaultBaseValue>1</defaultBaseValue>
     <minValue>0</minValue>

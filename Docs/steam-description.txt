@@ -13,7 +13,7 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 [*]Moving targets are harder to hit, and misses spread further at long range.
 [*]Visible projectile trails make incoming fire easier to read.
 [*]Drafted shooters can switch between Precision, Short Burst and Suppression fire, or let Auto choose by distance. Enemies pick their own.
-[*]Incoming fire suppresses: pawns under sustained fire aim worse and slower, and pinned enemies dive for cover. Armour shrugs off rounds that cannot match it. Works with any modded gun, no patches needed.
+[*]Incoming fire suppresses: pawns under sustained fire aim worse and slower, and pinned enemies dive for cover. Bullets flying past count too, armour shrugs off rounds that cannot match it, and being under fire hurts mood. Works with any modded gun, no patches needed.
 [*]Bullets and arrows produce distinct wounds based on how they strike the target.
 [/list]
 
