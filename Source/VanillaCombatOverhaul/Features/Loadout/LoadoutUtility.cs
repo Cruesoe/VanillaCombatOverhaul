@@ -56,7 +56,13 @@ namespace VanillaCombatOverhaul
             {
                 return null;
             }
-            var swapped = CompFor(pawn)?.SwappedPrimary;
+            var comp = CompFor(pawn);
+            var swapped = comp?.SwappedPrimary;
+            var locked = comp?.LockedSidearm;
+            if (locked != null && inventory.Contains(locked))
+            {
+                return locked;
+            }
             ThingWithComps best = null;
             var bestScore = -1f;
             for (var i = 0; i < inventory.Count; i++)
@@ -95,7 +101,7 @@ namespace VanillaCombatOverhaul
                     kept.Add(new ThingDefCount(item.thingDef, item.count));
                 }
             }
-            var sidearm = loadout.carrySidearm && SidearmsEnabled ? CarriedSidearm(pawn) : null;
+            var sidearm = (loadout.carrySidearm || comp.LockedSidearm != null) && SidearmsEnabled ? CarriedSidearm(pawn) : null;
             if (sidearm != null)
             {
                 kept.Add(new ThingDefCount(sidearm.def, 1));
@@ -105,6 +111,25 @@ namespace VanillaCombatOverhaul
             {
                 kept.Add(new ThingDefCount(swapped.def, 1));
             }
+        }
+
+        /// <summary>Point-blank chance from which a shooter who is better at Shooting than Melee keeps the gun up close.</summary>
+        public const float KeepGunPointBlankChance = 0.17f;
+
+        /// <summary>
+        /// True when firing point-blank beats drawing the sidearm: point-blank shooting is on, the pawn's
+        /// chance is at least KeepGunPointBlankChance (Shooting 15), and its Melee is lower than its Shooting.
+        /// </summary>
+        public static bool KeepsGunUpClose(Pawn pawn)
+        {
+            if (!PointBlankUtility.Enabled)
+            {
+                return false;
+            }
+            var shooting = PointBlankUtility.ShootingLevel(pawn);
+            var melee = pawn.skills?.GetSkill(SkillDefOf.Melee);
+            var meleeLevel = melee == null || melee.TotallyDisabled ? -1 : melee.Level;
+            return PointBlankUtility.ChanceFor(shooting) >= KeepGunPointBlankChance && meleeLevel < shooting;
         }
 
         /// <summary>An adjacent pawn the pawn would melee, as vanilla's drafted auto-attack checks.</summary>

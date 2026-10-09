@@ -73,19 +73,46 @@ namespace VanillaCombatOverhaul
 
         public override void FinalizeInit()
         {
-            if (loadouts.Count > 0)
+            if (loadouts.Count == 0)
             {
-                return;
+                if (legacyPolicies != null && legacyPolicies.Count > 0)
+                {
+                    MigrateLegacyPolicies(legacyPolicies, PawnsFinder.AllMapsWorldAndTemporary_Alive);
+                }
+                else
+                {
+                    GenerateStartingLoadouts();
+                }
+                legacyPolicies = null;
+                // Carry settings come from the colonists, so adding loadouts to a save keeps their medicine.
+                foreach (var loadout in loadouts)
+                {
+                    loadout.stock = null;
+                }
             }
-            if (legacyPolicies != null && legacyPolicies.Count > 0)
+            SeedStock(PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists);
+        }
+
+        /// <summary>Gives each loadout without stock the carry settings of a colonist using it, or defaults.</summary>
+        internal void SeedStock(IEnumerable<Pawn> colonists)
+        {
+            foreach (var loadout in loadouts)
             {
-                MigrateLegacyPolicies(legacyPolicies, PawnsFinder.AllMapsWorldAndTemporary_Alive);
+                if (loadout.stock != null)
+                {
+                    continue;
+                }
+                Pawn source = null;
+                foreach (var pawn in colonists)
+                {
+                    if (LoadoutUtility.CompFor(pawn)?.Loadout == loadout)
+                    {
+                        source = pawn;
+                        break;
+                    }
+                }
+                loadout.stock = LoadoutStockUtility.StockFromPawn(source);
             }
-            else
-            {
-                GenerateStartingLoadouts();
-            }
-            legacyPolicies = null;
         }
 
         // ------------------------------------------------------------ database

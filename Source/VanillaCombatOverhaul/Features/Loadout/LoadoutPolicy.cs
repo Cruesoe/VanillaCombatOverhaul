@@ -37,8 +37,23 @@ namespace VanillaCombatOverhaul
         public bool carrySidearm;
         public ThingFilter sidearmFilter = LoadoutUtility.NewWeaponFilter(ranged: false, melee: true);
         public List<LoadoutItem> items = new List<LoadoutItem>();
+        // Vanilla carry groups (medicine, and mods' such as ammo); null after loading a save from before stock, until seeded.
+        public List<LoadoutStock> stock = LoadoutStockUtility.DefaultStock();
 
         protected override string LoadKey => "VCO_Loadout";
+
+        /// <summary>The entry for a carry group, added with defaults if the group is new.</summary>
+        public LoadoutStock StockFor(InventoryStockGroupDef group)
+        {
+            stock ??= LoadoutStockUtility.DefaultStock();
+            var entry = stock.Find(s => s.group == group);
+            if (entry == null)
+            {
+                entry = LoadoutStockUtility.DefaultEntry(group);
+                stock.Add(entry);
+            }
+            return entry;
+        }
 
         public LoadoutPolicy()
         {
@@ -63,6 +78,11 @@ namespace VanillaCombatOverhaul
             {
                 items.Add(new LoadoutItem(item.thingDef, item.count));
             }
+            stock = new List<LoadoutStock>();
+            foreach (var entry in source.stock ?? LoadoutStockUtility.DefaultStock())
+            {
+                stock.Add(entry.Copy());
+            }
         }
 
         public int CountFor(ThingDef def)
@@ -85,8 +105,10 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref carrySidearm, "carrySidearm", false);
             Scribe_Deep.Look(ref sidearmFilter, "sidearmFilter");
             Scribe_Collections.Look(ref items, "items", LookMode.Deep);
+            Scribe_Collections.Look(ref stock, "stock", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                stock?.RemoveAll(s => s?.group == null);
                 weaponFilter ??= LoadoutUtility.NewWeaponFilter(ranged: true, melee: true);
                 sidearmFilter ??= LoadoutUtility.NewWeaponFilter(ranged: false, melee: true);
                 items ??= new List<LoadoutItem>();

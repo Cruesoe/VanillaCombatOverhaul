@@ -61,8 +61,18 @@ namespace VanillaCombatOverhaul
             var current = pawn.equipment.Primary;
             var autoPrimary = policy.autoPrimary
                               && !(current != null && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(pawn) == true);
-            var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled;
-            if (wantSidearm)
+            var locked = LoadoutUtility.SidearmsEnabled ? LoadoutUtility.CompFor(pawn)?.LockedSidearm : null;
+            // A locked sidearm replaces automatic choice; fetch it back if it is lying on this map.
+            var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled && locked == null;
+            if (locked != null && locked.Spawned && locked.Map == pawn.Map && !locked.IsForbidden(pawn)
+                && !MassUtility.WillBeOverEncumberedAfterPickingUp(pawn, locked, 1) && Reachable(pawn, locked, now))
+            {
+                var fetch = JobMaker.MakeJob(JobDefOf.TakeCountToInventory, locked);
+                fetch.count = 1;
+                WeaponRetryAfterTick[pawn.thingIDNumber] = now + WeaponRetryTicks;
+                return fetch;
+            }
+            if (wantSidearm || locked != null)
             {
                 DropSurplusSidearms(pawn);
             }

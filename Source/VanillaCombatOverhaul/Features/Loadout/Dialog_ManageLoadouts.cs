@@ -123,6 +123,13 @@ namespace VanillaCombatOverhaul
             Widgets.Label(intro, "VCO_Loadout_ItemsIntro".Translate());
             rect.yMin = intro.yMax + 6f;
 
+            foreach (var group in LoadoutStockUtility.Groups)
+            {
+                DoStockRow(new Rect(rect.x, rect.y, rect.width, RowHeight), policy, group);
+                rect.yMin += RowHeight + 2f;
+            }
+            rect.yMin += 4f;
+
             var add = new Rect(rect.x, rect.y, Mathf.Min(rect.width, 200f), RowHeight);
             if (Widgets.ButtonText(add, "VCO_Loadout_AddItem".Translate()))
             {
@@ -154,6 +161,65 @@ namespace VanillaCombatOverhaul
                 policy.items.Remove(remove);
                 countBuffers.Remove(remove);
             }
+        }
+
+        /// <summary>One vanilla carry group: which item, or the primary weapon's ammunition, and how many.</summary>
+        private static void DoStockRow(Rect row, LoadoutPolicy policy, InventoryStockGroupDef group)
+        {
+            var entry = policy.StockFor(group);
+            var labelRect = new Rect(row.x, row.y, 140f, row.height);
+            var countRect = new Rect(row.xMax - 70f, row.y + 2f, 70f, row.height - 4f);
+            var thingRect = new Rect(labelRect.xMax + 4f, row.y + 2f, countRect.x - labelRect.xMax - 8f, row.height - 4f);
+            using (new TextBlock(TextAnchor.MiddleLeft))
+            {
+                Widgets.Label(labelRect, GroupLabel(group));
+            }
+
+            var thingLabel = entry.matchWeapon
+                ? "VCO_Loadout_MatchWeapon".Translate().ToString()
+                : (entry.thingDef ?? group.DefaultThingDef).LabelCap.ToString();
+            if (Widgets.ButtonText(thingRect, thingLabel.Truncate(thingRect.width)))
+            {
+                var options = new List<FloatMenuOption>();
+                if (LoadoutStockUtility.IsAmmunitionGroup(group))
+                {
+                    options.Add(new FloatMenuOption("VCO_Loadout_MatchWeapon".Translate(), () => entry.matchWeapon = true));
+                }
+                foreach (var thing in group.thingDefs)
+                {
+                    var captured = thing;
+                    options.Add(new FloatMenuOption(thing.LabelCap, () =>
+                    {
+                        entry.thingDef = captured;
+                        entry.matchWeapon = false;
+                    }, captured));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+            if (entry.matchWeapon)
+            {
+                TooltipHandler.TipRegion(thingRect, "VCO_Loadout_MatchWeapon_Tip".Translate());
+            }
+
+            if (Widgets.ButtonText(countRect, entry.count.ToString()))
+            {
+                var options = new List<FloatMenuOption>();
+                for (var i = group.min; i <= group.max; i++)
+                {
+                    var captured = i;
+                    options.Add(new FloatMenuOption(i.ToString(), () => entry.count = captured));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+        }
+
+        private static string GroupLabel(InventoryStockGroupDef group)
+        {
+            if (LoadoutStockUtility.IsAmmunitionGroup(group))
+            {
+                return "VCO_Loadout_Ammunition".Translate();
+            }
+            return group.label.NullOrEmpty() ? group.defName : group.LabelCap.ToString();
         }
 
         /// <summary>Draws one carried item; returns true when its remove button was clicked.</summary>

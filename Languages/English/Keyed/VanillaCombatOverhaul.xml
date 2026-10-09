@@ -133,10 +133,18 @@
   <VCO_Loadout_AutoPrimary>Choose primary weapon automatically</VCO_Loadout_AutoPrimary>
   <VCO_Loadout_AutoPrimary_Tip>Colonists equip the best allowed weapon they can reach, and swap to a clearly better one when it turns up. Off: they keep whatever weapon you give them.</VCO_Loadout_AutoPrimary_Tip>
   <VCO_Loadout_CarrySidearm>Carry a backup melee weapon</VCO_Loadout_CarrySidearm>
-  <VCO_Loadout_CarrySidearm_Tip>Colonists with a ranged weapon carry the best allowed melee weapon in their inventory. When an enemy reaches them in a fight they switch to it, and switch back once the enemy is gone.\n\nDrafted colonists also get a button to switch by hand.</VCO_Loadout_CarrySidearm_Tip>
+  <VCO_Loadout_CarrySidearm_Tip>Colonists with a ranged weapon carry the best allowed melee weapon in their inventory. When an enemy reaches them in a fight they switch to it, and switch back once the enemy is gone.\n\nAny melee weapon in a colonist's inventory can serve as the sidearm. To choose one, right-click a melee weapon with the colonist selected and pick "carry as sidearm"; it is kept over better ones until you release it.\n\nStrong shooters (Shooting 15 or more, and better at Shooting than Melee) keep their gun up close and fire point-blank instead of switching. Drafted colonists also get a button to switch by hand.</VCO_Loadout_CarrySidearm_Tip>
   <VCO_Loadout_SidearmsByOtherMod>Simple Sidearms is active, so it handles backup weapons. Loadouts still choose the primary weapon and carried items.</VCO_Loadout_SidearmsByOtherMod>
   <VCO_Loadout_SidearmOff>Colonists with this loadout do not carry a backup weapon.</VCO_Loadout_SidearmOff>
-  <VCO_Loadout_ItemsIntro>Colonists keep these items in their inventory, fetching more when they run low. They stop picking up items that would leave them over-encumbered.</VCO_Loadout_ItemsIntro>
+  <VCO_Loadout_ItemsIntro>Colonists keep these items in their inventory, fetching more when they run low. They stop picking up items that would leave them over-encumbered. Medicine (and ammunition, with Progression: Ammunition) replace the Assign tab's carry columns.</VCO_Loadout_ItemsIntro>
+  <VCO_Loadout_Ammunition>Ammunition</VCO_Loadout_Ammunition>
+  <VCO_Loadout_MatchWeapon>Match primary weapon</VCO_Loadout_MatchWeapon>
+  <VCO_Loadout_MatchWeapon_Tip>Carries the refill the colonist's primary weapon uses: arrows for bows, ammo for guns, charge packs for charge weapons. It follows the weapon when it changes.</VCO_Loadout_MatchWeapon_Tip>
+  <VCO_Loadout_CarryAsSidearm>Carry {0} as sidearm</VCO_Loadout_CarryAsSidearm>
+  <VCO_Loadout_CannotCarryAsSidearm>Cannot carry {0} as sidearm</VCO_Loadout_CannotCarryAsSidearm>
+  <VCO_Loadout_TooHeavy>too heavy to carry</VCO_Loadout_TooHeavy>
+  <VCO_Loadout_ReleaseSidearm>Release sidearm</VCO_Loadout_ReleaseSidearm>
+  <VCO_Loadout_ReleaseSidearm_Tip>{0} was chosen as this colonist's sidearm. Release it so the loadout can choose the sidearm again.</VCO_Loadout_ReleaseSidearm_Tip>
   <VCO_Loadout_AddItem>Add item</VCO_Loadout_AddItem>
   <VCO_Loadout_ItemCount_Tip>How many to carry.</VCO_Loadout_ItemCount_Tip>
   <VCO_Loadout_RemoveItem>Stop carrying this item.</VCO_Loadout_RemoveItem>

@@ -20,7 +20,8 @@ Vanilla Combat Overhaul makes fights more tactical, readable and skill-driven wh
 [h1]Armour and equipment[/h1]
 [list]
 [*]Strong armour can stop weak hits outright, while partial protection still reduces their impact.
-[*]Loadouts, assigned in their own Assign tab column, set which weapons each colonist uses, whether they carry a backup melee weapon, and which items they keep in their inventory.
+[*]Loadouts, assigned in their own Assign tab column, set which weapons each colonist uses, whether they carry a backup melee weapon (or one you pick with a right-click), how much medicine they carry, and which other items they keep in their inventory.
+[*]With Progression: Ammunition, loadouts carry the refill each colonist's weapon needs: arrows for bows, ammo for guns, charge packs for charge weapons.
 [*]Colonists choose and upgrade their primary weapon by skill, switch to their melee sidearm when an enemy reaches them, and switch back afterwards.
 [*]Manual weapon choices remain locked until you allow automatic upgrades again.
 [*]Improved apparel coverage gives gloves, boots, masks, helmets and glasses more sensible protection and layering.

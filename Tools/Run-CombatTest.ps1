@@ -15,13 +15,15 @@
         .\Run-CombatTest.ps1                  # unseeded
         .\Run-CombatTest.ps1 -Seed 12345      # pinned seed, for regression checks
         .\Run-CombatTest.ps1 -KeepSandbox     # keep the folder with Player.log and results
+        .\Run-CombatTest.ps1 -ExtraMods ferny.ProgressionAmmunition   # also load other installed mods by package ID
 #>
 [CmdletBinding()]
 param(
     [int]    $Seed = 0,
     [int]    $TimeoutMinutes = 12,
     [string] $RimWorldPath = $(if ($env:RimWorldRoot) { $env:RimWorldRoot } elseif ($env:RIMWORLD_DIR) { $env:RIMWORLD_DIR } else { 'C:\Program Files (x86)\Steam\steamapps\common\RimWorld' }),
-    [switch] $KeepSandbox
+    [switch] $KeepSandbox,
+    [string[]] $ExtraMods = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -62,7 +64,7 @@ $realMods = Join-Path $realConfig 'ModsConfig.xml'
 if (Test-Path $realMods) { $version = ([xml](Get-Content $realMods -Raw)).ModsConfigData.version }
 
 $mods = @('brrainz.harmony', 'ludeon.rimworld', 'ludeon.rimworld.royalty', 'ludeon.rimworld.ideology',
-          'ludeon.rimworld.biotech', 'ludeon.rimworld.anomaly', 'ludeon.rimworld.odyssey', $packageId.ToLowerInvariant())
+          'ludeon.rimworld.biotech', 'ludeon.rimworld.anomaly', 'ludeon.rimworld.odyssey') + ($ExtraMods | ForEach-Object { $_.ToLowerInvariant() }) + @($packageId.ToLowerInvariant())
 $modsXml = "<?xml version=`"1.0`" encoding=`"utf-8`"?>`r`n<ModsConfigData>`r`n  <version>$version</version>`r`n  <activeMods>`r`n"
 foreach ($m in $mods) { $modsXml += "    <li>$m</li>`r`n" }
 $modsXml += "  </activeMods>`r`n</ModsConfigData>`r`n"

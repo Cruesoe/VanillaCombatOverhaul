@@ -10,14 +10,16 @@ namespace VanillaCombatOverhaul
         public CompProperties_Loadout() => compClass = typeof(CompLoadout);
     }
 
-    /// <summary>A pawn's assigned loadout and the swap between its primary and a carried melee sidearm.</summary>
+    /// <summary>A pawn's assigned loadout, its carry settings, and the swap between its primary and a carried melee sidearm.</summary>
     public class CompLoadout : ThingComp
     {
         public const int CheckIntervalTicks = 30;
+        public const int StockIntervalTicks = 250;
         public const int CalmChecksBeforeSwapBack = 4;
 
         private LoadoutPolicy loadout;
         private ThingWithComps swappedPrimary;
+        private ThingWithComps lockedSidearm;
         private bool autoSwapped;
         private int calmChecks;
 
@@ -35,8 +37,31 @@ namespace VanillaCombatOverhaul
         /// <summary>The primary weapon moved to inventory while the sidearm is in hand.</summary>
         public ThingWithComps SwappedPrimary => swappedPrimary;
 
+        /// <summary>The sidearm the player chose for this pawn, kept over any better one.</summary>
+        public ThingWithComps LockedSidearm
+        {
+            get
+            {
+                if (lockedSidearm != null && lockedSidearm.Destroyed)
+                {
+                    lockedSidearm = null;
+                }
+                return lockedSidearm;
+            }
+            set => lockedSidearm = value;
+        }
+
         public override void CompTickInterval(int delta)
         {
+            var pawn = Pawn;
+            if (pawn == null)
+            {
+                return;
+            }
+            if (LoadoutUtility.Enabled && pawn.IsColonist && parent.IsHashIntervalTick(StockIntervalTicks, delta))
+            {
+                LoadoutStockUtility.Apply(pawn, Loadout);
+            }
             if (!parent.IsHashIntervalTick(CheckIntervalTicks, delta))
             {
                 return;
@@ -44,15 +69,14 @@ namespace VanillaCombatOverhaul
             // Sidearms switched off with a primary still stowed: put the primary back in hand.
             if (!LoadoutUtility.SidearmsEnabled)
             {
-                if (swappedPrimary != null && Pawn?.inventory != null
-                    && (!Pawn.inventory.innerContainer.Contains(swappedPrimary) || LoadoutUtility.Swap(Pawn, swappedPrimary)))
+                if (swappedPrimary != null && pawn.inventory != null
+                    && (!pawn.inventory.innerContainer.Contains(swappedPrimary) || LoadoutUtility.Swap(pawn, swappedPrimary)))
                 {
                     ClearSwap();
                 }
                 return;
             }
-            var pawn = Pawn;
-            if (pawn == null || !pawn.Spawned || pawn.Downed || pawn.InMentalState || !pawn.IsColonistPlayerControlled)
+            if (!pawn.Spawned || pawn.Downed || pawn.InMentalState || !pawn.IsColonistPlayerControlled)
             {
                 return;
             }
@@ -70,8 +94,8 @@ namespace VanillaCombatOverhaul
         {
             var policy = Loadout;
             var primary = pawn.equipment?.Primary;
-            if (policy == null || !policy.carrySidearm || !LoadoutUtility.IsRanged(primary) || !InCombat(pawn)
-                || !LoadoutUtility.AdjacentThreat(pawn))
+            if (policy == null || !(policy.carrySidearm || LockedSidearm != null) || !LoadoutUtility.IsRanged(primary)
+                || !InCombat(pawn) || !LoadoutUtility.AdjacentThreat(pawn) || LoadoutUtility.KeepsGunUpClose(pawn))
             {
                 return;
             }
@@ -157,7 +181,23 @@ namespace VanillaCombatOverhaul
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
             var pawn = Pawn;
-            if (!LoadoutUtility.SidearmsEnabled || pawn == null || !pawn.Drafted || !pawn.IsColonistPlayerControlled)
+            if (!LoadoutUtility.SidearmsEnabled || pawn == null || !pawn.IsColonistPlayerControlled)
+            {
+                yield break;
+            }
+            var locked = LockedSidearm;
+            if (locked != null)
+            {
+                yield return new Command_Action
+                {
+                    defaultLabel = "VCO_Loadout_ReleaseSidearm".Translate(),
+                    defaultDesc = "VCO_Loadout_ReleaseSidearm_Tip".Translate(locked.LabelShortCap),
+                    icon = locked.def.uiIcon,
+                    iconAngle = locked.def.uiIconAngle,
+                    action = () => LockedSidearm = null
+                };
+            }
+            if (!pawn.Drafted)
             {
                 yield break;
             }
@@ -182,6 +222,7 @@ namespace VanillaCombatOverhaul
             base.PostExposeData();
             Scribe_References.Look(ref loadout, "vcoLoadout");
             Scribe_References.Look(ref swappedPrimary, "vcoSwappedPrimary");
+            Scribe_References.Look(ref lockedSidearm, "vcoLockedSidearm");
             Scribe_Values.Look(ref autoSwapped, "vcoAutoSwapped", false);
         }
     }

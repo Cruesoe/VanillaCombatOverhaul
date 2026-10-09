@@ -57,7 +57,7 @@ ARMOUR
 - Weapon armour penetration is shown on the weapon.
 
 EQUIPMENT
-- Loadouts, set in the Assign tab, choose each colonist's weapons, a backup melee weapon, and items to carry.
+- Loadouts, set in the Assign tab, choose each colonist's weapons, a backup melee weapon (or one you pick by right-clicking), medicine, and other items to carry. With Progression: Ammunition, colonists carry the refills their gun needs.
 - Colonists upgrade their primary weapon by skill and switch to their sidearm when an enemy reaches them.
 - Manually equipped weapons remain locked until you allow automatic upgrades again.
 

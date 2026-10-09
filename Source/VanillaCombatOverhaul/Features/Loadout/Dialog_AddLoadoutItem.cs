@@ -40,7 +40,7 @@ namespace VanillaCombatOverhaul
                 foreach (var def in DefDatabase<ThingDef>.AllDefs)
                 {
                     if (def.category == ThingCategory.Item && def.EverHaulable && !def.IsWeapon && !def.IsApparel
-                        && !def.IsCorpse && def.thingCategories != null)
+                        && !def.IsCorpse && def.thingCategories != null && !InStockGroup(def))
                     {
                         carryable.Add(def);
                     }
@@ -48,6 +48,19 @@ namespace VanillaCombatOverhaul
                 carryable.SortBy(d => d.label);
                 return carryable;
             }
+        }
+
+        /// <summary>Items a carry group (medicine, ammunition) handles, set in the loadout's stock rows instead.</summary>
+        private static bool InStockGroup(ThingDef def)
+        {
+            foreach (var group in DefDatabase<InventoryStockGroupDef>.AllDefs)
+            {
+                if (group.thingDefs.Contains(def))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override void DoWindowContents(Rect inRect)

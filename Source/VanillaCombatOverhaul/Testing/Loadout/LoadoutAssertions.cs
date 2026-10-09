@@ -131,6 +131,10 @@ namespace VanillaCombatOverhaul
                     assigned != null && assigned.label == apparel.label && assigned.weaponFilter.Allows(knife)
                     && !assigned.weaponFilter.Allows(rifle) && migrated.AllLoadouts.Count == Current.Game.outfitDatabase.AllOutfits.Count,
                     assigned?.label ?? "none"));
+                comp.Loadout = policy;
+
+                results.AddRange(StockTests(pawn, policy, migrated));
+                results.AddRange(SidearmChoiceTests(map, pawn, comp, knife, spawned));
                 comp.Loadout = null;
             }
             catch (Exception e)
@@ -154,6 +158,119 @@ namespace VanillaCombatOverhaul
             }
             results.Add(Check("the test leaves the colony's loadouts as it found them",
                 database.AllLoadouts.Count == loadoutCount, $"{loadoutCount} -> {database.AllLoadouts.Count}"));
+            return results;
+        }
+
+        /// <summary>Loadout stock drives vanilla's carry settings, seeds from colonists, and replaces the carry columns.</summary>
+        private static List<AssertionResult> StockTests(Pawn pawn, LoadoutPolicy policy, AutoEquipPolicyComponent scratch)
+        {
+            var results = new List<AssertionResult>();
+            var group = DefDatabase<InventoryStockGroupDef>.GetNamedSilentFail("Medicine");
+            if (group == null || pawn.inventoryStock == null)
+            {
+                results.Add(Check("medicine carry group exists", false, "no Medicine group or stock tracker"));
+                return results;
+            }
+
+            var entry = policy.StockFor(group);
+            entry.thingDef = ThingDefOf.MedicineHerbal;
+            entry.count = 2;
+            LoadoutStockUtility.Apply(pawn, policy);
+            results.Add(Check("the loadout sets the colonist's medicine to carry",
+                pawn.inventoryStock.GetDesiredThingForGroup(group) == ThingDefOf.MedicineHerbal
+                && pawn.inventoryStock.GetDesiredCountForGroup(group) == 2,
+                $"{pawn.inventoryStock.GetDesiredThingForGroup(group)?.defName} x{pawn.inventoryStock.GetDesiredCountForGroup(group)}"));
+
+            var seeded = scratch.MakeNewLoadout();
+            seeded.stock = null;
+            LoadoutUtility.CompFor(pawn).Loadout = seeded;
+            scratch.SeedStock(new[] { pawn });
+            var seededEntry = seeded.StockFor(group);
+            results.Add(Check("a new loadout in an existing save takes its users' medicine setting",
+                seededEntry.thingDef == ThingDefOf.MedicineHerbal && seededEntry.count == 2,
+                $"{seededEntry.thingDef?.defName} x{seededEntry.count}"));
+            LoadoutUtility.CompFor(pawn).Loadout = policy;
+
+            var carry = DefDatabase<PawnColumnDef>.GetNamedSilentFail("Carry");
+            results.Add(Check("vanilla's carry column is hidden while loadouts are on",
+                carry != null && !carry.Worker.VisibleCurrently, carry == null ? "no Carry column" : "hidden"));
+
+            if (LoadoutStockUtility.AmmunitionEnabled)
+            {
+                results.AddRange(AmmunitionTests(pawn, policy));
+            }
+            return results;
+        }
+
+        /// <summary>With Progression: Ammunition, the ammo stock follows the primary weapon.</summary>
+        private static List<AssertionResult> AmmunitionTests(Pawn pawn, LoadoutPolicy policy)
+        {
+            var results = new List<AssertionResult>();
+            var group = DefDatabase<InventoryStockGroupDef>.GetNamedSilentFail(LoadoutStockUtility.AmmunitionGroupDefName);
+            var bow = DefDatabase<ThingDef>.GetNamedSilentFail("Bow_Short");
+            var arrows = DefDatabase<ThingDef>.GetNamedSilentFail("PA_ArrowRefill");
+            var ammo = DefDatabase<ThingDef>.GetNamedSilentFail("PA_AmmoRefill");
+            if (group == null || bow == null || arrows == null || ammo == null)
+            {
+                results.Add(Check("Progression: Ammunition defs found", false, "missing ammo group, bow or refills"));
+                return results;
+            }
+            var entry = policy.StockFor(group);
+            entry.matchWeapon = true;
+            entry.count = 2;
+
+            LoadoutStockUtility.Apply(pawn, policy);
+            var withRifle = pawn.inventoryStock.GetDesiredThingForGroup(group);
+            var rifle = pawn.equipment.Primary;
+            pawn.equipment.Remove(rifle);
+            var bowThing = (ThingWithComps)ThingMaker.MakeThing(bow, GenStuff.DefaultStuffFor(bow));
+            pawn.equipment.AddEquipment(bowThing);
+            LoadoutStockUtility.Apply(pawn, policy);
+            var withBow = pawn.inventoryStock.GetDesiredThingForGroup(group);
+            pawn.equipment.DestroyEquipment(bowThing);
+            pawn.equipment.AddEquipment(rifle);
+
+            results.Add(Check("ammunition stock matches the primary weapon",
+                withRifle == ammo && withBow == arrows, $"rifle {withRifle?.defName}, bow {withBow?.defName}"));
+            results.Add(Check("Progression: Ammunition's ammo column is hidden while loadouts are on",
+                DefDatabase<PawnColumnDef>.GetNamedSilentFail("PA_AmmoCarry")?.Worker.VisibleCurrently == false, "hidden"));
+            return results;
+        }
+
+        /// <summary>A locked sidearm beats a better one, and strong shooters keep the gun up close.</summary>
+        private static List<AssertionResult> SidearmChoiceTests(Map map, Pawn pawn, CompLoadout comp, ThingDef knife, List<Thing> spawned)
+        {
+            var results = new List<AssertionResult>();
+            var inventory = pawn.inventory.innerContainer;
+            var stuffs = GenStuff.AllowedStuffsFor(knife).OrderBy(s => s.GetStatValueAbstract(StatDefOf.SharpDamageMultiplier)).ToList();
+            var poor = (ThingWithComps)ThingMaker.MakeThing(knife, stuffs.First());
+            var good = (ThingWithComps)ThingMaker.MakeThing(knife, stuffs.Last());
+            inventory.TryAdd(poor);
+            inventory.TryAdd(good);
+            var unlocked = LoadoutUtility.CarriedSidearm(pawn);
+            comp.LockedSidearm = poor;
+            var locked = LoadoutUtility.CarriedSidearm(pawn);
+            comp.LockedSidearm = null;
+            inventory.Remove(poor);
+            inventory.Remove(good);
+            results.Add(Check("the best melee weapon carried is the sidearm, unless one is locked",
+                unlocked == good && locked == poor, $"{unlocked?.Stuff?.defName} then {locked?.Stuff?.defName}"));
+
+            var shooting = pawn.skills.GetSkill(SkillDefOf.Shooting);
+            var melee = pawn.skills.GetSkill(SkillDefOf.Melee);
+            var keptShooting = shooting.Level;
+            var keptMelee = melee.Level;
+            shooting.Level = 20;
+            melee.Level = 5;
+            var specialist = LoadoutUtility.KeepsGunUpClose(pawn);
+            shooting.Level = 10;
+            melee.Level = 10;
+            var allRounder = LoadoutUtility.KeepsGunUpClose(pawn);
+            shooting.Level = keptShooting;
+            melee.Level = keptMelee;
+            results.Add(Check("a strong shooter keeps the gun up close, an all-rounder draws the sidearm",
+                (!PointBlankUtility.Enabled || specialist) && !allRounder,
+                $"shooting 20 melee 5: {specialist}, shooting 10 melee 10: {allRounder}"));
             return results;
         }
 
