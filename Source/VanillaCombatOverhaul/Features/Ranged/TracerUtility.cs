@@ -11,7 +11,7 @@ namespace VanillaCombatOverhaul
         private const float BaseLength = 1.1f;
         private const float BaseWidth = 0.07f;
 
-        public static void Draw(Projectile projectile, Vector3 drawLoc)
+        public static void Draw(Projectile projectile, Vector3 drawLoc, float travelled)
         {
             var settings = VCOMod.Settings;
             if (settings == null || !settings.enableVisibleTracers || projectile?.def?.projectile == null)
@@ -30,7 +30,12 @@ namespace VanillaCombatOverhaul
             }
 
             var sizeScale = Mathf.Clamp(settings.tracerScale, 0.5f, 2f);
-            var length = BaseLength * sizeScale;
+            // The tail never reaches back past the muzzle.
+            var length = Mathf.Min(BaseLength * sizeScale, travelled);
+            if (length < 0.05f)
+            {
+                return;
+            }
             var width = BaseWidth * sizeScale;
             var dir = travel.normalized;
             var tail = drawLoc - dir * length;
