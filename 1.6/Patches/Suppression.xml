@@ -18,4 +18,21 @@
       </value>
     </nomatch>
   </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>/Defs/StatDef[defName="MoveSpeed"]/parts</xpath>
+    <match Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="MoveSpeed"]/parts</xpath>
+      <value>
+        <li Class="VanillaCombatOverhaul.StatPart_SuppressionCrawl" />
+      </value>
+    </match>
+    <nomatch Class="PatchOperationAdd">
+      <xpath>/Defs/StatDef[defName="MoveSpeed"]</xpath>
+      <value>
+        <parts>
+          <li Class="VanillaCombatOverhaul.StatPart_SuppressionCrawl" />
+        </parts>
+      </value>
+    </nomatch>
+  </Operation>
 </Patch>

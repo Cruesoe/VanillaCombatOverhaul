@@ -37,6 +37,8 @@ namespace VanillaCombatOverhaul
         public const float SuppressedAccuracy = 0.85f;
         public const float SuppressedAimTime = 1.15f;
         public const float MaxAimTime = 1.5f;
+        // Suppression (Continued)'s prone-stage move speed factor.
+        public const float CrawlSpeedFactor = 0.65f;
 
         private static readonly HashSet<Pawn> HitThisImpact = new HashSet<Pawn>();
         private static readonly Dictionary<int, KeyValuePair<int, float>> ArmorCache = new Dictionary<int, KeyValuePair<int, float>>();
@@ -141,6 +143,25 @@ namespace VanillaCombatOverhaul
         }
 
         public static CompSuppression CompFor(Pawn pawn) => pawn?.TryGetComp<CompSuppression>();
+
+        /// <summary>A standing, conscious humanlike that is pinned with pinning switched on; it crawls whenever it moves.</summary>
+        public static bool CrawlsWhenMoving(Pawn pawn)
+        {
+            var settings = VCOMod.Settings;
+            if (settings == null || !settings.enableSuppression || !settings.enableSuppressionPinning)
+            {
+                return false;
+            }
+            if (!pawn.RaceProps.Humanlike || pawn.Downed || pawn.GetPosture() != PawnPosture.Standing)
+            {
+                return false;
+            }
+            return CompFor(pawn)?.Pinned == true && pawn.health.CanCrawl;
+        }
+
+        /// <summary>Crawling right now: pinned and on the move. Vanilla ends jobs of crawlers that cannot crawl, so CanCrawl is required.</summary>
+        public static bool IsCrawling(Pawn pawn) =>
+            pawn.Spawned && pawn.pather != null && pawn.pather.Moving && CrawlsWhenMoving(pawn);
 
         public static float LevelOf(Pawn pawn)
         {

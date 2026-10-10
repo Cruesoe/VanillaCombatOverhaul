@@ -125,6 +125,10 @@ namespace VanillaCombatOverhaul
                 var job = target.CurJobDef;
                 results.Add(Check("a pinned enemy is pinned down", job == VCO_JobDefOf.VCO_PinnedDown,
                     job?.defName ?? "no job"));
+                var moveCrawl = target.GetStatValue(StatDefOf.MoveSpeed, true, -1);
+                results.Add(Check("a pinned pawn crawls when it moves",
+                    SuppressionUtility.CrawlsWhenMoving(target) && (!target.pather.Moving || target.Crawling),
+                    $"moving {target.pather.Moving}, crawling {target.Crawling}, speed {moveCrawl:F2}"));
                 var thought = DefDatabase<ThoughtDef>.GetNamedSilentFail("VCO_UnderFire");
                 var state = thought?.Worker.CurrentState(target) ?? ThoughtState.Inactive;
                 results.Add(Check("a pinned pawn feels pinned down", state.Active && state.StageIndex == 2,

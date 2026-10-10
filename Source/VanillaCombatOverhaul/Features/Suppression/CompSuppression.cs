@@ -65,7 +65,7 @@ namespace VanillaCombatOverhaul
             level = SuppressionUtility.Decay(level, delta);
         }
 
-        /// <summary>Pinned pawns drop prone and stop firing; non-player pawns first sprint to nearby cover.</summary>
+        /// <summary>Pinned pawns drop prone and stop firing; non-player pawns first crawl to nearby cover.</summary>
         private void TryPinDown(Pawn pawn, IntVec3 source)
         {
             var settings = VCOMod.Settings;
@@ -74,10 +74,12 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (pawn.IsPrisoner || pawn.InMentalState || pawn.Downed || pawn.jobs == null
+            // A player order given while pinned is carried out, crawling, instead of being interrupted.
+            if (pawn.IsPrisoner || pawn.InMentalState || pawn.Downed || pawn.jobs == null || pawn.CurJob?.playerForced == true
                 || pawn.CurJobDef == VCO_JobDefOf.VCO_PinnedDown || pawn.CurJobDef == JobDefOf.AttackMelee
                 || pawn.CurJobDef == JobDefOf.Flee || pawn.CurJobDef == JobDefOf.FleeAndCower
-                || pawn.GetPosture() != PawnPosture.Standing || pawn.IsBurning())
+                || pawn.GetPosture() != PawnPosture.Standing || pawn.IsBurning()
+                || pawn.mindState?.MeleeThreatStillThreat == true || IsBursting(pawn))
             {
                 return;
             }
@@ -97,6 +99,10 @@ namespace VanillaCombatOverhaul
             pawn.jobs.StartJob(job, JobCondition.InterruptForced);
             VCODiagnostics.CountFor(pawn, "suppression.pinned");
         }
+
+        // A burst in progress finishes before the pawn goes down.
+        private static bool IsBursting(Pawn pawn) =>
+            pawn.stances?.curStance is Stance_Busy busy && busy.verb != null && busy.verb.Bursting;
 
         public override void PostDraw()
         {

@@ -71,7 +71,7 @@
   <VCO_Suppression>Incoming fire suppresses</VCO_Suppression>
   <VCO_Suppression_Tip>Bullets that land near or fly past an enemy of the shooter, and explosions nearby, build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it passes or lands, and the target's nerves and mood. Armour resists bullets that cannot match its rating, so weak rounds barely trouble a power-armoured trooper. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nPinning takes sustained fire: suppression starts fading half a second after the last nearby hit.</VCO_Suppression_Tip>
   <VCO_SuppressionPinning>Pinned pawns hit the dirt</VCO_SuppressionPinning>
-  <VCO_SuppressionPinning_Tip>A pinned pawn stops what it is doing, drops prone and holds fire until the shooting eases, staying down for at least four seconds. Enemies and allies sprint to nearby cover first; your colonists drop where they stand and can't be given orders until they get up.\n\nLying down makes a pawn much harder to hit from 4.5 cells or more, but point-blank shots hit far more easily, and a pawn attacked in melee gets up to fight.\n\nWith this off, pinned pawns only aim worse.</VCO_SuppressionPinning_Tip>
+  <VCO_SuppressionPinning_Tip>A pinned pawn stops what it is doing, drops prone and holds fire until the shooting eases, staying down for at least four seconds. Enemies and allies crawl to nearby cover first; your colonists drop where they stand.\n\nA pinned pawn that moves crawls, at 65% speed. Order a pinned colonist to move and they crawl there without being pinned down again on the way.\n\nLying down makes a pawn much harder to hit from 4.5 cells or more, but point-blank shots hit far more easily, and a pawn attacked in melee gets up to fight.\n\nWith this off, pinned pawns only aim worse.</VCO_SuppressionPinning_Tip>
   <VCO_SuppressionMood>Being under fire hurts mood</VCO_SuppressionMood>
   <VCO_SuppressionMood_Tip>Pawns being shot at get a mood penalty while it lasts: -5 under fire, -10 suppressed, -15 pinned.</VCO_SuppressionMood_Tip>
   <VCO_SuppressionStrength>Suppression strength: x{0}</VCO_SuppressionStrength>
@@ -82,6 +82,7 @@
   <VCO_Suppression_PinnedInspect>Pinned by incoming fire</VCO_Suppression_PinnedInspect>
   <VCO_SuppressionRead>Suppressed: {0}</VCO_SuppressionRead>
   <VCO_StatPart_Suppressed>Suppressed</VCO_StatPart_Suppressed>
+  <VCO_StatPart_Crawling>Crawling under fire</VCO_StatPart_Crawling>
   <VCO_StatPart_NerveAndMood>Nerves and mood</VCO_StatPart_NerveAndMood>
 
   <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>

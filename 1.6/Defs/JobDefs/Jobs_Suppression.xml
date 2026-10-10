@@ -5,7 +5,6 @@
     <driverClass>VanillaCombatOverhaul.JobDriver_PinnedDown</driverClass>
     <reportString>pinned down.</reportString>
     <casualInterruptible>false</casualInterruptible>
-    <playerInterruptible>false</playerInterruptible>
     <suspendable>false</suspendable>
     <checkOverrideOnDamage>Never</checkOverrideOnDamage>
     <alwaysShowWeapon>true</alwaysShowWeapon>

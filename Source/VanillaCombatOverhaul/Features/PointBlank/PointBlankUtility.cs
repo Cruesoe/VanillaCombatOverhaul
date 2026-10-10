@@ -240,6 +240,17 @@ namespace VanillaCombatOverhaul
             if (!ranged.TryStartCastOn(target))
             {
                 VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart");
+                VCODiagnostics.CountFor(pawn, ranged.state == VerbState.Bursting
+                    ? "pointblank.reject.cannotStart.bursting"
+                    : "pointblank.reject.cannotStart.noShot");
+                if (target.Thing is Pawn p && p.GetPosture() != PawnPosture.Standing)
+                {
+                    VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart.targetLaying");
+                }
+                if (pawn.CurJobDef == VCO_JobDefOf.VCO_PinnedDown)
+                {
+                    VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart.selfPinned");
+                }
                 return false;
             }
 
