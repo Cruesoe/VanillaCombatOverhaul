@@ -25,3 +25,6 @@ Directory.Build.targets
 *.slnx
 AGENTS.md
 CLAUDE.md
+
+# Raw screenshots used for preview art
+Screenshots/
