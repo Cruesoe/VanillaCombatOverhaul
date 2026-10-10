@@ -64,7 +64,7 @@
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
 
   <VCO_VisibleTracers>Show vibrant tracers on shots</VCO_VisibleTracers>
-  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells and grenades are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
+  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
 
   <!-- Fire modes -->
   <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>

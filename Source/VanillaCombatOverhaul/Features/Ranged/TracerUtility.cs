@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -18,7 +20,7 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (projectile.def.projectile.explosionRadius > 0.2f)
+            if (projectile.def.projectile.explosionRadius > 0.2f || IsShotgun(projectile))
             {
                 return;
             }
@@ -79,6 +81,26 @@ namespace VanillaCombatOverhaul
                 return new Color(0.35f, 0.85f, 1f, 0.9f);
             }
             return new Color(0.95f, 0.95f, 0.7f, 0.9f);
+        }
+
+        // Shotgun blasts already draw a pellet spread; matched by projectile or weapon defName, cached per def.
+        private static readonly Dictionary<ThingDef, bool> ShotgunCache = new Dictionary<ThingDef, bool>();
+
+        private static bool IsShotgun(Projectile projectile) =>
+            IsShotgunDef(projectile.def) || IsShotgunDef(projectile.EquipmentDef);
+
+        private static bool IsShotgunDef(ThingDef def)
+        {
+            if (def == null)
+            {
+                return false;
+            }
+            if (!ShotgunCache.TryGetValue(def, out var result))
+            {
+                result = def.defName.IndexOf("shotgun", StringComparison.OrdinalIgnoreCase) >= 0;
+                ShotgunCache[def] = result;
+            }
+            return result;
         }
 
         private static Material MatFor(Projectile projectile) =>
