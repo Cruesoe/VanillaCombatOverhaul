@@ -10,11 +10,10 @@ namespace VanillaCombatOverhaul
         public CompProperties_Suppression() => compClass = typeof(CompSuppression);
     }
 
-    /// <summary>A pawn's suppression level, its decay, and taking cover when pinned.</summary>
+    /// <summary>A pawn's suppression level, its decay, its overhead icon, and going prone when pinned.</summary>
     public class CompSuppression : ThingComp
     {
         public const float CoverSearchRadius = 5.9f;
-        public const int PinTicks = 240;
         public const int PinCooldownTicks = 60;
 
         private float level;
@@ -53,7 +52,7 @@ namespace VanillaCombatOverhaul
             }
             if (level >= SuppressionUtility.PinnedLevel)
             {
-                TryTakeCover(pawn, source);
+                TryPinDown(pawn, source);
             }
         }
 
@@ -66,8 +65,8 @@ namespace VanillaCombatOverhaul
             level = SuppressionUtility.Decay(level, delta);
         }
 
-        /// <summary>Non-player pawns move to nearby cover and hold there while pinned.</summary>
-        private void TryTakeCover(Pawn pawn, IntVec3 source)
+        /// <summary>Pinned pawns drop prone and stop firing; non-player pawns first sprint to nearby cover.</summary>
+        private void TryPinDown(Pawn pawn, IntVec3 source)
         {
             var settings = VCOMod.Settings;
             var now = Find.TickManager.TicksGame;
@@ -75,31 +74,37 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (pawn.Faction == Faction.OfPlayer || pawn.IsPrisoner || pawn.InMentalState || pawn.Downed
-                || pawn.jobs == null || pawn.CurJobDef == JobDefOf.AttackMelee)
+            if (pawn.IsPrisoner || pawn.InMentalState || pawn.Downed || pawn.jobs == null
+                || pawn.CurJobDef == VCO_JobDefOf.VCO_PinnedDown || pawn.CurJobDef == JobDefOf.AttackMelee
+                || pawn.CurJobDef == JobDefOf.Flee || pawn.CurJobDef == JobDefOf.FleeAndCower
+                || pawn.GetPosture() != PawnPosture.Standing || pawn.IsBurning())
             {
                 return;
             }
-            nextPinTick = now + PinTicks + PinCooldownTicks;
+            nextPinTick = now + PinCooldownTicks;
 
-            var wait = JobMaker.MakeJob(JobDefOf.Wait_Combat);
-            wait.expiryInterval = PinTicks;
-            wait.checkOverrideOnExpire = true;
-
-            var cover = SuppressionUtility.FindCover(pawn, source, CoverSearchRadius);
-            if (cover != pawn.Position)
+            var job = JobMaker.MakeJob(VCO_JobDefOf.VCO_PinnedDown);
+            job.targetB = source;
+            if (pawn.Faction != Faction.OfPlayer)
             {
-                var move = JobMaker.MakeJob(JobDefOf.Goto, cover);
-                move.locomotionUrgency = LocomotionUrgency.Sprint;
-                move.expiryInterval = PinTicks;
-                pawn.jobs.StartJob(move, JobCondition.InterruptForced);
-                pawn.jobs.jobQueue.EnqueueFirst(wait);
+                var cover = SuppressionUtility.FindCover(pawn, source, CoverSearchRadius);
+                if (cover != pawn.Position)
+                {
+                    job.targetA = cover;
+                    job.locomotionUrgency = LocomotionUrgency.Sprint;
+                }
             }
-            else
-            {
-                pawn.jobs.StartJob(wait, JobCondition.InterruptForced);
-            }
+            pawn.jobs.StartJob(job, JobCondition.InterruptForced);
             VCODiagnostics.CountFor(pawn, "suppression.pinned");
+        }
+
+        public override void PostDraw()
+        {
+            var pawn = Pawn;
+            if (Suppressed && pawn != null && pawn.Spawned)
+            {
+                SuppressionOverlay.Draw(pawn, Pinned);
+            }
         }
 
         public override string CompInspectStringExtra()

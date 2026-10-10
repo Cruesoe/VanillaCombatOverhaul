@@ -21,7 +21,7 @@ The depth of Combat Extended without its ammo, calibres or compatibility patches
 [h2]Suppression[/h2]
 [list]
 [*]Bullets landing near or flying past a pawn suppress them, making them aim worse and slower.
-[*]Sustained fire pins enemies, sending them diving for cover.
+[*]Sustained fire pins pawns, sending them diving for cover and flat on the ground.
 [*]Armour shrugs off rounds that cannot match it, and being under fire hurts mood.
 [/list]
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>VCO_PinnedDown</defName>
+    <driverClass>VanillaCombatOverhaul.JobDriver_PinnedDown</driverClass>
+    <reportString>pinned down.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+    <playerInterruptible>false</playerInterruptible>
+    <suspendable>false</suspendable>
+    <checkOverrideOnDamage>Never</checkOverrideOnDamage>
+    <alwaysShowWeapon>true</alwaysShowWeapon>
+  </JobDef>
+</Defs>

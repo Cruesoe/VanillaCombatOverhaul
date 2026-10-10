@@ -123,8 +123,8 @@ namespace VanillaCombatOverhaul
                 results.Add(Check("sustained fire pins the target", targetComp?.Pinned == true,
                     $"{shots} shots, level {targetComp?.Level:F1}"));
                 var job = target.CurJobDef;
-                results.Add(Check("a pinned enemy takes cover",
-                    job == JobDefOf.Goto || job == JobDefOf.Wait_Combat, job?.defName ?? "no job"));
+                results.Add(Check("a pinned enemy is pinned down", job == VCO_JobDefOf.VCO_PinnedDown,
+                    job?.defName ?? "no job"));
                 var thought = DefDatabase<ThoughtDef>.GetNamedSilentFail("VCO_UnderFire");
                 var state = thought?.Worker.CurrentState(target) ?? ThoughtState.Inactive;
                 results.Add(Check("a pinned pawn feels pinned down", state.Active && state.StageIndex == 2,
@@ -140,6 +140,16 @@ namespace VanillaCombatOverhaul
                 results.Add(Check("suppression slows aiming", aimPinned > aimClear, $"{aimClear:F2} -> {aimPinned:F2}"));
                 results.Add(Check("suppression lowers the shooter's hit factor", hitPinned < hitClear,
                     $"{hitClear:F3} -> {hitPinned:F3}"));
+
+                // Reaching cover and dropping takes a few seconds; the job holds prone after the level fades.
+                for (var i = 0; i < 300 && target.CurJobDef == VCO_JobDefOf.VCO_PinnedDown
+                                && target.GetPosture() == PawnPosture.Standing; i++)
+                {
+                    Find.TickManager.DoSingleTick();
+                }
+                results.Add(Check("a pinned enemy drops prone",
+                    !target.Downed && target.CurJobDef == VCO_JobDefOf.VCO_PinnedDown && target.GetPosture() != PawnPosture.Standing,
+                    $"{target.CurJobDef?.defName ?? "no job"}, {target.GetPosture()}"));
 
                 // Nothing left to fight while the level decays.
                 shooter.Destroy(DestroyMode.Vanish);

@@ -71,8 +71,8 @@ Drafted colonists holding a gun get a fire mode button:
 [*]How much depends on the round's damage and how close it passes, and on the pawn: steady nerves (such as Iron-willed) and a good mood resist it, while Nervous, Volatile or unhappy pawns are easily suppressed. Each pawn's suppressability is on their Stats tab.
 [*]Armour resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmoured one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
 [*]Active shield belts, mechanoids and animals are never suppressed.
-[*]A suppressed pawn aims worse and takes longer to aim. "Suppressed" text appears over them and on their inspect panel.
-[*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. Pinned enemies run to nearby cover and hold there for a few seconds before carrying on. Your own colonists are never taken out of your control; they only take the penalties.
+[*]A suppressed pawn aims worse and takes longer to aim. An amber icon stays over their head while it lasts, and their inspect panel shows how close they are to being pinned.
+[*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies sprint to nearby cover first, and your colonists drop where they stand and take no orders until they get up. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
 [*]Suppression starts fading half a second after the last nearby round, so pinning an enemy takes sustained fire: a single rifleman's bursts, several shooters or a machine gun.
 [*]Being shot at hurts mood while it lasts: -5 under fire, -10 suppressed, -15 pinned.
 [/list]
@@ -134,7 +134,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 
 [h2]Feedback[/h2]
 [list]
-[*]The mod is still being tuned, and your feedback is needed and much appreciated. Suppression strength, how long pinned enemies stay in cover, and when colonists draw their sidearm are all early numbers that play will refine.
+[*]The mod is still being tuned, and your feedback is needed and much appreciated. Suppression strength, how long pinned pawns stay down, and when colonists draw their sidearm are all early numbers that play will refine.
 [*]If a fight feels off, a number seems wrong or something breaks, leave a comment on the Workshop page with what happened and, for errors, the red text from the log.
 [/list]
 
