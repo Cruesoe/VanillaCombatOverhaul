@@ -6,18 +6,8 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// Counters for how often each part of the mod actually fires.
-    ///
-    /// A clean startup log proves nothing crashed; it says nothing about whether pawns are
-    /// parrying, how often a rejection reason bites, or whether directional damage is
-    /// replacing hit parts at all. These counters answer that.
-    ///
-    /// Deliberately a summary rather than a line per event: a single fight produces hundreds
-    /// of damage instances, and per-event logging would bury anything useful. Counters
-    /// accumulate and are dumped on an interval or on demand through developer debug actions.
-    ///
-    /// This is scaffolding for tuning, not a shipping feature. Remove it, along with the
-    /// Count/Sample calls it is paired with, once the numbers stop being interesting.
+    /// Counters and sampled values for how often each mechanic fires, recorded only with verbose
+    /// logging on (the test suite turns it on). Dumped on an interval or from the debug actions.
     /// </summary>
     public static class VCODiagnostics
     {
@@ -45,25 +35,10 @@ namespace VanillaCombatOverhaul
         /// <summary>Cheap gate so instrumentation costs nothing when switched off.</summary>
         public static bool Enabled => VCOMod.Settings?.verboseLogging ?? false;
 
-        /// <summary>
-        /// Optional restriction on whose events are recorded. Null in normal play, so
-        /// everything counts.
-        ///
-        /// The test arena sets this to the pawns under test, because a parry produces a
-        /// counter-attack, and that counter is itself a melee attack the original attacker can
-        /// parry. Without a filter an asymmetric matchup records both directions and reports
-        /// their mean, which is exactly what made two scenarios look broken when they were not.
-        /// </summary>
+        /// <summary>Limits pawn-attributed events to the pawns under test; null records everything.</summary>
         public static System.Func<Pawn, bool> SubjectFilter;
 
-        /// <summary>
-        /// Test-only hook, invoked when a parry chance is computed. Null in normal play.
-        ///
-        /// The arena needs the formula's inputs as they were at the moment of the attempt.
-        /// Sampling them on the refresh tick instead measures freshly healed pawns, and under
-        /// six attackers a defender is rarely healthy when the roll actually happens -- worth
-        /// 4.4 points of apparent error that belonged to the harness, not the mod.
-        /// </summary>
+        /// <summary>Test hook called with the parry formula's inputs at each roll; null in normal play.</summary>
         public static System.Action<Pawn, Pawn, float> ParryChanceProbe;
 
         public static void ProbeParryChance(Pawn defender, Pawn attacker, float directionFactor)
@@ -95,17 +70,7 @@ namespace VanillaCombatOverhaul
             Sample(key, value);
         }
 
-        /// <summary>
-        /// Pre-built counter keys for an enum-valued suffix, e.g. "parry.facing.Front".
-        ///
-        /// C# evaluates arguments before the call, so <c>Count(prefix + facing)</c> pays a
-        /// string concat and a reflective Enum.ToString on every hit -- even with counting
-        /// switched off, which defeats the gate below. Measured at ~180ns against ~0.2ns for
-        /// an array index, on a path that runs once per damage instance.
-        ///
-        /// Built once at startup from the enum itself and indexed by the underlying value, so
-        /// adding or renumbering a case cannot desynchronise the table.
-        /// </summary>
+        /// <summary>Counter keys for each enum value (e.g. "parry.facing.Front"), indexed by the value, so hot paths avoid string building.</summary>
         public static string[] KeyTable<TEnum>(string prefix) where TEnum : struct
         {
             var values = (TEnum[])System.Enum.GetValues(typeof(TEnum));
@@ -201,7 +166,7 @@ namespace VanillaCombatOverhaul
                 sb.AppendLine("    " + line.Key.PadRight(width) + "  " + line.Value);
             }
 
-            // Derived rates, which are the numbers actually worth reading.
+            // Derived rates.
             var attempts = Get("parry.attempt");
             if (attempts > 0)
             {

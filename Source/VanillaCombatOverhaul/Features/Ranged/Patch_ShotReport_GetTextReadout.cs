@@ -7,12 +7,8 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// Vanilla Combat Reloaded's inspect readout: vanilla weapon/weather numbers plus the
-    /// skill-adjusted ones, evasion, incoming side, and targeted-height chance.
-    ///
-    /// Reloaded replaced the whole string. This restores the raw factors for vanilla's own
-    /// lines, then appends the extras, so a RimWorld update that adds a new factor still
-    /// shows it.
+    /// Shot readout: vanilla's lines with the raw factors restored, then the skill-adjusted factors,
+    /// fire mode, suppression, evasion, incoming side and targeted-height chance appended.
     /// </summary>
     [HarmonyPatch(typeof(ShotReport), nameof(ShotReport.GetTextReadout))]
     public static class Patch_ShotReport_GetTextReadout
@@ -92,6 +88,12 @@ namespace VanillaCombatOverhaul
                               rawShooter.ToStringPercent(), modeShooter.ToStringPercent()));
                 shownMode = FireMode.Default;
             }
+            var suppression = SuppressionUtility.LevelOf(Find.Selector.SingleSelectedThing as Pawn);
+            if (suppression >= SuppressionUtility.SuppressedLevel)
+            {
+                sb.AppendLine("   " + "VCO_SuppressionRead".Translate(
+                    Mathf.Min(1f, suppression / SuppressionUtility.PinnedLevel).ToStringPercent()));
+            }
             if (stashed && !Mathf.Approximately(rawEquipment, mitigatedEquipment))
             {
                 sb.AppendLine("      " + "VCO_AdjWeapon".Translate() + ": " + mitigatedEquipment.ToStringPercent());
@@ -144,14 +146,7 @@ namespace VanillaCombatOverhaul
             return sb.Length == 0 ? null : sb.ToString();
         }
 
-        /// <summary>
-        /// Notes the shooter factor with and without the fire mode.
-        ///
-        /// Unlike weapon and weather, the report is left holding the moded value: vanilla's
-        /// headline hit chance is computed from it inside GetTextReadout, and swapping the raw
-        /// value in would make the headline ignore the mode. The raw value is recomputed from
-        /// vanilla rather than inverted, so it is exact.
-        /// </summary>
+        /// <summary>Notes the shooter factor with and without the fire mode; the report keeps the moded value for vanilla's headline.</summary>
         private static void NoteFireMode(ref ShotReport report)
         {
             if (!FireModeUtility.Enabled || !(Find.Selector.SingleSelectedThing is Pawn pawn))
@@ -166,8 +161,8 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var current = ShotReportAccess.GetShooterFactor(ref report);
             var raw = ShotReport.HitFactorFromShooter(pawn, distance);
+            var current = FireModeUtility.AdjustHitFactor(raw, FireModeUtility.TuningFor(mode)?.accuracy ?? 1f);
             if (Mathf.Approximately(current, raw))
             {
                 return;

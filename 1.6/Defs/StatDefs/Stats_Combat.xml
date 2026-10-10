@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Mechanics are exposed as ordinary stats so they appear on the pawn's Stats tab,
-       can be retuned in XML, and can be modified by apparel, hediffs, genes, traits and
-       other mods without anyone needing to patch our C#. -->
-
   <StatDef>
     <defName>VCO_ParryChance</defName>
     <label>parry aptitude</label>
@@ -17,8 +13,7 @@
     <showIfUndefined>false</showIfUndefined>
     <displayPriorityInCategory>2100</displayPriorityInCategory>
     <parts>
-      <!-- Order matters: aptitude is seeded from melee ability, then adjusted, then
-           zeroed outright if there is nothing in hand to parry with. -->
+      <!-- Order matters: the melee part sets the value, darkness adjusts it, no weapon zeroes it. -->
       <li Class="VanillaCombatOverhaul.StatPart_ParryAptitudeFromMelee" />
       <li Class="VanillaCombatOverhaul.StatPart_ParryDarkness" />
       <li Class="VanillaCombatOverhaul.StatPart_ParryRequiresWeapon" />
@@ -54,6 +49,22 @@
     <displayPriorityInCategory>2090</displayPriorityInCategory>
     <parts>
       <li Class="VanillaCombatOverhaul.StatPart_EvasionFromMovement" />
+    </parts>
+  </StatDef>
+
+  <StatDef>
+    <defName>VCO_Suppressability</defName>
+    <label>suppressability</label>
+    <description>How strongly incoming fire suppresses this pawn. Bullets and explosions landing nearby, and bullets flying past, build suppression, which makes a pawn aim worse and slower, and pins enemies in cover.\n\nSteady nerves and good mood lower it. Armour also resists suppression from bullets, depending on their armour penetration.</description>
+    <category>PawnCombat</category>
+    <defaultBaseValue>1</defaultBaseValue>
+    <minValue>0</minValue>
+    <toStringStyle>PercentZero</toStringStyle>
+    <showOnAnimals>false</showOnAnimals>
+    <showOnMechanoids>false</showOnMechanoids>
+    <displayPriorityInCategory>2085</displayPriorityInCategory>
+    <parts>
+      <li Class="VanillaCombatOverhaul.StatPart_SuppressabilityFromMind" />
     </parts>
   </StatDef>
 

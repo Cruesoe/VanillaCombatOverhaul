@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <!-- Groups used to work out which parts an attack from a given side can reach.
-       These are additive: they are seeded onto existing BodyDefs by Patches/, and
-       nothing about vanilla's own groups is changed. -->
+  <!-- Added to every BodyDef by Patches/DirectionalBodyParts.xml. -->
 
   <BodyPartGroupDef>
     <defName>VCO_Left</defName>

@@ -7,25 +7,13 @@ using Verse.AI.Group;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// Point-blank shooting: a skilled shooter caught in melee sometimes fires the gun in hand
-    /// instead of swinging it.
-    ///
-    /// The mod decides only whether this melee attack becomes a shot. Everything after that --
-    /// line of fire, projectile, burst, accuracy, XP, cooldown -- is the weapon's own verb
-    /// running exactly as it would for any other shot, with the warmup removed.
-    ///
-    /// The ranged cast is started from inside the melee verb's own TryStartCastOn, and only
-    /// when that call is the one Pawn_MeleeVerbs.TryMeleeAttack makes. By then vanilla has
-    /// already rejected a busy pawn and picked a usable melee verb, so each roll corresponds
-    /// to exactly one real attack and none of those gates are copied here.
+    /// Point-blank shooting: a skilled shooter in melee sometimes fires the gun in hand instead of
+    /// swinging it. The shot is the weapon's own verb with no warmup, started from the melee verb's
+    /// TryStartCastOn when called by Pawn_MeleeVerbs.TryMeleeAttack.
     /// </summary>
     public static class PointBlankUtility
     {
-        /// <summary>
-        /// Chance per eligible attack, indexed by Shooting level. A table rather than a curve
-        /// because the agreed balance names an exact value per level, and interpolation
-        /// between control points would drift from it.
-        /// </summary>
+        /// <summary>Chance per eligible attack, indexed by Shooting level.</summary>
         private static readonly float[] ChanceBySkill =
         {
             0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
@@ -34,25 +22,17 @@ namespace VanillaCombatOverhaul
 
         public const int MinimumSkill = 10;
 
-        /// <summary>
-        /// Test-only: lets the arena drive attacks with ordered jobs, which are always
-        /// player-forced, without the player-order exclusion rejecting every one of them.
-        /// </summary>
+        /// <summary>Test-only: lets the arena's ordered (player-forced) attacks roll.</summary>
         public static bool IgnorePlayerForcedForTesting;
 
-        // The pawn and target of the TryMeleeAttack call in progress. Anything that starts a
-        // melee verb outside that call is not a normal melee attack and is left alone.
+        // Pawn and target of the TryMeleeAttack call in progress.
         private static Pawn meleeAttacker;
         private static Thing meleeTarget;
 
-        // The ranged verb being checked and started as a point-blank shot. Its warmup reads
-        // as zero, and vanilla's melee lock does not apply to it.
+        // Ranged verb being started as a point-blank shot.
         private static Verb startingVerb;
 
-        // Point-blank verbs still partway through a burst. The later shots run on later ticks,
-        // outside any call we can scope, and must not be cut off by the melee lock the first
-        // shot was allowed past. Not saved: a burst interrupted by a reload finishes under
-        // normal rules, which for a non-player pawn usually means it stops early.
+        // Point-blank verbs partway through a burst, so later shots also skip the melee lock. Not saved.
         private static readonly List<Verb> burstingVerbs = new List<Verb>();
 
         public static bool Enabled => VCOMod.Settings?.enablePointBlank ?? false;
@@ -66,10 +46,7 @@ namespace VanillaCombatOverhaul
             return ChanceBySkill[shootingLevel < ChanceBySkill.Length ? shootingLevel : ChanceBySkill.Length - 1];
         }
 
-        /// <summary>
-        /// The level the table is read at. Aptitudes count, because they are part of the
-        /// Shooting level the player sees on the pawn; a pawn that cannot shoot at all has none.
-        /// </summary>
+        /// <summary>Shooting level including aptitudes, or -1 when Shooting is disabled.</summary>
         public static int ShootingLevel(Pawn pawn)
         {
             var skill = pawn.skills?.GetSkill(SkillDefOf.Shooting);
@@ -80,11 +57,7 @@ namespace VanillaCombatOverhaul
             return skill.Level;
         }
 
-        /// <summary>
-        /// Marks a TryMeleeAttack call for its lifetime. The previous values are restored on
-        /// dispose rather than cleared, because a parry counter-attack is a melee attack made
-        /// from inside another pawn's.
-        /// </summary>
+        /// <summary>Marks a TryMeleeAttack call; dispose restores the previous call's values, as melee attacks can nest.</summary>
         public static MeleeAttackScope BeginMeleeAttack(Pawn pawn, Thing target)
         {
             var scope = new MeleeAttackScope(meleeAttacker, meleeTarget);
@@ -116,10 +89,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// Called as a melee verb starts its cast. Returns true when a point-blank shot was
-        /// fired in its place, in which case the melee cast must not run.
-        /// </summary>
+        /// <summary>Called as a melee verb starts its cast; true when a point-blank shot was fired instead.</summary>
         public static bool TryReplace(Verb meleeVerb, LocalTargetInfo castTarg)
         {
             var pawn = meleeVerb.CasterPawn;
@@ -128,8 +98,7 @@ namespace VanillaCombatOverhaul
                 return false;   // Not the attack TryMeleeAttack is making.
             }
 
-            // Only pawns holding a ranged weapon are counted, so the rates below describe
-            // shooters rather than being diluted by every sword swing in the game.
+            // Only pawns holding a ranged weapon count as opportunities.
             var ranged = pawn.equipment?.PrimaryEq?.PrimaryVerb;
             if (ranged == null || ranged.verbProps.IsMeleeAttack)
             {
@@ -146,8 +115,7 @@ namespace VanillaCombatOverhaul
 
             if (!(castTarg.Thing is Pawn target) || target.Downed)
             {
-                // Buildings are not the design's target, and a finishing blow on a downed
-                // pawn must not turn into a gunshot.
+                // Pawns only, and never a downed one.
                 VCODiagnostics.CountFor(pawn, "pointblank.reject.target");
                 return false;
             }
@@ -171,8 +139,7 @@ namespace VanillaCombatOverhaul
             startingVerb = ranged;
             try
             {
-                // Checked as a point-blank cast, so the melee lock is lifted but everything
-                // else that makes a weapon unusable -- fuel, charges, roles -- still applies.
+                // Checked as a point-blank cast: the melee lock is lifted, fuel, charges and roles still apply.
                 if (!ranged.IsStillUsableBy(pawn))
                 {
                     VCODiagnostics.CountFor(pawn, "pointblank.reject.weapon");
@@ -184,8 +151,7 @@ namespace VanillaCombatOverhaul
                 VCODiagnostics.SampleFor(pawn, "pointblank.chanceRolled", chance);
                 if (IsPlayerMeleeOrder(pawn))
                 {
-                    // Only reachable while the arena waives the rule; the ordered-melee
-                    // scenario asserts this stays at zero.
+                    // Only reachable with IgnorePlayerForcedForTesting set.
                     VCODiagnostics.CountFor(pawn, "pointblank.roll.onPlayerOrder");
                 }
                 if (!Rand.Chance(chance))
@@ -202,13 +168,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// Melee that has a reason to stay melee: a social fight or duel is not meant to be
-        /// lethal gunplay, an explicit player melee order is a deliberate choice, and a parry
-        /// counter-attack is VCO's own bonus swing rather than a normal attack.
-        ///
-        /// Returns the counter key for the reason, or null when none applies.
-        /// </summary>
+        /// <summary>Counter key when the attack stays melee (parry counter, social fight, duel, player melee order), else null.</summary>
         private static string ExcludedContext(Pawn pawn)
         {
             if (ParryUtility.ResolvingCounter)
@@ -230,21 +190,14 @@ namespace VanillaCombatOverhaul
             return null;
         }
 
-        /// <summary>
-        /// An explicit "melee attack" order. A drafted pawn's automatic melee runs under
-        /// Wait_Combat, not AttackMelee, so it is not caught here.
-        /// </summary>
+        /// <summary>An explicit melee attack order; a drafted pawn's automatic melee runs under Wait_Combat instead.</summary>
         private static bool IsPlayerMeleeOrder(Pawn pawn)
         {
             var job = pawn.CurJob;
             return job != null && job.playerForced && job.def == JobDefOf.AttackMelee;
         }
 
-        /// <summary>
-        /// True while this verb is firing a point-blank shot: during its start, and for the
-        /// rest of the burst that start began. Vanilla's melee lock is lifted for exactly
-        /// these casts and no others.
-        /// </summary>
+        /// <summary>True while this verb is starting or bursting a point-blank shot.</summary>
         public static bool IsPointBlankCast(Verb verb)
         {
             if (verb == startingVerb)
@@ -268,10 +221,7 @@ namespace VanillaCombatOverhaul
             return false;
         }
 
-        /// <summary>
-        /// Called when a verb finishes a shot or is reset. Once its burst is over, its next
-        /// cast is an ordinary one and must be held to the ordinary rules.
-        /// </summary>
+        /// <summary>Stops tracking a verb once its burst is over.</summary>
         public static void NotifyBurstProgress(Verb verb)
         {
             if (burstingVerbs.Count > 0 && !verb.Bursting)
@@ -286,21 +236,29 @@ namespace VanillaCombatOverhaul
             var mind = pawn.mindState;
             var attackedBefore = mind?.lastAttackTargetTick ?? now;
 
-            // Vanilla's own checks decide whether the weapon can fire at this target; a
-            // refusal returns before the verb changes any state, so melee proceeds clean.
+            // A refusal leaves the verb untouched, so the melee attack goes ahead.
             if (!ranged.TryStartCastOn(target))
             {
                 VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart");
+                VCODiagnostics.CountFor(pawn, ranged.state == VerbState.Bursting
+                    ? "pointblank.reject.cannotStart.bursting"
+                    : "pointblank.reject.cannotStart.noShot");
+                if (target.Thing is Pawn p && p.GetPosture() != PawnPosture.Standing)
+                {
+                    VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart.targetLaying");
+                }
+                if (pawn.CurJobDef == VCO_JobDefOf.VCO_PinnedDown)
+                {
+                    VCODiagnostics.CountFor(pawn, "pointblank.reject.cannotStart.selfPinned");
+                }
                 return false;
             }
 
-            // Notify_AttackedTarget runs only when a shot actually went off, for any verb
-            // type, which makes it a better signal than anything projectile-specific.
+            // lastAttackTargetTick is set only when a shot actually went off.
             var fired = mind != null && attackedBefore != now && mind.lastAttackTargetTick == now;
             if (!fired)
             {
-                // The verb accepted the target and then failed its first shot. The melee
-                // attack still runs, and its cooldown replaces the ranged one just set.
+                // The first shot failed: the melee attack runs and its cooldown replaces the ranged one.
                 VCODiagnostics.CountFor(pawn, "pointblank.reject.notFired");
                 return false;
             }
@@ -311,8 +269,7 @@ namespace VanillaCombatOverhaul
             }
 
             VCODiagnostics.CountFor(pawn, "pointblank.success");
-            // Recorded for tuning the cooldown decision: what the shot costs against what the
-            // replaced swing would have.
+            // Shot cooldown against the replaced swing's cooldown.
             VCODiagnostics.SampleFor(pawn, "pointblank.rangedCooldownTicks",
                 ranged.verbProps.AdjustedCooldownTicks(ranged, pawn));
             VCODiagnostics.SampleFor(pawn, "pointblank.meleeCooldownTicks",
@@ -320,7 +277,6 @@ namespace VanillaCombatOverhaul
 
             if (pawn.Spawned)
             {
-                // ThrowText already skips maps and cells the player cannot see.
                 MoteMaker.ThrowText(pawn.DrawPos, pawn.Map, "VCO_PointBlankShot".Translate());
             }
             return true;

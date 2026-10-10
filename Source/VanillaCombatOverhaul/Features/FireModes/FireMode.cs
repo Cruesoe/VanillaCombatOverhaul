@@ -11,15 +11,8 @@ namespace VanillaCombatOverhaul
     }
 
     /// <summary>
-    /// The numbers behind one fire mode.
-    ///
-    /// Accuracy is not a plain multiplier on hit chance. The shooter factor vanilla computes is
-    /// accuracy-per-cell raised to the distance, so the mode divides that exponent instead:
-    /// accuracy 1.5 aims as if the target were at two thirds of the range. That can never push
-    /// a shot past certainty, and it bites hardest at long range where aiming matters.
-    ///
-    /// Burst size is scaled and then capped, so a minigun's 25-round burst does not balloon
-    /// into 50 the way an assault rifle's 3 becomes 6.
+    /// Tuning for one fire mode. Accuracy divides the distance exponent of the shooter factor
+    /// (1.5 aims as if the target were at two thirds of the range); burst size is scaled, then capped.
     /// </summary>
     public class FireModeTuning : IExposable
     {
@@ -42,8 +35,6 @@ namespace VanillaCombatOverhaul
             this.burstMaxChange = burstMaxChange;
         }
 
-        // Precision costs aim time and gains no cooldown, so it is a trade even for a
-        // single-shot rifle that has no burst to give up.
         public static FireModeTuning PrecisionDefaults() => new FireModeTuning(1.5f, 1.3f, 1f, 0.67f, 10);
 
         public static FireModeTuning ShortBurstDefaults() => new FireModeTuning(0.85f, 0.8f, 0.9f, 1.5f, 3);

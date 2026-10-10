@@ -3,14 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// A pawn with nothing in hand has nothing to parry with.
-    ///
-    /// This is the pattern the whole mod uses: mechanics live in StatParts on real StatDefs
-    /// rather than in formulas buried in a Harmony patch. The payoff is that the number shows
-    /// up on the pawn's Stats tab with a readable explanation, other mods can add their own
-    /// StatParts or offsets without patching us, and XML alone can retune it.
-    /// </summary>
+    /// <summary>Zero parry aptitude with nothing in hand.</summary>
     public class StatPart_ParryRequiresWeapon : StatPart
     {
         public override void TransformValue(StatRequest req, ref float val)

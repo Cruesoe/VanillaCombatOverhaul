@@ -13,25 +13,14 @@ namespace VanillaCombatOverhaul
         private Vector2 scrollPosition;
         private SettingsTab drawnTab = SettingsTab.Combat;
 
-        /// <summary>
-        /// Measured content height, per tab. One shared height was not enough: the scroll view is
-        /// sized from the previous frame's measurement, so arriving on a long tab carrying a short
-        /// tab's height drew the overflow outside the scrollable region, where it could neither be
-        /// seen nor scrolled to, and no scrollbar appeared for it either.
-        /// </summary>
+        /// <summary>Content height measured on the previous frame, per tab, for sizing the scroll view.</summary>
         private readonly Dictionary<SettingsTab, float> contentHeights =
             new Dictionary<SettingsTab, float>();
 
-        /// <summary>
-        /// Height assumed for a tab that has not been measured yet. Deliberately taller than any
-        /// tab can be: over-estimating costs one frame of empty space below the content, whereas
-        /// under-estimating hides content outright, so the first draw errs long and the
-        /// measurement taken from it corrects the next one.
-        /// </summary>
+        /// <summary>Height assumed for a tab not yet measured; taller than any tab so nothing is clipped.</summary>
         private const float UnmeasuredHeight = 4000f;
 
-        // Empty means collapsed. The Combat tab is long enough that an always-open
-        // list buries later options (tracers, suppression) below the fold.
+        // Expanded section keys; sections start collapsed.
         private static readonly HashSet<string> ExpandedSections = new HashSet<string>();
 
         public VCOMod(ModContentPack content) : base(content)
@@ -77,9 +66,7 @@ namespace VanillaCombatOverhaul
                 contentHeight = UnmeasuredHeight;
             }
 
-            // Clamped before the draw rather than after it. Collapsing a section shortens the
-            // content under a scroll position that is still deep, and correcting that only on the
-            // following frame shows a frame of blank space past the end of the list.
+            // Clamped before drawing so collapsing a section never shows blank space past the end.
             scrollPosition.y = Mathf.Clamp(scrollPosition.y, 0f,
                                            Mathf.Max(0f, contentHeight - outRect.height));
 
@@ -156,6 +143,18 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
             }
 
+            if (Section(l, "VCO_Section_Suppression"))
+            {
+                Toggle(l, "VCO_Suppression", ref s.enableSuppression);
+                if (s.enableSuppression)
+                {
+                    Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
+                    Toggle(l, "VCO_SuppressionMood", ref s.enableSuppressionMood);
+                    s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
+                                                   0.25f, 3f, 0.05f, "0.00");
+                }
+            }
+
             if (Section(l, "VCO_Section_FireModes"))
             {
                 Toggle(l, "VCO_FireModes", ref s.enableFireModes);
@@ -207,7 +206,7 @@ namespace VanillaCombatOverhaul
             {
                 l.Label("VCO_AutoEquip_Intro".Translate());
                 l.Gap(6f);
-                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip);
+                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true);
             }
 
             if (Section(l, "VCO_Section_Apparel"))
@@ -235,10 +234,7 @@ namespace VanillaCombatOverhaul
 
         // --------------------------------------------------------------- helpers
 
-        /// <summary>
-        /// Clickable foldout heading. Returns true while the body should be drawn.
-        /// Starts collapsed so every heading on a tab is visible without scrolling.
-        /// </summary>
+        /// <summary>Clickable foldout heading; returns true while the section is expanded.</summary>
         private static bool Section(Listing_Standard l, string key)
         {
             l.Gap(8f);
@@ -272,9 +268,7 @@ namespace VanillaCombatOverhaul
             return expanded;
         }
 
-        /// <summary>
-        /// A labelled checkbox. Every option carries a plain-language tooltip.
-        /// </summary>
+        /// <summary>A labelled checkbox with the key plus "_Tip" as its tooltip.</summary>
         private static void Toggle(Listing_Standard l, string key, ref bool value,
                                    bool restartRequired = false)
         {
@@ -295,10 +289,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// A labelled slider snapped to <paramref name="step"/>. The key's text takes the
-        /// current value as {0}, and the key plus "_Tip" is the tooltip.
-        /// </summary>
+        /// <summary>A labelled slider snapped to <paramref name="step"/>; the label takes the value as {0}.</summary>
         private static float Slider(Listing_Standard l, string key, float value, float min, float max,
                                     float step, string format)
         {

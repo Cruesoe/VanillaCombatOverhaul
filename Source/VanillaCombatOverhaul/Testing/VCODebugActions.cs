@@ -3,10 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Tier 1: manual entry points in the dev-mode debug menu, under "Vanilla Combat Overhaul".
-    /// Results go to the log; the same code path is what the headless runner drives.
-    /// </summary>
+    /// <summary>Dev-mode debug actions that run the checks on the current map and log the results.</summary>
     public static class VCODebugActions
     {
         private const string Category = "Vanilla Combat Overhaul";
@@ -69,6 +66,15 @@ namespace VanillaCombatOverhaul
         private static void RunAutoEquipChecks()
         {
             Log.Message(TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
+        }
+
+        [DebugAction(Category, "Suppression and loadout checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void RunSuppressionAndLoadoutChecks()
+        {
+            var suppression = SuppressionAssertions.SelfTests();
+            suppression.AddRange(SuppressionAssertions.MapTests(Find.CurrentMap));
+            Log.Message(TestSuite.FormatChecks("suppression checks", suppression)
+                        + "\n" + TestSuite.FormatChecks("loadout checks", LoadoutAssertions.MapTests(Find.CurrentMap)));
         }
 
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]

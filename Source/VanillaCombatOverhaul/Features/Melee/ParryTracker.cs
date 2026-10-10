@@ -3,17 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Caps how often a pawn can parry.
-    ///
-    /// Without this, parry chance is rolled independently per incoming attack, so a skilled
-    /// defender surrounded by six attackers parries all six at full rate forever and being
-    /// flanked stops mattering. A budget per short window makes numbers matter again: one
-    /// attacker is survivable, six overwhelm you regardless of skill.
-    ///
-    /// Not saved. Losing the budget across a save/load is harmless -- the window is about a
-    /// second -- and it keeps this out of save data entirely.
-    /// </summary>
+    /// <summary>Caps parries per pawn within a short window, so being surrounded overwhelms a defender. Not saved.</summary>
     public class ParryTracker : GameComponent
     {
         private struct Record
@@ -66,10 +56,7 @@ namespace VanillaCombatOverhaul
                 record.Count++;
                 records[id] = record;
 
-                // RecordParry is only ever reached after CanParry allowed it, so exceeding the
-                // cap means the gate and the ledger disagree. Counted rather than asserted in
-                // place because the arena is the only thing that can drive enough attackers at
-                // one defender to prove the cap actually holds.
+                // Counted for the test suite; CanParry should make this unreachable.
                 if (record.Count > settings.parryBudgetPerWindow)
                 {
                     VCODiagnostics.CountFor(pawn, "parry.budget.overrun");
@@ -89,7 +76,7 @@ namespace VanillaCombatOverhaul
             }
             lastSweepTick = now;
 
-            // Records expire after roughly a second, so anything older is dead weight.
+            // Drops records whose window has ended.
             var window = VCOMod.Settings?.parryWindowTicks ?? 60;
             List<int> stale = null;
             foreach (var kv in records)

@@ -3,13 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Fire mode effect on a pawn stat, shown in the stat's explanation.
-    ///
-    /// During a cast the verb being fired decides, via the shot context the verb patches
-    /// push, so a psycast from a pawn in Precision is not slowed down. Outside a cast (the
-    /// Stats tab) the primary weapon stands in.
-    /// </summary>
+    /// <summary>Fire mode factor on a pawn stat, for the verb being cast or, outside a cast, the primary weapon.</summary>
     public abstract class StatPart_FireMode : StatPart
     {
         protected abstract float FactorFor(FireModeTuning tuning);
@@ -37,8 +31,6 @@ namespace VanillaCombatOverhaul
         private static FireModeTuning TuningFor(StatRequest req, out FireMode mode)
         {
             mode = FireMode.Default;
-            // Gated before the verb is looked up: these stats are read uncached, for every
-            // pawn, and most are undrafted colonists no mode applies to.
             if (!(req.Thing is Pawn pawn) || !FireModeUtility.ModesApplyTo(pawn))
             {
                 return null;

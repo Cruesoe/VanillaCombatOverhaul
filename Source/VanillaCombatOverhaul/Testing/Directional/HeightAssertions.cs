@@ -25,21 +25,12 @@ namespace VanillaCombatOverhaul
             return results;
         }
 
-        /// <summary>
-        /// The fused coverage walk must agree with the two-pass reference it replaced.
-        ///
-        /// CoveragePair totals both heights from one walk of the unfiltered part list, which
-        /// is only valid if GetNotMissingParts(h) selects exactly the parts whose own height
-        /// is h. That is RimWorld's behaviour, not ours, so it is asserted against real bodies
-        /// rather than assumed -- if Ludeon ever makes the height filter hierarchical, this
-        /// fails loudly instead of quietly skewing every hit location in the game.
-        /// </summary>
+        /// <summary>CoveragePair must match the two-pass Coverage on real bodies, which relies on vanilla's height filter.</summary>
         public static IEnumerable<AssertionResult> CoverageFusionTests(Pawn pawn)
         {
             if (pawn?.health?.hediffSet == null)
             {
-                // A check that cannot run must fail, not vanish -- a scenario contributing no
-                // assertions is exactly how a suite reports green while proving nothing.
+                // A check that cannot run fails rather than disappearing.
                 yield return Check("fused coverage had a body to check against", false,
                                    "no humanlike pawn on the map");
                 yield break;

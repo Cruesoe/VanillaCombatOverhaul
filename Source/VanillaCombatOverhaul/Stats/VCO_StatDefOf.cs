@@ -15,6 +15,9 @@ namespace VanillaCombatOverhaul
         /// <summary>Reduction to an attacker's chance to hit this pawn while it is moving.</summary>
         public static StatDef VCO_Evasion;
 
+        /// <summary>How strongly incoming fire suppresses this pawn.</summary>
+        public static StatDef VCO_Suppressability;
+
         static VCO_StatDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(VCO_StatDefOf));

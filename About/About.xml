@@ -4,7 +4,7 @@
   <author>cruesoe</author>
   <packageId>cruesoe.vanillacombatoverhaul</packageId>
   <modVersion>261005</modVersion>
-  <url></url>
+  <url>https://github.com/Cruesoe/VanillaCombatOverhaul</url>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
@@ -34,6 +34,9 @@
     <li>Snues.AutoArm</li>
     <!-- Both mods would change burst size, aim time and hit chance for the same shot. -->
     <li>Aliza.VanillaFireModes</li>
+    <!-- Both mods would suppress the same pawns, stacking the penalties. -->
+    <li>Mlie.Suppression</li>
+    <li>misstall.combattweaks</li>
   </incompatibleWith>
   <description>Adds depth to RimWorld's combat without replacing it.
 
@@ -50,13 +53,15 @@ RANGED
 - Bullets and arrows wound differently - bullets by force, arrows by cutting deep.
 - Projectiles leave a short glowing trail, so you can see where fire is coming from.
 - Drafted shooters can pick a fire mode: Precision, Short Burst, Suppression, or Auto by distance. Enemies choose theirs too.
+- Incoming fire suppresses: pawns under sustained fire aim worse and slower, and pinned pawns hit the dirt and crawl. Bullets flying past count, armour resists weak rounds, and being under fire hurts mood.
 
 ARMOUR
 - Armour that fails to stop a hit still reduces it, instead of the all-or-nothing vanilla roll.
 - Weapon armour penetration is shown on the weapon.
 
 EQUIPMENT
-- Colonists automatically choose and upgrade their primary weapon using their skills and assigned policy.
+- Loadouts, set in the Assign tab, choose each colonist's weapons, a backup melee weapon (or one you pick by right-clicking), medicine, and other items to carry. With Progression: Ammunition, colonists carry the refills their gun needs.
+- Colonists upgrade their primary weapon by skill and switch to their sidearm when an enemy reaches them.
 - Manually equipped weapons remain locked until you allow automatic upgrades again.
 
 CLOTHING
@@ -64,5 +69,5 @@ CLOTHING
 
 Combat and equipment systems can be configured individually in the mod settings.
 
-Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, or Vanilla Fire Modes.</description>
+Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Suppression (Continued), or Misstall's Combat Tweaks. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.</description>
 </ModMetaData>

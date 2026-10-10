@@ -6,14 +6,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Turns arena counters into pass/fail checks.
-    ///
-    /// A harness that only prints numbers cannot regress; something has to be able to fail.
-    /// The expected parry chance is derived from the vanilla MeleeHitChance curve read out of
-    /// the def at runtime, not from a constant copied into this file, so the prediction stays
-    /// honest if Ludeon retunes the curve.
-    /// </summary>
+    /// <summary>Pass/fail checks from the melee arena's counters; expected parry chances use the live MeleeHitChance curve.</summary>
     public static class MeleeAssertions
     {
         /// <summary>Below this many attempts, rates are noise and the run proves nothing.</summary>
@@ -22,9 +15,7 @@ namespace VanillaCombatOverhaul
         private const double ChanceTolerance = 0.03;
         private const double RateTolerance = 0.06;
 
-        // Four standard errors: a false failure about once in 15,000 checks, which across a
-        // nine-scenario matrix is rare enough never to be the reason someone stops trusting
-        // the suite, while still far tighter than any real regression in the roll.
+        // Four standard errors: a false failure about once in 15,000 checks.
         private const double SigmaTolerance = 4d;
 
         /// <summary>Share of attacks a duel may lose to the parry budget before it counts as throttled.</summary>
@@ -34,8 +25,7 @@ namespace VanillaCombatOverhaul
         {
             if (r.Spec.IsPointBlank)
             {
-                // Gun-butt attackers and shots in the mix make the parry predictions the
-                // wrong question; these scenarios answer point-blank questions only.
+                // Point-blank scenarios are checked by PointBlankAssertions only.
                 PointBlankAssertions.Evaluate(r);
                 return;
             }
@@ -49,7 +39,7 @@ namespace VanillaCombatOverhaul
 
             if (attempts < MinimumAttempts)
             {
-                // Everything below divides by these numbers; stop rather than report noise.
+                // Too few samples for the rate checks below.
                 return;
             }
 
@@ -61,8 +51,7 @@ namespace VanillaCombatOverhaul
 
             if (r.Spec.defenderUnarmed)
             {
-                // An unarmed defender is gated out before any roll is taken, so there is no
-                // chance to compare against. Zero rolls is the pass condition here, not a gap.
+                // An unarmed defender must never roll.
                 AssertUnarmedCannotParry(r);
                 return;
             }
@@ -71,15 +60,7 @@ namespace VanillaCombatOverhaul
             AssertRollHonoursChance(r);
         }
 
-        /// <summary>
-        /// The combatants must be the ones the scenario named.
-        ///
-        /// Added after a run fielded attackers with no skills tracker at all, so pinning melee
-        /// skill did nothing and a skill-20 scenario measured roughly skill 7. Every other
-        /// assertion passed, because they check the formula against the inputs it was fed
-        /// rather than against the inputs the spec asked for. Nothing downstream can catch a
-        /// wrong matchup; only this can.
-        /// </summary>
+        /// <summary>The combatants' melee skills must match the scenario.</summary>
         private static void AssertCombatantsMatchSpec(MeleeArenaResult r)
         {
             CheckSkillPinned(r, "attacker", "measured.attackerSkill", r.Spec.attackerMeleeSkill);
@@ -94,14 +75,7 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            // Min and max, not the mean: an average can sit on target while individuals drift
-            // either side of it, and -1 marks a combatant with no skills tracker.
-            //
-            // One level of slack, because combat grants melee XP continuously while the
-            // re-pin only runs on the refresh tick, so a sample can legitimately catch a pawn
-            // between drifting and being corrected. The arena.skillRepinned counter shows how
-            // often that happens. A wrong matchup is off by far more than one level -- the
-            // failure this exists to catch read 0 against an expected 20.
+            // Min and max must sit within one level (XP gained between re-pins); -1 means no skills tracker.
             const float Slack = 1.01f;
             var pinned = reading.Min >= expected - Slack && reading.Max <= expected + Slack;
             r.Assertions.Add(Check(
@@ -124,10 +98,7 @@ namespace VanillaCombatOverhaul
                 $"{rejected:N0} rejected of {rear:N0} rear-facing attacks"));
         }
 
-        /// <summary>
-        /// Non-zero means the body-part group seeder left some body shape without parts on a
-        /// side, which is the failure mode the XPath fallbacks exist to prevent.
-        /// </summary>
+        /// <summary>Every body must have parts on each side after the group seeder runs.</summary>
         private static void AssertSeederCoverage(MeleeArenaResult r)
         {
             var gaps = r.Counter("directional.keep.noPartsOnSide");
@@ -137,10 +108,7 @@ namespace VanillaCombatOverhaul
                 gaps == 0 ? "no gaps" : $"{gaps:N0} damage instances found no part on the exposed side"));
         }
 
-        /// <summary>
-        /// The cap must actually hold. A pawn is never allowed to bank more parries in one
-        /// window than the budget permits, however many attackers are on it.
-        /// </summary>
+        /// <summary>No defender may parry more than the budget in one window.</summary>
         private static void AssertBudgetRespected(MeleeArenaResult r)
         {
             var overruns = r.Counter("parry.budget.overrun");
@@ -152,11 +120,7 @@ namespace VanillaCombatOverhaul
                     : $"{overruns:N0} parries were banked past the cap"));
         }
 
-        /// <summary>
-        /// The budget is meant to punish being surrounded, not to throttle an ordinary duel.
-        /// A lone attacker cannot swing often enough to spend a budget of two per window, so
-        /// any rejection in a one-on-one fight means the window or the cap is mistuned.
-        /// </summary>
+        /// <summary>The budget must be negligible in a duel.</summary>
         private static void AssertBudgetScopedToBeingOutnumbered(MeleeArenaResult r)
         {
             var spent = r.Counter("parry.reject.budgetSpent");
@@ -164,11 +128,7 @@ namespace VanillaCombatOverhaul
 
             if (r.Spec.attackersPerDefender <= 1)
             {
-                // Not exactly zero. A lone attacker occasionally lands two swings inside one
-                // 60-tick window, so the cap can bite about once in several hundred attacks.
-                // The contract is that it stays negligible in a duel, not that it never fires
-                // -- measured at 10% of attacks against six attackers, so a duel sitting under
-                // 1% is a wide separation.
+                // A lone attacker occasionally lands two swings in one window, so a small share is allowed.
                 var share = (double)spent / attempts;
                 r.Assertions.Add(Check(
                     "budget negligible in a duel",
@@ -178,10 +138,7 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            // Nothing is asserted for an outnumbered defender. Whether three attackers swing
-            // often enough to spend the budget is a balance question this run is measuring,
-            // not a contract it may assume -- an assertion that cannot fail is not a test. The
-            // count reaches the report through the counter dump.
+            // Outnumbered defenders are reported through the counters, not asserted.
         }
 
         private static void AssertUnarmedCannotParry(MeleeArenaResult r)
@@ -197,17 +154,10 @@ namespace VanillaCombatOverhaul
                 $"{successes:N0} parries by an unarmed defender"));
         }
 
-        /// <summary>
-        /// The chance actually rolled should match the documented formula for these two skill
-        /// levels. Arena opponents face one another, so every sampled roll uses the frontal
-        /// factor and shares one expected value.
-        /// </summary>
+        /// <summary>The chance rolled must match the formula for the measured inputs.</summary>
         private static void AssertChanceMatchesCurve(MeleeArenaResult r)
         {
-            // Built from the stat values measured during the run rather than from the skill
-            // curve alone. Light level and injuries both move MeleeHitChance, so a curve-only
-            // prediction sits a few points above the live one and the assertion would be
-            // testing the environment instead of the formula.
+            // From stat values measured during the run, since light and injuries move MeleeHitChance.
             var expected = ExpectedFromMeasuredInputs(r);
             if (expected < 0)
             {
@@ -224,12 +174,7 @@ namespace VanillaCombatOverhaul
                 $"expected {expected:P1} from measured inputs, rolled {observed:P1} (delta {delta:P1})"));
         }
 
-        /// <summary>
-        /// The parry formula, reimplemented here rather than called from ParryUtility. Calling
-        /// the production method would make the assertion compare a value to itself; writing it
-        /// out separately means a wrong exponent, direction factor or clamp in the
-        /// implementation shows up as a mismatch.
-        /// </summary>
+        /// <summary>The parry formula, written out independently of ParryUtility.</summary>
         public static double FormulaFor(double aptitude, double attackerMelee, double directionFactor)
         {
             if (directionFactor <= 0d)
@@ -245,23 +190,13 @@ namespace VanillaCombatOverhaul
             return Math.Pow(aptitude, (1d / directionFactor) / (1d - attackerMelee));
         }
 
-        /// <summary>
-        /// Average of the formula evaluated per pair during the run.
-        ///
-        /// Evaluated per pair and then averaged, never the other way round. The formula is
-        /// strongly non-linear in the attacker's ability, so averaging the inputs first and
-        /// evaluating once gives a materially different answer whenever the stats vary --
-        /// which is what left this assertion four points out while everything else matched.
-        /// </summary>
+        /// <summary>Average of the formula evaluated per pair (the formula is non-linear, so inputs are not averaged first).</summary>
         public static double ExpectedFromMeasuredInputs(MeleeArenaResult r) =>
             r.Readings.ContainsKey("measured.expectedChance")
                 ? r.ReadingAverage("measured.expectedChance")
                 : -1;
 
-        /// <summary>
-        /// Verifies the RNG actually honours the chance: of the rolls taken, the proportion
-        /// that succeeded should track the average chance offered.
-        /// </summary>
+        /// <summary>The success rate of the rolls must track the average chance offered.</summary>
         private static void AssertRollHonoursChance(MeleeArenaResult r)
         {
             var success = r.Counter("parry.success");
@@ -277,16 +212,7 @@ namespace VanillaCombatOverhaul
             var offered = r.ReadingAverage("parry.chanceRolled");
             var delta = Math.Abs(observedRate - offered);
 
-            // A fixed tolerance is the wrong shape for this check. Whether n successes out of
-            // r rolls is consistent with an offered probability depends on r: at ~450 rolls
-            // and p near 0.5 the standard error alone is about 2.4%, so a flat 6% band sat at
-            // 2.5 sigma and failed roughly one run in fifty for no reason but luck -- which is
-            // exactly what it did, at delta 6.0% against a 6.0% limit.
-            //
-            // The band is now the binomial standard error scaled to SigmaTolerance, with the
-            // old flat value kept as a floor so a very large sample cannot demand absurd
-            // precision. A roll that genuinely ignored the offered chance misses by far more
-            // than four sigma, so this still catches the regression it exists to catch.
+            // Tolerance is SigmaTolerance binomial standard errors, with a flat floor for large samples.
             var sigma = Math.Sqrt(Math.Max(offered * (1d - offered), 1e-9) / rolls);
             var tolerance = Math.Max(RateTolerance, SigmaTolerance * sigma);
 
@@ -298,10 +224,7 @@ namespace VanillaCombatOverhaul
                 + $"and {SigmaTolerance:F0}x sigma {sigma:P1})"));
         }
 
-        /// <summary>
-        /// Independent prediction of parry chance, reading the vanilla curve from the def
-        /// rather than repeating numbers from the README.
-        /// </summary>
+        /// <summary>Parry chance predicted from the vanilla MeleeHitChance curve read from the def.</summary>
         public static double PredictParryChance(MeleeArenaSpec spec)
         {
             var curve = StatDefOf.MeleeHitChance?.postProcessCurve;
@@ -328,18 +251,12 @@ namespace VanillaCombatOverhaul
 
         // ------------------------------------------------------------- unit checks
 
-        /// <summary>
-        /// Direct check of the facing maths, needing no combat at all. Fast, deterministic,
-        /// and it isolates a bug in FacingUtility from a bug in how combat reaches it.
-        /// </summary>
+        /// <summary>Direct checks of the facing maths, without combat.</summary>
         public static List<AssertionResult> FacingSelfTest()
         {
             var results = new List<AssertionResult>();
 
-            // A target facing north is looking north, so an attacker standing to its north is
-            // in front of it and one to the south is behind it. The first version of this
-            // table had that the wrong way round, which is exactly the sort of thing a unit
-            // check is for.
+            // A target facing north has an attacker to its north in front and one to its south behind.
             var cases = new (Rot4 targetFacing, IntVec3 attackerOffset, AttackFacing expected)[]
             {
                 (Rot4.North, IntVec3.North, AttackFacing.Front),

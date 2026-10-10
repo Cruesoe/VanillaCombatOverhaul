@@ -3,14 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Applies Ideology's light-level melee offsets to parry aptitude: you cannot turn an
-    /// attack you cannot see coming.
-    ///
-    /// Vanilla Combat Reloaded applied the same offsets inline inside its parry roll. Doing it
-    /// as a StatPart instead means the penalty shows up in the pawn's Stats tab with a reason
-    /// attached, rather than silently changing a number the player never sees.
-    /// </summary>
+    /// <summary>Applies Ideology's light-level melee offsets to parry aptitude.</summary>
     public class StatPart_ParryDarkness : StatPart
     {
         public override void TransformValue(StatRequest req, ref float val)

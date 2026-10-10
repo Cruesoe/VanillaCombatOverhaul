@@ -9,32 +9,20 @@ namespace VanillaCombatOverhaul
         Equipment
     }
 
-    /// <summary>
-    /// Defaults are set per feature, not by one global switch.
-    ///
-    /// A feature defaults ON only once it is built and verified by the arena suite. Work in
-    /// progress is kept out of the settings screen until it is ready for players.
-    ///
-    /// Verbose logging is internal diagnostic scaffolding and ships off. A player's log should
-    /// hold their own mod list's problems, not a per-hour dump of our counters. These values are
-    /// retained for developer configuration but are not exposed in the player settings window.
-    /// </summary>
+    /// <summary>Mod settings. Values without a settings control keep their defaults unless edited in the settings file.</summary>
     public class VCOSettings : ModSettings
     {
-        // Built, verified by the arena suite, safe to ship enabled.
+        // Default for features covered by the test suite.
         private const bool Shipped = true;
 
         public SettingsTab CurrentTab = SettingsTab.Combat;
 
         // ---- Melee -------------------------------------------------------------
         public bool enableParry = Shipped;
-        // Exponent divisors, not linear multipliers: higher means easier to parry.
-        // Front keeps Vanilla Combat Reloaded's 1.5. Side is deliberately lower so
-        // gaining a flank weakens a defender's parry without denying it outright.
+        // Exponent divisors in the parry formula: higher is easier to parry.
         public float parryFrontFactor = 1.5f;
         public float parrySideFactor = 1.25f;
-        // Measured at 2: negligible in a duel (0 rejections), light at 3v1 (2.4% of
-        // attacks), and material at 6v1 (9.9%). See the balance notes in README.md.
+        // Parries allowed per window before further attacks get through.
         public int parryBudgetPerWindow = 2;
         public int parryWindowTicks = 60;
         public bool enableCounterAttack = Shipped;
@@ -45,7 +33,7 @@ namespace VanillaCombatOverhaul
         public bool enableMeleeFlanking = Shipped;
         public bool enableHeightTargeting = Shipped;
 
-        // ---- Projectile wounds (VCR damage workers, without swapping workerClass) ----
+        // ---- Projectile wounds ------------------------------------------------
         public bool enableBulletWorker = Shipped;
         public float bulletStoppingPowerCap = 10f;
         public bool enableArrowWorker = Shipped;
@@ -54,46 +42,49 @@ namespace VanillaCombatOverhaul
         public bool enableAdvancedAccuracy = Shipped;
         public float accuracyScale = 5f;
         public bool enableEvasion = Shipped;
-        // Per speed unit above minSpeed; lower means more evasion. VCR default 0.8.
+        // Hit chance factor per speed unit above evasionMinSpeed; lower means more evasion.
         public float evasionFactor = 0.8f;
         public float evasionMinSpeed = 2.5f;
         public bool evasionSkillContest = true;
         public bool enableFiringArc = Shipped;
         public float firingArcDegrees = 45f;
-        // Vanilla Combat Reloaded ships six miss-spread distributions; 0 is the default.
+        // Miss-spread distribution, 0 to 5 (see FiringArcUtility.RadiusFor).
         public int firingArcType = 0;
         public bool enableVisibleTracers = Shipped;
-        // One knob, not two: the streak has one right look, and length and width only ever
-        // wanted to move together. 1 is the shipped size, and the range is the useful span
-        // either side of it rather than everything the draw code can survive.
+        // Scales tracer length and width together.
         public float tracerScale = 1f;
 
         // ---- Fire modes --------------------------------------------------------
         public bool enableFireModes = Shipped;
         // Non-player pawns always choose by distance; this turns that off.
         public bool fireModesForNpcs = true;
-        // Auto selection: Suppression below the short burst range, Short Burst up to the
-        // precision range, Precision beyond it. Matches Vanilla Fire Modes' 12 and 25.
+        // Auto: Suppression below the short burst range, Short Burst up to the precision range, Precision beyond.
         public float fireModeShortBurstRange = 12f;
         public float fireModePrecisionRange = 25f;
         public FireModeTuning precisionTuning = FireModeTuning.PrecisionDefaults();
         public FireModeTuning shortBurstTuning = FireModeTuning.ShortBurstDefaults();
         public FireModeTuning suppressionTuning = FireModeTuning.SuppressionDefaults();
 
+        // ---- Suppression -------------------------------------------------------
+        public bool enableSuppression = Shipped;
+        public float suppressionStrength = 1f;
+        // Non-player pawns take cover when pinned; player pawns only take the penalties.
+        public bool enableSuppressionPinning = Shipped;
+        public bool enableSuppressionMood = Shipped;
+
         // ---- Armor -------------------------------------------------------------
-        // Leftover stretch and AP compensation. Defaults match Vanilla Combat Reloaded:
-        // always-block at 100% leftover (armorScale 2), weapons show 2x AP.
+        // armorScale 2 always blocks at 100% leftover armour; penetrationScale multiplies weapon AP.
         public bool enableAdvancedArmor = Shipped;
         public float armorScale = 2f;
         public float penetrationScale = 2f;
 
-        // ---- Automatic primary weapons ---------------------------------------
+        // ---- Loadouts ----------------------------------------------------------
+        // Saved under its original name so existing settings files keep their choice.
         public bool enableAutoEquip = Shipped;
-        // A replacement must be this much better than an allowed current weapon.
-        // The margin prevents pawns oscillating between near-identical choices.
+        // A replacement must score this many times the allowed current weapon.
         public float autoEquipUpgradeThreshold = 1.10f;
 
-        // ---- Apparel / coverage (VCR XML pack) ---------------------------------
+        // ---- Apparel coverage -------------------------------------------------
         public bool enableHandFeetPatch = Shipped;
         public bool enableAcidHeatPatch = Shipped;
         public bool enableThumpBluntPatch = Shipped;
@@ -106,8 +97,7 @@ namespace VanillaCombatOverhaul
 
         // ---- Internal diagnostics (not shown in player settings) ---------------
         public bool verboseLogging = false;
-        // Ticks between automatic diagnostic dumps to the log. 2500 ticks is about one
-        // in-game hour. Zero disables the periodic dump without losing the counters.
+        // Ticks between diagnostic dumps to the log; 0 turns the periodic dump off.
         public int diagnosticDumpIntervalTicks = 2500;
 
         public override void ExposeData()
@@ -157,6 +147,11 @@ namespace VanillaCombatOverhaul
                 suppressionTuning ??= FireModeTuning.SuppressionDefaults();
             }
 
+            Scribe_Values.Look(ref enableSuppression, nameof(enableSuppression), Shipped);
+            Scribe_Values.Look(ref suppressionStrength, nameof(suppressionStrength), 1f);
+            Scribe_Values.Look(ref enableSuppressionPinning, nameof(enableSuppressionPinning), Shipped);
+            Scribe_Values.Look(ref enableSuppressionMood, nameof(enableSuppressionMood), Shipped);
+
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
@@ -204,15 +199,16 @@ namespace VanillaCombatOverhaul
             suppressionTuning = FireModeTuning.SuppressionDefaults();
         }
 
-        /// <summary>
-        /// Settings consumed by XML PatchOperations during def load. These cannot change
-        /// without a restart, so the UI marks them and they are snapshotted once.
-        /// </summary>
+        /// <summary>Flags read by XML patches at def load; changing them needs a restart.</summary>
         public IEnumerable<string> ActiveXmlFlags()
         {
             if (enableDirectionalDamage)
             {
                 yield return "DirectionalDamage";
+            }
+            if (enableAutoEquip)
+            {
+                yield return "Loadouts";
             }
             if (enableHandFeetPatch)
             {

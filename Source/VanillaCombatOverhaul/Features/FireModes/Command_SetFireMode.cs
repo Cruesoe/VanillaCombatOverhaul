@@ -4,11 +4,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// One button for the whole choice, auto included, so a drafted squad does not grow a
-    /// second gizmo. Multi-select follows Command_SetHeightTarget: every selected pawn's
-    /// command folds into the one that is clicked.
-    /// </summary>
+    /// <summary>Fire mode menu, Auto included; with several pawns selected the choice applies to all of them.</summary>
     public class Command_SetFireMode : Command
     {
         public CompFireMode comp;
@@ -39,8 +35,7 @@ namespace VanillaCombatOverhaul
 
             foreach (var mode in FireModeUtility.Modes)
             {
-                // Offered when any selected pawn's weapon can use it. A pawn whose weapon
-                // cannot simply fires as Default until it holds one that can.
+                // Offered when any selected pawn's weapon can use it; others fire as Default.
                 if (!comps.Exists(c => FireModeUtility.Offers(c.Pawn, mode)))
                 {
                     continue;

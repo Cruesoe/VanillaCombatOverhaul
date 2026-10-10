@@ -4,17 +4,10 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// The scenario matrix, shared by the manual dev-menu runs and the automated headless run
-    /// so both exercise exactly the same thing.
-    /// </summary>
+    /// <summary>Scenario matrices and report formatting, shared by the debug actions and the headless run.</summary>
     public static class TestSuite
     {
-        /// <summary>
-        /// Skill pairings chosen to hit the corners and the middle of the balance table: an
-        /// even fight, a mismatch in each direction, plus a control that must produce no
-        /// parries at all.
-        /// </summary>
+        /// <summary>Even fights, a mismatch each way, an unarmed control, crowd scenarios and the point-blank matrix.</summary>
         public static IEnumerable<MeleeArenaSpec> DefaultMatrix()
         {
             yield return new MeleeArenaSpec { label = "even-novice",   attackerMeleeSkill = 0,  defenderMeleeSkill = 0 };
@@ -25,22 +18,11 @@ namespace VanillaCombatOverhaul
             yield return new MeleeArenaSpec { label = "unarmed-control", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          defenderUnarmed = true };
 
-            // The only scenario that puts the parry budget under any pressure. Every matchup
-            // above is a duel, and a lone attacker cannot swing fast enough to spend a budget
-            // of two per window, so the one mechanic with no equivalent in Vanilla Combat
-            // Reloaded went entirely unexercised until this was added. Fewer groups because
-            // each one now costs four pawns and needs a clear ring of ground to stand on.
-            // A crowd puts a defender down well inside the 120-tick refresh the duels use, and
-            // most of the window is then spent with nothing attacking a downed pawn -- six
-            // attackers produced fewer samples than three until this dropped to 30. The three
-            // crowd scenarios share a cadence so they can be compared with each other.
+            // Crowd scenarios put the parry budget under pressure; they refresh every 15 ticks so downed defenders are replaced quickly.
             yield return new MeleeArenaSpec { label = "outnumbered-3v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 3, pairs = 12, refreshEveryTicks = 15 };
 
-            // Six attackers, run twice: once as configured, once with the cap lifted. The pair
-            // is the experiment -- the difference between them is exactly what the budget
-            // contributes, and everything else in the drop belongs to the facing gate. Without
-            // the control the two effects are impossible to tell apart from one number.
+            // Six attackers with and without the budget, so its effect can be separated from facing.
             yield return new MeleeArenaSpec { label = "outnumbered-6v1", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
                                          attackersPerDefender = 6, pairs = 14, refreshEveryTicks = 15, ticks = 16000 };
             yield return new MeleeArenaSpec { label = "outnumbered-6v1-nobudget", attackerMeleeSkill = 10, defenderMeleeSkill = 10,
@@ -53,11 +35,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// Point-blank shooting: the skill threshold from both sides, the table at its low,
-        /// middle and top, burst and bow weapons, and the two cases that must never shoot.
-        /// Skill 10 runs longest because a 5% chance needs the most rolls to pin down.
-        /// </summary>
+        /// <summary>Point-blank: the skill threshold, the chance table's low, middle and top, burst and bow weapons, and cases that must never shoot.</summary>
         public static IEnumerable<MeleeArenaSpec> PointBlankMatrix()
         {
             MeleeArenaSpec Shooter(string label, int shooting, string weapon = "Gun_Autopistol", int ticks = 6000) =>

@@ -3,9 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// A pawn's accuracy mitigation aptitude is their shooting ability.
-    /// </summary>
+    /// <summary>Sets accuracy mitigation to the pawn's shooting accuracy.</summary>
     public class StatPart_AccuracyMitigationFromShooting : StatPart
     {
         public override void TransformValue(StatRequest req, ref float val)

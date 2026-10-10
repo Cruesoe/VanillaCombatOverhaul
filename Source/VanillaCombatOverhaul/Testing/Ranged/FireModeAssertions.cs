@@ -7,10 +7,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Fire mode checks: the formulas on their own, then one drafted shooter run through
-    /// every mode against a real target, reading the numbers the game itself would use.
-    /// </summary>
+    /// <summary>Fire mode formula checks, then a drafted shooter run through every mode against a real target.</summary>
     public static class FireModeAssertions
     {
         private const double Tolerance = 0.001;

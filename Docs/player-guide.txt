@@ -1,0 +1,146 @@
+[b]A player's guide to everything Vanilla Combat Overhaul changes, and how to make the most of it.[/b]
+
+Every system below can be switched on or off in the mod settings (Options > Mod settings > Vanilla Combat Overhaul). Numbers are the defaults.
+
+[h2]Melee[/h2]
+
+[h3]Parrying[/h3]
+[list]
+[*]A pawn holding a weapon can turn an incoming melee blow aside and take no damage. Unarmed pawns cannot parry.
+[*]The chance comes from the defender's melee ability against the attacker's: a skilled fighter parries most blows from a novice, while two masters parry each other about half the time.
+[*]Attacks from directly behind can never be parried, and attacks from the side are harder to parry than ones from the front.
+[*]A pawn can parry at most two blows a second, so a defender surrounded by several attackers is quickly overwhelmed.
+[*]Darkness counts against a parry, using Ideology's light-level melee modifiers.
+[*]Parrying trains Melee. The pawn's parry aptitude appears on their Stats tab.
+[/list]
+
+[h3]Counter-attacks[/h3]
+[list]
+[*]After a successful parry, the defender strikes back at once with a free attack.
+[/list]
+
+[h3]Point-blank shots[/h3]
+[list]
+[*]A pawn with Shooting 10 or higher who is caught in melee with a gun sometimes fires it instead of swinging it. The chance rises with skill: 5% at Shooting 10, 17% at 15, 50% at 20.
+[*]The shot uses the gun's own damage, burst and cooldown, with no aiming time.
+[*]Social fights, duels, finishing blows on downed pawns, and melee attacks you order directly always stay melee.
+[*]Enemies can do it too.
+[/list]
+
+[h2]Shooting[/h2]
+
+[h3]Skill and accuracy[/h3]
+[list]
+[*]Good shooters partly overcome a weapon's poor accuracy at range and bad weather. Cover, smoke and target size are unchanged.
+[*]A pawn running at speed is harder to hit, and better shooters are less put off by it. Standing still gives no protection, so moving and shooting back are a trade-off.
+[*]Missed shots spread in a cone, so shots from far away miss wider and closing the distance pays off.
+[*]A short glowing streak follows each bullet and arrow, coloured by damage type: yellow bullets, orange arrows, red fire, cyan stun.
+[/list]
+
+[h3]Fire modes[/h3]
+Drafted colonists holding a gun get a fire mode button:
+[table]
+[tr][th]Mode[/th][th]Aim[/th][th]Aiming time[/th][th]Burst[/th][th]Recovery[/th][/tr]
+[tr][td]Precision[/td][td]Better (aims as if the target were a third closer)[/td][td]30% longer[/td][td]A third fewer rounds[/td][td]Normal[/td][/tr]
+[tr][td]Short Burst[/td][td]Slightly worse[/td][td]20% shorter[/td][td]Half again as many rounds (up to 3 more)[/td][td]10% quicker[/td][/tr]
+[tr][td]Suppression[/td][td]Much worse[/td][td]Half[/td][td]Double (up to 10 more)[/td][td]20% slower[/td][/tr]
+[/table]
+[list]
+[*]Auto picks by distance: Suppression under 12 cells, Short Burst from 12, Precision from 25.
+[*]Modes only apply while drafted, so hunting and undrafted self-defence fire normally. Single-shot and beam weapons offer only Default and Precision; explosives, one-use launchers and abilities are never affected.
+[*]Raiders, visitors and allies choose a mode by distance, as Auto does.
+[*]Suppression fire suppresses half again as much as normal fire.
+[/list]
+
+[h3]Where hits land[/h3]
+[list]
+[*]Hits land on the side the attack comes from: shoot a raider from their left and you can hit their left arm, eye or lung, but not their right ones. The torso can be hit from any angle. Melee follows the same rule.
+[*]Drafted colonists with Shooting 10 or higher can aim for the head, torso or legs. More skill makes the chosen band land more often; a miss still lands on that side of the body. Enemies with the skill pick a height when they arrive.
+[/list]
+
+[h3]Wounds[/h3]
+[list]
+[*]Bullets wound by stopping power: light rounds fragment into nearby body parts, medium rounds pass through to the parts behind, and heavy rounds mushroom into one deeper wound.
+[*]Arrows either stab inward or slice across a neighbouring outer part.
+[*]Armour that already reduced the hit stops these extra effects.
+[/list]
+
+[h2]Suppression[/h2]
+[list]
+[*]Bullets that land near a pawn, or fly within three cells of them, build suppression. Explosions build twice as much. Shots from the pawn's own side never suppress them.
+[*]How much depends on the round's damage and how close it passes, and on the pawn: steady nerves (such as Iron-willed) and a good mood resist it, while Nervous, Volatile or unhappy pawns are easily suppressed. Each pawn's suppressability is on their Stats tab.
+[*]Armour resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmoured one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
+[*]Active shield belts, mechanoids and animals are never suppressed.
+[*]A suppressed pawn aims worse and takes longer to aim. An amber icon stays over their head while it lasts, and their inspect panel shows how close they are to being pinned.
+[*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies crawl to nearby cover first, and your colonists drop where they stand. A pinned pawn that moves crawls at 65% speed; order a pinned colonist to move and they crawl there without being pinned down again on the way. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
+[*]Suppression starts fading half a second after the last nearby round, so pinning an enemy takes sustained fire: a single rifleman's bursts, several shooters or a machine gun.
+[*]Being shot at hurts mood while it lasts: -5 under fire, -10 suppressed, -15 pinned.
+[/list]
+
+[h2]Armour[/h2]
+[list]
+[*]In vanilla, armour that beats a weapon's penetration usually turns the hit into a bruise. Here, armour with 100% to spare stops it outright. Armour that only matches the weapon still does nothing, so a charge rifle still goes through a flak vest.
+[*]Weapons show double their vanilla armour penetration to keep the same weapons beating the same armour.
+[/list]
+
+[h2]Clothing and coverage[/h2]
+[list]
+[*]Gloves protect the hands and boots the feet, and both layer properly with other gear.
+[*]Gas masks, visage masks, war masks and veils cover the face as they look; glasses and the array headset sit on the eyes and can be worn with a helmet. Gunlink, airwire and integrator headsets can be worn with a helmet.
+[*]Acid burns count against heat armour and thumps against blunt armour.
+[*]Pawns can arrive wearing glasses or masks under their helmet.
+[*]Switching the coverage changes on or off needs a restart.
+[/list]
+
+[h2]Loadouts[/h2]
+Loadouts replace the weapon tab of apparel policies. Assign one to each colonist in the Assign tab's Loadout column; "Manage loadouts" opens the editor.
+
+[h3]Weapons[/h3]
+[list]
+[*]Choose which weapons a loadout allows. With "Choose primary weapon automatically" on, colonists equip the best allowed weapon they can reach and swap when a clearly better one (10% or more) turns up, judging damage, accuracy, armour penetration, condition and their own skill. Off, they keep what you give them.
+[*]Equipping a weapon by hand locks it until you use the colonist's "Allow weapon upgrades" button.
+[*]New games start with Anything, Ranged with sidearm, Melee and Manual weapons loadouts.
+[/list]
+
+[h3]Sidearms[/h3]
+[list]
+[*]With "Carry a backup melee weapon" on, colonists with a gun carry the best allowed melee weapon in their inventory.
+[*]When an enemy reaches them in a fight they draw it, and put it away once the enemy is gone.
+[*]Strong shooters (Shooting 15 or more, and better at Shooting than Melee) keep their gun up close and fire point-blank instead.
+[*]Any melee weapon in a colonist's inventory can serve as the sidearm. To choose one, select the colonist, right-click a melee weapon and pick "Carry as sidearm". It is kept over better ones, and fetched back if dropped, until you press "Release sidearm".
+[*]Drafted colonists get a button to switch between gun and sidearm by hand; a sidearm drawn this way stays out until you switch back or undraft.
+[/list]
+
+[h3]Supplies[/h3]
+[list]
+[*]The Items tab sets how much medicine each colonist carries (and which kind), replacing the Assign tab's Carry column.
+[*]Add any other item, such as food or drugs, with a count. Colonists fetch more when they run low, and stop before they would be over-encumbered.
+[*]Loadout supplies, the sidearm and a stowed gun stay in the inventory when colonists unload after a caravan.
+[/list]
+
+[h2]New game recommended[/h2]
+[list]
+[*]The mod can be added to an existing save. Each apparel policy's old weapon settings become a loadout with the same name, assigned to the same colonists, and colonists keep their current medicine settings.
+[*]Even so, a new game is recommended. Armour, accuracy, suppression and loadouts change how fights play out, and a colony armed and armoured for vanilla combat will feel it. Starting fresh lets you build around the new rules from the first raid.
+[/list]
+
+[h2]Other mods[/h2]
+[list]
+[*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
+[*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is greyed out. Loadouts still handle weapons and supplies.
+[*]Another loadout mod: turn Loadouts off in the settings and restart.
+[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm, which control the same systems.
+[/list]
+
+[h2]Feedback[/h2]
+[list]
+[*]The mod is still being tuned, and your feedback is needed and much appreciated. Suppression strength, how long pinned pawns stay down, and when colonists draw their sidearm are all early numbers that play will refine.
+[*]If a fight feels off, a number seems wrong or something breaks, leave a comment on the Workshop page with what happened and, for errors, the red text from the log.
+[/list]
+
+[h2]Thanks[/h2]
+[list]
+[*]The [b]Combat Extended[/b] team, whose mod showed how deep RimWorld combat can go. Suppression here follows its rules: the amount per hit, armour against penetration, rounds flying past, how quickly it fades, and the mood penalties.
+[*][b]Vanilla Combat Reloaded[/b], for parrying, directional damage, accuracy, evasion, armour and wound systems that inspired much of this mod.
+[*][b]Vanilla Fire Modes[/b], for selectable fire modes, and [b]Auto Arm[/b], for automatic weapon selection.
+[/list]

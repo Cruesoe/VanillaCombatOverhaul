@@ -2,13 +2,7 @@ using System;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Pass/fail checks for point-blank scenarios.
-    ///
-    /// The expected chances are the agreed design table, written out again here rather than
-    /// read from PointBlankUtility, so a typo in the mod's table fails instead of being
-    /// compared against itself.
-    /// </summary>
+    /// <summary>Checks for point-blank scenarios; the expected chance table is written out independently of the mod's.</summary>
     public static class PointBlankAssertions
     {
         private static readonly double[] DesignTable =
@@ -21,11 +15,7 @@ namespace VanillaCombatOverhaul
         private const long MinimumMeleeAttacks = 200;
         private const double SigmaTolerance = 4d;
 
-        /// <summary>
-        /// Share of passed rolls allowed to fall back to melee because the shot would not
-        /// start. Adjacent targets always have a line of fire, so this should be near zero;
-        /// a high value means the start path is refusing shots it should take.
-        /// </summary>
+        /// <summary>Share of passed rolls allowed to fall back to melee because the shot would not start.</summary>
         private const double MaxFallbackShare = 0.05;
 
         public static double ExpectedChance(int shootingSkill) =>
@@ -35,8 +25,7 @@ namespace VanillaCombatOverhaul
         {
             var spec = r.Spec;
 
-            // Parry attempts are the defenders' count of melee attacks that actually landed a
-            // swing, independent of point-blank bookkeeping, so they prove the fight happened.
+            // Parry attempts count swings that reached a defender, proving the fight happened.
             var melee = r.Counter("parry.attempt");
             var opportunities = r.Counter("pointblank.opportunity");
             r.Assertions.Add(Check(
@@ -62,9 +51,7 @@ namespace VanillaCombatOverhaul
 
             if (spec.pointBlankHonourOrders)
             {
-                // Rolls still happen here: once an arena order expires, the pawn's own AI
-                // melees under a job the player never gave, and that attack is eligible. The
-                // claim is that no roll is ever taken while a player order is running.
+                // AI-chosen melee after an order expires may roll; none may roll under a player order.
                 var onOrder = r.Counter("pointblank.roll.onPlayerOrder");
                 var refused = r.Counter("pointblank.reject.context.playerOrder");
                 r.Assertions.Add(Check(
@@ -115,10 +102,7 @@ namespace VanillaCombatOverhaul
                 $"expected shooting {expected}, saw {reading.Min:0.#} to {reading.Max:0.#}"));
         }
 
-        /// <summary>
-        /// Every opportunity must end in exactly one recorded outcome. An exit path that
-        /// forgets to count would show up here as a gap.
-        /// </summary>
+        /// <summary>Every opportunity must end in exactly one recorded outcome.</summary>
         private static void AssertOpportunitiesAccounted(MeleeArenaResult r)
         {
             var opportunities = r.Counter("pointblank.opportunity");
@@ -154,11 +138,7 @@ namespace VanillaCombatOverhaul
                 $"offered {reading.Min:P1} to {reading.Max:P1}"));
         }
 
-        /// <summary>
-        /// Passed rolls against the table, within four binomial standard errors. There is no
-        /// flat floor as the parry check has: at 5% a floor that size would pass a roll that
-        /// never succeeded at all.
-        /// </summary>
+        /// <summary>Passed rolls against the table, within four binomial standard errors.</summary>
         private static void AssertRollHonoursChance(MeleeArenaResult r, long rolls, double expected)
         {
             var passed = rolls - r.Counter("pointblank.reject.rollFailed");
