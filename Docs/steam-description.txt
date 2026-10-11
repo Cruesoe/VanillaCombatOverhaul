@@ -14,6 +14,7 @@ The depth of Combat Extended without its ammo, calibres or compatibility patches
 [*]Shooting skill counts for more, overcoming bad weapons and weather, while moving targets are harder to hit.
 [*]Misses spread realistically around the target, and glowing tracers show where fire is coming from.
 [*]Drafted shooters choose Precision, Short Burst or Suppression fire, or let Auto pick by distance.
+[*]Run and gun: shooters fire on the move instead of stopping, at a small cost to accuracy and pace.
 [*]Skilled marksmen can aim for the head, torso or legs, and hits land on the side the shot came from.
 [*]Bullets and arrows wound differently: rounds fragment, pass through or mushroom, and arrows cut deep.
 [/list]
@@ -38,7 +39,7 @@ Every system can be switched on or off individually, so you keep only the parts 
 
 [h2]Compatibility[/h2]
 Works with vanilla-style weapon, apparel and race mods without patches. With [b]Progression: Ammunition[/b], loadouts carry the refills each colonist's weapon needs. With [b]Simple Sidearms[/b], it handles backup weapons and loadouts handle the rest; with another loadout mod, turn Loadouts off.
-Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm, because they control the same systems.
+Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, because they control the same systems.
 Safe to add to an existing save, though a new game is recommended (see below).
 
 [h2]New game recommended[/h2]

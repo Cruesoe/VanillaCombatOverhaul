@@ -67,6 +67,11 @@
   <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
 
   <!-- Fire modes -->
+  <VCO_RunAndGun>Run and gun</VCO_RunAndGun>
+  <VCO_RunAndGun_Tip>Drafted colonists with Fire at Will on shoot at enemies while walking to where you sent them, instead of stopping or holding fire.\n\nShooting on the move costs 10% accuracy, and the shooter walks 10% slower while aiming and firing, or 40% with a heavy weapon of 5 kg or more (LMG, minigun). Suppressed pawns and explosive or one-use weapons don't run and gun. Turn off Fire at Will to move a colonist without shooting.</VCO_RunAndGun_Tip>
+  <VCO_RunAndGunNpcs>Enemies and allies run and gun too</VCO_RunAndGunNpcs>
+  <VCO_RunAndGunNpcs_Tip>Non-player pawns shoot at their current target while moving to a firing position.</VCO_RunAndGunNpcs_Tip>
+  <VCO_RequiresRunAndGun>Requires "Run and gun" to be on.</VCO_RequiresRunAndGun>
   <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
   <VCO_Suppression>Incoming fire suppresses</VCO_Suppression>
   <VCO_Suppression_Tip>Bullets that land near or fly past an enemy of the shooter, and explosions nearby, build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it passes or lands, and the target's nerves and mood. Armour resists bullets that cannot match its rating, so weak rounds barely trouble a power-armoured trooper. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nPinning takes sustained fire: suppression starts fading half a second after the last nearby hit.</VCO_Suppression_Tip>

@@ -35,6 +35,7 @@ Every system below can be switched on or off in the mod settings (Options > Mod 
 [*]A pawn running at speed is harder to hit, and better shooters are less put off by it. Standing still gives no protection, so moving and shooting back are a trade-off.
 [*]Missed shots spread in a cone, so shots from far away miss wider and closing the distance pays off.
 [*]A short glowing streak follows each bullet and arrow, coloured by damage type: yellow bullets, orange arrows, red fire, cyan stun.
+[*]Run and gun: drafted colonists with Fire at Will on shoot at enemies while walking where you send them, at 10% worse accuracy and 10% slower walking while they aim and fire (40% with a heavy weapon of 5 kg or more, such as the LMG or minigun). Turn off Fire at Will to move without shooting. Enemies and allies run and gun to their firing positions too. Suppressed pawns, explosives and one-use weapons do not.
 [/list]
 
 [h3]Fire modes[/h3]
@@ -129,7 +130,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
 [*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is greyed out. Loadouts still handle weapons and supplies.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
-[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes or Auto Arm, which control the same systems.
+[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, which control the same systems.
 [/list]
 
 [h2]Feedback[/h2]

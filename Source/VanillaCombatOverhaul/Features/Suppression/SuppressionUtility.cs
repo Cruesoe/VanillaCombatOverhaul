@@ -152,11 +152,12 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            if (!pawn.RaceProps.Humanlike || pawn.Downed || pawn.GetPosture() != PawnPosture.Standing)
+            // Cheapest first: most pawns fail on race or level before the posture and capacity checks.
+            if (!pawn.RaceProps.Humanlike || CompFor(pawn)?.Pinned != true)
             {
                 return false;
             }
-            return CompFor(pawn)?.Pinned == true && pawn.health.CanCrawl;
+            return !pawn.Downed && pawn.GetPosture() == PawnPosture.Standing && pawn.health.CanCrawl;
         }
 
         /// <summary>Crawling right now: pinned and on the move. Vanilla ends jobs of crawlers that cannot crawl, so CanCrawl is required.</summary>

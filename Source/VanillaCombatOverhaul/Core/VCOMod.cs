@@ -141,6 +141,9 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_Evasion", ref s.enableEvasion);
                 Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
+                Toggle(l, "VCO_RunAndGun", ref s.enableRunAndGun);
+                Toggle(l, "VCO_RunAndGunNpcs", ref s.runAndGunForNpcs,
+                       requirementKey: s.enableRunAndGun ? null : "VCO_RequiresRunAndGun");
             }
 
             if (Section(l, "VCO_Section_Suppression"))
@@ -270,7 +273,7 @@ namespace VanillaCombatOverhaul
 
         /// <summary>A labelled checkbox with the key plus "_Tip" as its tooltip.</summary>
         private static void Toggle(Listing_Standard l, string key, ref bool value,
-                                   bool restartRequired = false)
+                                   bool restartRequired = false, string requirementKey = null)
         {
             var label = key.Translate().ToString();
             var tip = (key + "_Tip").Translate().ToString();
@@ -281,8 +284,20 @@ namespace VanillaCombatOverhaul
                 tip += "\n\n" + "VCO_RestartTag_Tip".Translate();
             }
 
+            // A requirement greys the option out and makes it inert.
+            var wasEnabled = GUI.enabled;
+            if (requirementKey != null)
+            {
+                tip += "\n\n" + requirementKey.Translate();
+                GUI.enabled = false;
+            }
             var before = value;
             l.CheckboxLabeled(label, ref value, tip);
+            GUI.enabled = wasEnabled;
+            if (requirementKey != null)
+            {
+                value = before;
+            }
             if (restartRequired && before != value)
             {
                 Messages.Message("VCO_RestartNeeded".Translate(), MessageTypeDefOf.CautionInput, false);

@@ -77,6 +77,10 @@ namespace VanillaCombatOverhaul
                         + "\n" + TestSuite.FormatChecks("loadout checks", LoadoutAssertions.MapTests(Find.CurrentMap)));
         }
 
+        [DebugAction(Category, "Run and gun checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void RunRunAndGunChecks() =>
+            Log.Message(TestSuite.FormatChecks("run and gun checks", RunAndGunAssertions.MapTests(Find.CurrentMap)));
+
         [DebugAction(Category, "Write diagnostic counters", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void WriteCounters() => VCODiagnostics.WriteReport();
 

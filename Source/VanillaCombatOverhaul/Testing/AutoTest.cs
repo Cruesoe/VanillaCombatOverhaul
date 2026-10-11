@@ -134,6 +134,7 @@ namespace VanillaCombatOverhaul
                 var suppression = SuppressionAssertions.SelfTests();
                 suppression.AddRange(SuppressionAssertions.MapTests(map));
                 var loadouts = LoadoutAssertions.MapTests(map);
+                var runAndGun = RunAndGunAssertions.MapTests(map);
 
                 report = Environment.NewLine + fingerprint + Environment.NewLine
                          + TestSuite.FormatReport(results, facing, armor)
@@ -148,7 +149,9 @@ namespace VanillaCombatOverhaul
                          + Environment.NewLine
                          + TestSuite.FormatChecks("suppression checks", suppression)
                          + Environment.NewLine
-                         + TestSuite.FormatChecks("loadout checks", loadouts);
+                         + TestSuite.FormatChecks("loadout checks", loadouts)
+                         + Environment.NewLine
+                         + TestSuite.FormatChecks("run and gun checks", runAndGun);
 
                 allPassed = !facing.Exists(a => !a.Passed)
                             && !armor.Exists(a => !a.Passed)
@@ -159,7 +162,8 @@ namespace VanillaCombatOverhaul
                             && rangedResults.TrueForAll(r => r.AllAssertionsPassed)
                             && !autoEquip.Exists(a => !a.Passed)
                             && !suppression.Exists(a => !a.Passed)
-                            && !loadouts.Exists(a => !a.Passed);
+                            && !loadouts.Exists(a => !a.Passed)
+                            && !runAndGun.Exists(a => !a.Passed);
             }
             catch (Exception e)
             {

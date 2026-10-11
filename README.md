@@ -11,6 +11,7 @@ game's familiar systems and broad mod compatibility.
 - Stronger influence from shooting skill, weather, movement, and distance.
 - More natural missed-shot spread and visible projectile trails.
 - Selectable fire modes for drafted shooters: Precision, Short Burst, Suppression, or Auto by distance.
+- Run and gun: shooters fire on the move instead of stopping.
 - Suppression: incoming fire makes pawns aim worse and slower, and pins them flat in cover.
 - Distinct bullet and arrow wounds.
 - Armour that can reduce damage even when it does not stop a hit completely.
@@ -30,6 +31,9 @@ Not compatible with:
 - Vanilla Combat Reloaded
 - Auto Arm
 - Vanilla Fire Modes
+- Suppression (Continued)
+- Misstall's Combat Tweaks
+- Run and Gun
 
 Vanilla Combat Reloaded inspired several combat systems, Vanilla Fire Modes inspired selectable
 fire modes, and Auto Arm inspired automatic weapon selection.

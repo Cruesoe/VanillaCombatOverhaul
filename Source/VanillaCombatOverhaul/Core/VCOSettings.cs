@@ -53,6 +53,9 @@ namespace VanillaCombatOverhaul
         public bool enableVisibleTracers = Shipped;
         // Scales tracer length and width together.
         public float tracerScale = 1f;
+        // Drafted colonists with Fire at Will shoot while walking; runAndGunForNpcs extends it to everyone else.
+        public bool enableRunAndGun = Shipped;
+        public bool runAndGunForNpcs = true;
 
         // ---- Fire modes --------------------------------------------------------
         public bool enableFireModes = Shipped;
@@ -68,7 +71,7 @@ namespace VanillaCombatOverhaul
         // ---- Suppression -------------------------------------------------------
         public bool enableSuppression = Shipped;
         public float suppressionStrength = 1f;
-        // Non-player pawns take cover when pinned; player pawns only take the penalties.
+        // Pinned pawns drop prone and hold fire, and crawl when they move.
         public bool enableSuppressionPinning = Shipped;
         public bool enableSuppressionMood = Shipped;
 
@@ -131,6 +134,8 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref firingArcType, nameof(firingArcType), 0);
             Scribe_Values.Look(ref enableVisibleTracers, nameof(enableVisibleTracers), Shipped);
             Scribe_Values.Look(ref tracerScale, nameof(tracerScale), 1f);
+            Scribe_Values.Look(ref enableRunAndGun, nameof(enableRunAndGun), Shipped);
+            Scribe_Values.Look(ref runAndGunForNpcs, nameof(runAndGunForNpcs), true);
 
             Scribe_Values.Look(ref enableFireModes, nameof(enableFireModes), Shipped);
             Scribe_Values.Look(ref fireModesForNpcs, nameof(fireModesForNpcs), true);
