@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -16,8 +17,8 @@ namespace VanillaCombatOverhaul
         {
             var results = new List<AssertionResult>();
             results.Add(Check("below the suppressed level has no effect",
-                Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel - 1f), 1f)
-                && Approx(SuppressionUtility.AimTimeFor(SuppressionUtility.SuppressedLevel - 1f), 1f), "1.0"));
+                Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel * 0.5f), 1f)
+                && Approx(SuppressionUtility.AimTimeFor(SuppressionUtility.SuppressedLevel * 0.5f), 1f), "1.0"));
             results.Add(Check("suppressed level starts the light penalty",
                 Approx(SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel), SuppressionUtility.SuppressedAccuracy),
                 SuppressionUtility.AccuracyFor(SuppressionUtility.SuppressedLevel).ToString("F3")));
@@ -43,25 +44,23 @@ namespace VanillaCombatOverhaul
             results.Add(Check("fly-by distance is measured to the bullet's path, not past its end",
                 Approx(along, 2f) && Approx(past, 5f), $"{along:F2} / {past:F2}"));
             results.Add(Check("mood stages follow the suppression level",
-                ThoughtWorker_UnderFire.StageFor(0f) == -1 && ThoughtWorker_UnderFire.StageFor(1f) == 0
+                ThoughtWorker_UnderFire.StageFor(0f) == -1 && ThoughtWorker_UnderFire.StageFor(0.5f) == 0
                 && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.SuppressedLevel) == 1
                 && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.PinnedLevel) == 2, "-1 / 0 / 1 / 2"));
             results.Add(Check("armour can stop suppression entirely, and no penetration suppresses nothing",
                 Approx(SuppressionUtility.ArmorFactor(2f, 0.1f), 0f) && Approx(SuppressionUtility.ArmorFactor(0f, 0f), 0f), "0 / 0"));
 
-            var calm = StatPart_SuppressabilityFromMind.FactorFor(0.35f, 0.5f);
-            var ironWilled = StatPart_SuppressabilityFromMind.FactorFor(0.17f, 0.5f);
-            var volatileNerves = StatPart_SuppressabilityFromMind.FactorFor(0.5f, 0.5f);
-            var happy = StatPart_SuppressabilityFromMind.FactorFor(0.35f, 0.9f);
-            results.Add(Check("default nerves and mood leave suppressability at 1",
-                Approx(calm, 1f), calm.ToString("F3")));
-            results.Add(Check("steadier nerves resist suppression",
-                ironWilled < calm && calm < volatileNerves, $"{ironWilled:F2} < {calm:F2} < {volatileNerves:F2}"));
-            results.Add(Check("good mood resists suppression", happy < calm, $"{happy:F2} < {calm:F2}"));
-            results.Add(Check("suppressability stays within its limits",
-                StatPart_SuppressabilityFromMind.FactorFor(0.01f, 1f) >= StatPart_SuppressabilityFromMind.Min
-                && StatPart_SuppressabilityFromMind.FactorFor(0.5f, 0f) <= StatPart_SuppressabilityFromMind.Max,
-                "0.5 to 1.5"));
+            // Vanilla's default major break threshold is 0.35 * 4/7 = 0.2.
+            var average = SuppressionUtility.ThresholdFor(0.5f, 0.2f);
+            var happy = SuppressionUtility.ThresholdFor(0.8f, 0.2f);
+            var ironWilled = SuppressionUtility.ThresholdFor(0.5f, 0.1f);
+            var breaking = SuppressionUtility.ThresholdFor(0.15f, 0.2f);
+            results.Add(Check("the threshold matches Combat Extended's at 50% mood",
+                Math.Abs(average - 71.89f) < 0.05f, average.ToString("F2")));
+            results.Add(Check("good mood and steady nerves raise the threshold",
+                happy > average && ironWilled > average, $"{average:F1} < {happy:F1}, {ironWilled:F1}"));
+            results.Add(Check("a pawn below its major break threshold is suppressed by any shot",
+                Approx(breaking, SuppressionUtility.MinThreshold), breaking.ToString("F2")));
             return results;
         }
 
@@ -114,17 +113,23 @@ namespace VanillaCombatOverhaul
                     (SuppressionUtility.CompFor(ally)?.Level ?? 0f) == 0f && (SuppressionUtility.CompFor(shooter)?.Level ?? 0f) == 0f,
                     (SuppressionUtility.CompFor(ally)?.Level ?? 0f).ToString("F1")));
 
+                // Rounds at the assault rifle's burst spacing, without pausing between bursts.
+                var bulletDef = rifle.Verbs[0].defaultProjectile;
+                var rifleSpacing = rifle.Verbs[0].ticksBetweenBurstShots;
                 var shots = 1;
+                var inFlight = new List<Projectile>();
                 while (targetComp != null && !targetComp.Pinned && shots < MaxShots)
                 {
-                    FireAt(shooter, rifle, missCell);
+                    inFlight.Add(Launch(shooter, bulletDef, missCell));
                     shots++;
+                    TickWhile(rifleSpacing, () => !targetComp.Pinned);
                 }
+                TickWhile(MaxFlightTicks, () => !targetComp.Pinned && inFlight.Exists(b => !b.Destroyed));
                 results.Add(Check("sustained fire pins the target", targetComp?.Pinned == true,
-                    $"{shots} shots, level {targetComp?.Level:F1}"));
+                    $"{shots} rounds; level {targetComp?.Level:F1}, threshold {targetComp?.Threshold:F1}"));
                 var job = target.CurJobDef;
                 results.Add(Check("a pinned enemy is pinned down", job == VCO_JobDefOf.VCO_PinnedDown,
-                    job?.defName ?? "no job"));
+                    $"{job?.defName ?? "no job"}, forced {target.CurJob?.playerForced}, mental {target.InMentalState}, posture {target.GetPosture()}, melee threat {target.mindState?.MeleeThreatStillThreat}, burning {target.IsBurning()}, bursting {target.stances?.curStance}"));
                 var moveCrawl = target.GetStatValue(StatDefOf.MoveSpeed, true, -1);
                 results.Add(Check("a pinned pawn crawls when it moves",
                     SuppressionUtility.CrawlsWhenMoving(target) && (!target.pather.Moving || target.Crawling),
@@ -168,6 +173,7 @@ namespace VanillaCombatOverhaul
 
                 results.AddRange(ArmorTests(map, origin + IntVec3.North * 6, spawned));
                 results.AddRange(FlybyTests(map, origin + IntVec3.South * 8, rifle, enemyFaction, spawned));
+                results.AddRange(BurstTests(map, origin + IntVec3.North * 14, enemyFaction, spawned));
             }
             catch (Exception e)
             {
@@ -291,13 +297,94 @@ namespace VanillaCombatOverhaul
         /// <summary>Launches one bullet from the shooter's weapon at a cell and ticks until it lands.</summary>
         private static void FireAt(Pawn shooter, ThingDef weaponDef, IntVec3 cell)
         {
-            var bulletDef = weaponDef.Verbs[0].defaultProjectile;
+            var bullet = Launch(shooter, weaponDef.Verbs[0].defaultProjectile, cell);
+            TickWhile(MaxFlightTicks, () => !bullet.Destroyed);
+        }
+
+        private static Projectile Launch(Pawn shooter, ThingDef bulletDef, IntVec3 cell)
+        {
             var bullet = (Projectile)GenSpawn.Spawn(bulletDef, shooter.Position, shooter.Map);
             bullet.Launch(shooter, shooter.DrawPos, cell, cell, ProjectileHitFlags.None, false, shooter.equipment.Primary);
-            for (var i = 0; i < MaxFlightTicks && !bullet.Destroyed; i++)
+            return bullet;
+        }
+
+        private static void TickWhile(int maxTicks, Func<bool> condition)
+        {
+            for (var i = 0; i < maxTicks && condition(); i++)
             {
                 Find.TickManager.DoSingleTick();
             }
+        }
+
+        /// <summary>
+        /// One full burst of each weapon's own bullets and spacing, landing a cell from a fresh hostile at 50% mood,
+        /// reporting the peak level reached (1 suppressed, 4 pinned).
+        /// </summary>
+        private static List<AssertionResult> BurstTests(Map map, IntVec3 cell, Faction enemyFaction, List<Pawn> spawned)
+        {
+            var results = new List<AssertionResult>();
+            var settings = VCOMod.Settings;
+            var wasPinning = settings.enableSuppressionPinning;
+            // Peak level only; the target stays standing on its cell.
+            settings.enableSuppressionPinning = false;
+            try
+            {
+                var peaks = new Dictionary<string, float>();
+                var thresholds = new List<string>();
+                foreach (var weaponName in new[] { "Gun_AssaultRifle", "Gun_HeavySMG", "Gun_LMG", "Gun_Minigun" })
+                {
+                    var weapon = DefDatabase<ThingDef>.GetNamedSilentFail(weaponName);
+                    if (weapon == null)
+                    {
+                        continue;
+                    }
+                    var shooter = RangedCombatArena.SpawnShooter(map, cell + IntVec3.West * 12, 10, weapon);
+                    var target = SpawnHostile(map, cell, enemyFaction);
+                    spawned.Add(shooter);
+                    spawned.Add(target);
+                    if (target.needs?.mood != null)
+                    {
+                        target.needs.mood.CurLevel = 0.5f;
+                    }
+                    target.jobs.StartJob(JobMaker.MakeJob(JobDefOf.Wait, 99999), JobCondition.InterruptForced);
+                    var comp = SuppressionUtility.CompFor(target);
+                    var verb = weapon.Verbs[0];
+                    var peak = 0f;
+                    var inFlight = new List<Projectile>();
+                    for (var round = 0; round < verb.burstShotCount; round++)
+                    {
+                        inFlight.Add(Launch(shooter, verb.defaultProjectile, cell + IntVec3.South));
+                        TickWhile(round < verb.burstShotCount - 1 ? verb.ticksBetweenBurstShots : 0, () =>
+                        {
+                            peak = Math.Max(peak, comp.Pressure);
+                            return true;
+                        });
+                    }
+                    TickWhile(MaxFlightTicks, () =>
+                    {
+                        peak = Math.Max(peak, comp.Pressure);
+                        return inFlight.Exists(b => !b.Destroyed);
+                    });
+                    peaks[weaponName] = peak;
+                    thresholds.Add($"{comp.Threshold:F0}");
+                    shooter.Destroy(DestroyMode.Vanish);
+                    target.Destroy(DestroyMode.Vanish);
+                }
+                var detail = string.Join(", ", peaks.Select(p => $"{p.Key.Replace("Gun_", "")} {p.Value:F2}"))
+                             + "; thresholds " + string.Join("/", thresholds);
+                results.Add(Check("one assault rifle burst does not suppress an average pawn",
+                    peaks.TryGetValue("Gun_AssaultRifle", out var rifle) && rifle < SuppressionUtility.SuppressedLevel, detail));
+                results.Add(Check("one LMG burst suppresses but does not pin",
+                    peaks.TryGetValue("Gun_LMG", out var lmg) && lmg >= SuppressionUtility.SuppressedLevel
+                    && lmg < SuppressionUtility.PinnedLevel, detail));
+                results.Add(Check("one minigun burst pins",
+                    peaks.TryGetValue("Gun_Minigun", out var minigun) && minigun >= SuppressionUtility.PinnedLevel, detail));
+            }
+            finally
+            {
+                settings.enableSuppressionPinning = wasPinning;
+            }
+            return results;
         }
 
         private static bool Approx(float actual, float expected) => Math.Abs(actual - expected) <= Tolerance;

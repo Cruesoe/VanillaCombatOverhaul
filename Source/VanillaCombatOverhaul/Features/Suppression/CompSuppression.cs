@@ -19,20 +19,39 @@ namespace VanillaCombatOverhaul
         private float level;
         private int lastSuppressedTick = -99999;
         private int nextPinTick;
+        private float threshold;
+        private int thresholdTick = -99999;
 
         public Pawn Pawn => parent as Pawn;
 
+        /// <summary>Raw suppression, as added by each round.</summary>
         public float Level => level;
 
-        public bool Suppressed => SuppressionUtility.Enabled && level >= SuppressionUtility.SuppressedLevel;
+        /// <summary>Raw suppression at which this pawn is suppressed, from mood and nerves, cached briefly.</summary>
+        public float Threshold
+        {
+            get
+            {
+                var now = Find.TickManager.TicksGame;
+                if (now - thresholdTick >= SuppressionUtility.ThresholdCacheTicks && Pawn != null)
+                {
+                    threshold = SuppressionUtility.ThresholdFor(Pawn);
+                    thresholdTick = now;
+                }
+                return Mathf.Max(threshold, SuppressionUtility.MinThreshold);
+            }
+        }
 
-        public bool Pinned => SuppressionUtility.Enabled && level >= SuppressionUtility.PinnedLevel;
+        /// <summary>Suppression relative to the threshold: 1 is suppressed, 4 is pinned.</summary>
+        public float Pressure => level <= 0f ? 0f : level / Threshold;
+
+        public bool Suppressed => SuppressionUtility.Enabled && Pressure >= SuppressionUtility.SuppressedLevel;
+
+        public bool Pinned => SuppressionUtility.Enabled && Pressure >= SuppressionUtility.PinnedLevel;
 
         public void AddSuppression(float amount, IntVec3 source)
         {
-            var wasSuppressed = level >= SuppressionUtility.SuppressedLevel;
-            var wasPinned = level >= SuppressionUtility.PinnedLevel;
-            level = Mathf.Min(SuppressionUtility.MaxLevel, level + amount);
+            level = Mathf.Min(SuppressionUtility.MaxLevel * Threshold, level + amount);
             lastSuppressedTick = Find.TickManager.TicksGame;
             VCODiagnostics.CountFor(Pawn, "suppression.added");
 
@@ -41,16 +60,7 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (!wasPinned && level >= SuppressionUtility.PinnedLevel)
-            {
-                MoteMaker.ThrowText(pawn.DrawPos, pawn.Map, "VCO_Suppression_PinnedMote".Translate(), Color.red);
-            }
-            else if (!wasSuppressed && level >= SuppressionUtility.SuppressedLevel)
-            {
-                MoteMaker.ThrowText(pawn.DrawPos, pawn.Map, "VCO_Suppression_SuppressedMote".Translate(),
-                                    new Color(1f, 0.75f, 0.3f));
-            }
-            if (level >= SuppressionUtility.PinnedLevel)
+            if (Pressure >= SuppressionUtility.PinnedLevel)
             {
                 TryPinDown(pawn, source);
             }
@@ -120,7 +130,7 @@ namespace VanillaCombatOverhaul
                 return null;
             }
             var key = Pinned ? "VCO_Suppression_PinnedInspect" : "VCO_Suppression_SuppressedInspect";
-            return key.Translate(Mathf.Min(1f, level / SuppressionUtility.PinnedLevel).ToStringPercent());
+            return key.Translate(Mathf.Min(1f, Pressure / SuppressionUtility.PinnedLevel).ToStringPercent());
         }
 
         public override void PostExposeData()

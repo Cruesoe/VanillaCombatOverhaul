@@ -8,15 +8,20 @@ namespace VanillaCombatOverhaul
 {
     /// <summary>
     /// Incoming fire builds suppression on nearby hostile humanlikes. Suppressed pawns aim worse and
-    /// slower; pinned non-player pawns take cover. Works from any projectile's damage, so modded
-    /// weapons need no patches. Amount, armour reduction and fading follow Combat Extended's rules.
+    /// slower; pinned pawns drop prone. Works from any projectile's damage, so modded weapons need no
+    /// patches. Amount, armour reduction, threshold and fading follow Combat Extended's rules.
     /// </summary>
     [StaticConstructorOnStartup]
     public static class SuppressionUtility
     {
-        public const float SuppressedLevel = 30f;
-        public const float PinnedLevel = 90f;
-        public const float MaxLevel = 150f;
+        // Levels are suppression divided by the pawn's threshold: 1 is suppressed, 4 is pinned.
+        public const float SuppressedLevel = 1f;
+        public const float PinnedLevel = 4f;
+        public const float MaxLevel = PinnedLevel * 5f / 3f;
+        // Combat Extended's suppressed threshold: sqrt(mood - major break threshold) * 1050 * 0.125.
+        public const float ThresholdScale = 131.25f;
+        public const float MinThreshold = 1f;
+        public const int ThresholdCacheTicks = 30;
         public const float BaseRadius = 2.9f;
         public const float ExplosionRadiusBonus = 2f;
         public const float EdgeFalloff = 0.5f;
@@ -44,6 +49,13 @@ namespace VanillaCombatOverhaul
         private static readonly Dictionary<int, KeyValuePair<int, float>> ArmorCache = new Dictionary<int, KeyValuePair<int, float>>();
 
         public static bool Enabled => VCOMod.Settings?.enableSuppression ?? false;
+
+        /// <summary>Raw suppression at which a pawn is suppressed; a pawn at or below its major break threshold is suppressed by any shot.</summary>
+        public static float ThresholdFor(float mood, float majorBreakThreshold) =>
+            Mathf.Max(MinThreshold, Mathf.Sqrt(Mathf.Max(0f, mood - majorBreakThreshold)) * ThresholdScale);
+
+        public static float ThresholdFor(Pawn pawn) =>
+            ThresholdFor(pawn.needs?.mood?.CurLevel ?? 0.5f, pawn.mindState?.mentalBreaker?.BreakThresholdMajor ?? 0f);
 
         /// <summary>0 below the suppressed level, rising to 1 at the pinned level.</summary>
         public static float Severity(float level)
@@ -170,7 +182,7 @@ namespace VanillaCombatOverhaul
             {
                 return 0f;
             }
-            return CompFor(pawn)?.Level ?? 0f;
+            return CompFor(pawn)?.Pressure ?? 0f;
         }
 
         /// <summary>Spreads suppression from a projectile landing or exploding at a point.</summary>

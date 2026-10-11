@@ -81,14 +81,11 @@
   <VCO_SuppressionMood_Tip>Pawns being shot at get a mood penalty while it lasts: -5 under fire, -10 suppressed, -15 pinned.</VCO_SuppressionMood_Tip>
   <VCO_SuppressionStrength>Suppression strength: x{0}</VCO_SuppressionStrength>
   <VCO_SuppressionStrength_Tip>Multiplies how much suppression each shot causes. Higher pins pawns sooner.</VCO_SuppressionStrength_Tip>
-  <VCO_Suppression_SuppressedMote>Suppressed</VCO_Suppression_SuppressedMote>
-  <VCO_Suppression_PinnedMote>Pinned!</VCO_Suppression_PinnedMote>
   <VCO_Suppression_SuppressedInspect>Suppressed ({0})</VCO_Suppression_SuppressedInspect>
   <VCO_Suppression_PinnedInspect>Pinned by incoming fire</VCO_Suppression_PinnedInspect>
   <VCO_SuppressionRead>Suppressed: {0}</VCO_SuppressionRead>
   <VCO_StatPart_Suppressed>Suppressed</VCO_StatPart_Suppressed>
   <VCO_StatPart_Crawling>Crawling under fire</VCO_StatPart_Crawling>
-  <VCO_StatPart_NerveAndMood>Nerves and mood</VCO_StatPart_NerveAndMood>
 
   <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>
   <VCO_FireModes>Drafted pawns can choose a fire mode</VCO_FireModes>

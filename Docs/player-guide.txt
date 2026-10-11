@@ -69,12 +69,12 @@ Drafted colonists holding a gun get a fire mode button:
 [h2]Suppression[/h2]
 [list]
 [*]Bullets that land near a pawn, or fly within three cells of them, build suppression. Explosions build twice as much. Shots from the pawn's own side never suppress them.
-[*]How much depends on the round's damage and how close it passes, and on the pawn: steady nerves (such as Iron-willed) and a good mood resist it, while Nervous, Volatile or unhappy pawns are easily suppressed. Each pawn's suppressability is on their Stats tab.
+[*]How much each round adds depends on its damage and how close it passes. How much a pawn can take depends on how far their mood is above their major mental break threshold, as in Combat Extended: steady nerves (such as Iron-willed) and a good mood hold out longer, while Nervous, Volatile or unhappy pawns are easily suppressed, and a pawn about to break is suppressed by any shot. It takes four times as much to pin a pawn as to suppress them.
 [*]Armour resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmoured one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
 [*]Active shield belts, mechanoids and animals are never suppressed.
 [*]A suppressed pawn aims worse and takes longer to aim. An amber icon stays over their head while it lasts, and their inspect panel shows how close they are to being pinned.
 [*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies crawl to nearby cover first, and your colonists drop where they stand. A pinned pawn that moves crawls at 65% speed; order a pinned colonist to move and they crawl there without being pinned down again on the way. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
-[*]Suppression starts fading half a second after the last nearby round, so pinning an enemy takes sustained fire: a single rifleman's bursts, several shooters or a machine gun.
+[*]Suppression starts fading half a second after the last nearby round, so it takes concentrated fire. Against a pawn in an average mood, one assault rifle burst falls just short of suppressing them, an LMG burst suppresses them, and pinning takes a minigun or several shooters firing together.
 [*]Being shot at hurts mood while it lasts: -5 under fire, -10 suppressed, -15 pinned.
 [/list]
 
