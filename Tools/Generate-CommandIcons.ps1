@@ -1,5 +1,5 @@
 param(
-    [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\1.6\Textures\UI\Commands')
+    [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\Textures\UI\Commands')
 )
 
 Add-Type -AssemblyName System.Drawing

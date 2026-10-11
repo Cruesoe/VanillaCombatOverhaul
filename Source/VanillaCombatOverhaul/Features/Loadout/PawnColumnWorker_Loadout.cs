@@ -6,7 +6,7 @@ using Verse.Sound;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>Assign tab column choosing each colonist's loadout, modelled on vanilla's apparel policy column.</summary>
+    /// <summary>Assign tab column choosing each colonist's loadout, modeled on vanilla's apparel policy column.</summary>
     public class PawnColumnWorker_Loadout : PawnColumnWorker
     {
         private const int TopAreaHeight = 65;

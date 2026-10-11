@@ -19,6 +19,7 @@ namespace VanillaCombatOverhaul
         private float level;
         private int lastSuppressedTick = -99999;
         private int nextPinTick;
+        private IntVec3 lastSource = IntVec3.Invalid;
         private float threshold;
         private int thresholdTick = -99999;
 
@@ -53,26 +54,32 @@ namespace VanillaCombatOverhaul
         {
             level = Mathf.Min(SuppressionUtility.MaxLevel * Threshold, level + amount);
             lastSuppressedTick = Find.TickManager.TicksGame;
+            lastSource = source;
             VCODiagnostics.CountFor(Pawn, "suppression.added");
-
-            var pawn = Pawn;
-            if (pawn?.Map == null)
-            {
-                return;
-            }
-            if (Pressure >= SuppressionUtility.PinnedLevel)
-            {
-                TryPinDown(pawn, source);
-            }
+            CheckPinned();
         }
 
         public override void CompTickInterval(int delta)
         {
-            if (level <= 0f || Find.TickManager.TicksGame - lastSuppressedTick < SuppressionUtility.DecayDelayTicks)
+            if (level <= 0f)
             {
                 return;
             }
-            level = SuppressionUtility.Decay(level, delta);
+            if (Find.TickManager.TicksGame - lastSuppressedTick >= SuppressionUtility.DecayDelayTicks)
+            {
+                level = SuppressionUtility.Decay(level, delta);
+            }
+            // Mood falls under fire, lowering the threshold, so a pawn can become pinned between hits.
+            CheckPinned();
+        }
+
+        private void CheckPinned()
+        {
+            var pawn = Pawn;
+            if (pawn?.Map != null && lastSource.IsValid && Pressure >= SuppressionUtility.PinnedLevel)
+            {
+                TryPinDown(pawn, lastSource);
+            }
         }
 
         /// <summary>Pinned pawns drop prone and stop firing; non-player pawns first crawl to nearby cover.</summary>
@@ -139,6 +146,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref level, "vcoSuppression", 0f);
             Scribe_Values.Look(ref lastSuppressedTick, "vcoSuppressionTick", -99999);
             Scribe_Values.Look(ref nextPinTick, "vcoSuppressionPinTick", 0);
+            Scribe_Values.Look(ref lastSource, "vcoSuppressionSource", IntVec3.Invalid);
         }
     }
 }

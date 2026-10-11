@@ -124,9 +124,10 @@ namespace VanillaCombatOverhaul
                 var height = HeightAssertions.SelfTests();
                 var results = TestSuite.RunMatrix(map, Seed);
 
-                // After the matrix, so there is a humanlike body on the map.
+                // Any humanlike body will do; some maps have none spawned, so one is generated off-map.
                 height.AddRange(HeightAssertions.CoverageFusionTests(
-                    map.mapPawns.AllPawnsSpawned.FirstOrDefault(p => p.RaceProps.Humanlike)));
+                    map.mapPawns.AllPawnsSpawned.FirstOrDefault(p => p.RaceProps.Humanlike)
+                    ?? PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer)));
                 var rangedSelf = RangedAssertions.SelfTests();
                 var rangedResults = TestSuite.RunRangedMatrix(map, Seed);
 

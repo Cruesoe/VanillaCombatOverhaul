@@ -76,7 +76,7 @@ namespace VanillaCombatOverhaul
         public bool enableSuppressionMood = Shipped;
 
         // ---- Armor -------------------------------------------------------------
-        // armorScale 2 always blocks at 100% leftover armour; penetrationScale multiplies weapon AP.
+        // armorScale 2 always blocks at 100% leftover armor; penetrationScale multiplies weapon AP.
         public bool enableAdvancedArmor = Shipped;
         public float armorScale = 2f;
         public float penetrationScale = 2f;

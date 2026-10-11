@@ -31,9 +31,9 @@ namespace VanillaCombatOverhaul
                 && Approx(SuppressionUtility.Falloff(3.1f, 3f), 0f), "1 / 0.5 / 0"));
             results.Add(Check("decay removes 240 a second and stops at zero",
                 Approx(SuppressionUtility.Decay(150f, 15), 90f) && Approx(SuppressionUtility.Decay(5f, 600), 0f), "150 -> 90 in 15 ticks"));
-            results.Add(Check("no armour leaves suppression whole",
+            results.Add(Check("no armor leaves suppression whole",
                 Approx(SuppressionUtility.ArmorFactor(0f, 0.16f), 1f), SuppressionUtility.ArmorFactor(0f, 0.16f).ToString("F2")));
-            results.Add(Check("more armour resists more, more penetration resists less",
+            results.Add(Check("more armor resists more, more penetration resists less",
                 SuppressionUtility.ArmorFactor(1f, 0.16f) < SuppressionUtility.ArmorFactor(0.5f, 0.16f)
                 && SuppressionUtility.ArmorFactor(1f, 0.35f) > SuppressionUtility.ArmorFactor(1f, 0.16f),
                 $"{SuppressionUtility.ArmorFactor(0.5f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.16f):F2} / {SuppressionUtility.ArmorFactor(1f, 0.35f):F2}"));
@@ -47,7 +47,7 @@ namespace VanillaCombatOverhaul
                 ThoughtWorker_UnderFire.StageFor(0f) == -1 && ThoughtWorker_UnderFire.StageFor(0.5f) == 0
                 && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.SuppressedLevel) == 1
                 && ThoughtWorker_UnderFire.StageFor(SuppressionUtility.PinnedLevel) == 2, "-1 / 0 / 1 / 2"));
-            results.Add(Check("armour can stop suppression entirely, and no penetration suppresses nothing",
+            results.Add(Check("armor can stop suppression entirely, and no penetration suppresses nothing",
                 Approx(SuppressionUtility.ArmorFactor(2f, 0.1f), 0f) && Approx(SuppressionUtility.ArmorFactor(0f, 0f), 0f), "0 / 0"));
 
             // Vanilla's default major break threshold is 0.35 * 4/7 = 0.2.
@@ -127,6 +127,8 @@ namespace VanillaCombatOverhaul
                 TickWhile(MaxFlightTicks, () => !targetComp.Pinned && inFlight.Exists(b => !b.Destroyed));
                 results.Add(Check("sustained fire pins the target", targetComp?.Pinned == true,
                     $"{shots} rounds; level {targetComp?.Level:F1}, threshold {targetComp?.Threshold:F1}"));
+                // A pin reached between hits, as mood falls, is acted on at the pawn's next tick interval.
+                TickWhile(15, () => target.CurJobDef != VCO_JobDefOf.VCO_PinnedDown);
                 var job = target.CurJobDef;
                 results.Add(Check("a pinned enemy is pinned down", job == VCO_JobDefOf.VCO_PinnedDown,
                     $"{job?.defName ?? "no job"}, forced {target.CurJob?.playerForced}, mental {target.InMentalState}, posture {target.GetPosture()}, melee threat {target.mindState?.MeleeThreatStillThreat}, burning {target.IsBurning()}, bursting {target.stances?.curStance}"));
@@ -196,7 +198,7 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>An unarmed hostile pawn, so it cannot fire back while the test ticks the game.</summary>
-        /// <summary>Armour factor for real apparel sets against real bullets, reported for tuning against Combat Extended.</summary>
+        /// <summary>Armor factor for real apparel sets against real bullets, reported for tuning against Combat Extended.</summary>
         private static List<AssertionResult> ArmorTests(Map map, IntVec3 cell, List<Pawn> spawned)
         {
             var results = new List<AssertionResult>();
@@ -210,12 +212,12 @@ namespace VanillaCombatOverhaul
             var rifleFlak = SuppressionUtility.ArmorFactor(flak, rifle);
             var rifleMarine = SuppressionUtility.ArmorFactor(marine, rifle);
             var chargeMarine = SuppressionUtility.ArmorFactor(marine, charge);
-            var detail = $"armour {none:F2}/{flak:F2}/{marine:F2}; assault rifle (pen {rifle:F2}) x{rifleNone:F2} none, "
+            var detail = $"armor {none:F2}/{flak:F2}/{marine:F2}; assault rifle (pen {rifle:F2}) x{rifleNone:F2} none, "
                          + $"x{rifleFlak:F2} flak, x{rifleMarine:F2} marine; charge rifle (pen {charge:F2}) x{chargeMarine:F2} marine";
-            results.Add(Check("an unarmoured pawn takes full suppression", Math.Abs(rifleNone - 1f) <= Tolerance, detail));
+            results.Add(Check("an unarmored pawn takes full suppression", Math.Abs(rifleNone - 1f) <= Tolerance, detail));
             results.Add(Check("flak gear resists part of a rifle's suppression", rifleFlak > 0.4f && rifleFlak < 0.85f, detail));
-            results.Add(Check("marine armour resists most of a rifle's suppression", rifleMarine < rifleFlak && rifleMarine < 0.5f, detail));
-            results.Add(Check("higher penetration suppresses armour more", chargeMarine > rifleMarine, detail));
+            results.Add(Check("marine armor resists most of a rifle's suppression", rifleMarine < rifleFlak && rifleMarine < 0.5f, detail));
+            results.Add(Check("higher penetration suppresses armor more", chargeMarine > rifleMarine, detail));
             return results;
         }
 

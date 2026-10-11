@@ -190,6 +190,14 @@ namespace VanillaCombatOverhaul
         private static Pawn pendingCounterAttacker;
         private static Pawn pendingCounterDefender;
 
+        public static void ResetState()
+        {
+            pendingCounterVerb = null;
+            pendingCounterAttacker = null;
+            pendingCounterDefender = null;
+            resolvingCounter = false;
+        }
+
         /// <summary>Makes the counter-attack queued by a parry of this verb's swing.</summary>
         internal static void ResolvePendingCounter(Verb verb)
         {

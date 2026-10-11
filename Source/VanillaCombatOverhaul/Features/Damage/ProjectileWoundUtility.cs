@@ -13,7 +13,7 @@ namespace VanillaCombatOverhaul
 
     /// <summary>
     /// Vanilla Combat Reloaded's bullet and arrow wounds, applied by intercepting
-    /// <see cref="DamageWorker_AddInjury"/>. Armour that reduced the hit cancels them.
+    /// <see cref="DamageWorker_AddInjury"/>. Armor that reduced the hit cancels them.
     /// </summary>
     public static class ProjectileWoundUtility
     {

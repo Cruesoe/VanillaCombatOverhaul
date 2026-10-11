@@ -43,14 +43,4 @@ namespace VanillaCombatOverhaul
             return mode == FireMode.Default ? null : FireModeUtility.TuningFor(mode);
         }
     }
-
-    public class StatPart_FireModeAimTime : StatPart_FireMode
-    {
-        protected override float FactorFor(FireModeTuning tuning) => tuning.aimTime;
-    }
-
-    public class StatPart_FireModeCooldown : StatPart_FireMode
-    {
-        protected override float FactorFor(FireModeTuning tuning) => tuning.cooldown;
-    }
 }

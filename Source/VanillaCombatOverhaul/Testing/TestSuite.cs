@@ -58,7 +58,7 @@ namespace VanillaCombatOverhaul
             yield return disabled;
 
             var ordered = Shooter("pointblank-player-orders", 20);
-            ordered.pointBlankHonourOrders = true;
+            ordered.pointBlankHonorOrders = true;
             yield return ordered;
         }
 

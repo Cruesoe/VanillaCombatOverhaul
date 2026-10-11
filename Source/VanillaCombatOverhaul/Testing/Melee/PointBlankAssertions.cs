@@ -49,7 +49,7 @@ namespace VanillaCombatOverhaul
             var rolls = r.Counter("pointblank.roll");
             var expected = ExpectedChance(spec.attackerShootingSkill);
 
-            if (spec.pointBlankHonourOrders)
+            if (spec.pointBlankHonorOrders)
             {
                 // AI-chosen melee after an order expires may roll; none may roll under a player order.
                 var onOrder = r.Counter("pointblank.roll.onPlayerOrder");
@@ -82,7 +82,7 @@ namespace VanillaCombatOverhaul
             }
 
             AssertChanceMatchesTable(r, expected);
-            AssertRollHonoursChance(r, rolls, expected);
+            AssertRollHonorsChance(r, rolls, expected);
             AssertPassedRollsFire(r, rolls);
         }
 
@@ -139,7 +139,7 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>Passed rolls against the table, within four binomial standard errors.</summary>
-        private static void AssertRollHonoursChance(MeleeArenaResult r, long rolls, double expected)
+        private static void AssertRollHonorsChance(MeleeArenaResult r, long rolls, double expected)
         {
             var passed = rolls - r.Counter("pointblank.reject.rollFailed");
             var observed = (double)passed / rolls;
@@ -147,7 +147,7 @@ namespace VanillaCombatOverhaul
             var tolerance = SigmaTolerance * sigma;
             var delta = Math.Abs(observed - expected);
             r.Assertions.Add(Check(
-                "roll honours chance",
+                "roll honors chance",
                 delta <= tolerance,
                 $"{passed:N0}/{rolls:N0} = {observed:P1} against {expected:P1} " +
                 $"(delta {delta:P1}, allowed {tolerance:P1})"));

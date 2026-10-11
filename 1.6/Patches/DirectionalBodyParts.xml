@@ -2,7 +2,7 @@
 <Patch>
 
   <!-- Adds directional groups to every BodyDef, modded races included (approach from Vanilla Combat Reloaded by Donald):
-       parts labelled "left" only from the left, "right" only from the right, everything else from both and midline,
+       parts labeled "left" only from the left, "right" only from the right, everything else from both and midline,
        the core part from every angle. Existing groups are kept. -->
 
   <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
@@ -19,7 +19,7 @@
           </value>
         </li>
 
-        <!-- 2. Not left-labelled, so reachable from the right.
+        <!-- 2. Not left-labeled, so reachable from the right.
                 translate() folds case, so "Left", "LEFT" and "left" all match. -->
         <li Class="PatchOperationAdd">
           <success>Always</success>
@@ -29,7 +29,7 @@
           </value>
         </li>
 
-        <!-- 3. Not right-labelled, so reachable from the left. -->
+        <!-- 3. Not right-labeled, so reachable from the left. -->
         <li Class="PatchOperationAdd">
           <success>Always</success>
           <xpath>Defs/BodyDef//li[def][not(customLabel) or not(contains(translate(customLabel,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'right'))]/groups</xpath>

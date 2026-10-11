@@ -14,7 +14,7 @@ namespace VanillaCombatOverhaul
     /// <summary>Which side of a target an attack arrives from, shared by parrying and directional damage.</summary>
     public static class FacingUtility
     {
-        /// <summary>Facing of an attack travelling from <paramref name="origin"/> onto <paramref name="target"/>.</summary>
+        /// <summary>Facing of an attack traveling from <paramref name="origin"/> onto <paramref name="target"/>.</summary>
         public static AttackFacing Relative(IntVec3 origin, Thing target)
         {
             // Downed pawns count every attack as frontal.

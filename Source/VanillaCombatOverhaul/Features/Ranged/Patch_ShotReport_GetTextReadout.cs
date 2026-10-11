@@ -137,8 +137,8 @@ namespace VanillaCombatOverhaul
                 {
                     var chance = HeightTargetingUtility.ChanceToLand(
                         caster, hitPawn, side, height, DamageDefOf.Bullet, melee: false);
-                    sb.AppendLine("   " + "VCO_HeightChance".Translate()
-                                  + HeightTargetingUtility.LabelFor(height) + ": " + chance.ToStringPercent());
+                    sb.AppendLine("   " + "VCO_HeightChance".Translate(
+                                  HeightTargetingUtility.LabelFor(height).UncapitalizeFirst(), chance.ToStringPercent()));
                 }
             }
 

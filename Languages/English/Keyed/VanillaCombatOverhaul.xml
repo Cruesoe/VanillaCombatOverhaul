@@ -25,7 +25,7 @@
   <VCO_Counter>A successful parry lets your pawn hit back</VCO_Counter>
   <VCO_Counter_Tip>After a successful parry, your pawn immediately gets a free attack against whoever swung at them.\n\nThis makes good melee fighters noticeably stronger.</VCO_Counter_Tip>
 
-  <VCO_PointBlank>Enable Point-Blank Shots</VCO_PointBlank>
+  <VCO_PointBlank>Skilled shooters fire point-blank in melee</VCO_PointBlank>
   <VCO_PointBlank_Tip>A skilled shooter stuck in melee sometimes fires their gun instead of swinging it.\n\nOnly pawns with Shooting 10 or higher can do this. The chance is 5% at Shooting 10 and rises to 50% at Shooting 20. The shot fires instantly at the pawn they were fighting, and otherwise works like any other shot from that weapon. It applies to everyone, including enemies.\n\nSocial fights, duels, finishing blows on downed pawns, and melee attacks you order directly always stay melee.</VCO_PointBlank_Tip>
   <VCO_PointBlankShot>Point-blank shot!</VCO_PointBlankShot>
 
@@ -64,7 +64,7 @@
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
 
   <VCO_VisibleTracers>Show vibrant tracers on shots</VCO_VisibleTracers>
-  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColour follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibres.</VCO_VisibleTracers_Tip>
+  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColor follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibers.</VCO_VisibleTracers_Tip>
 
   <!-- Fire modes -->
   <VCO_RunAndGun>Run and gun</VCO_RunAndGun>
@@ -72,9 +72,13 @@
   <VCO_RunAndGunNpcs>Enemies and allies run and gun too</VCO_RunAndGunNpcs>
   <VCO_RunAndGunNpcs_Tip>Non-player pawns shoot at their current target while moving to a firing position.</VCO_RunAndGunNpcs_Tip>
   <VCO_RequiresRunAndGun>Requires "Run and gun" to be on.</VCO_RequiresRunAndGun>
+  <VCO_RequiresParry>Requires "Pawns can parry melee attacks" to be on.</VCO_RequiresParry>
+  <VCO_RequiresDirectionalDamage>Requires "Where you get hit depends on the angle" to be on.</VCO_RequiresDirectionalDamage>
+  <VCO_RequiresSuppression>Requires "Incoming fire suppresses" to be on.</VCO_RequiresSuppression>
+  <VCO_RequiresFireModes>Requires "Drafted pawns can choose a fire mode" to be on.</VCO_RequiresFireModes>
   <VCO_Section_Suppression>Suppression</VCO_Section_Suppression>
   <VCO_Suppression>Incoming fire suppresses</VCO_Suppression>
-  <VCO_Suppression_Tip>Bullets that land near or fly past an enemy of the shooter, and explosions nearby, build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it passes or lands, and the target's nerves and mood. Armour resists bullets that cannot match its rating, so weak rounds barely trouble a power-armoured trooper. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nPinning takes sustained fire: suppression starts fading half a second after the last nearby hit.</VCO_Suppression_Tip>
+  <VCO_Suppression_Tip>Bullets that land near or fly past an enemy of the shooter, and explosions nearby, build suppression. Suppressed pawns aim worse and take longer to aim. Pinned pawns are hit harder by both.\n\nHow much depends on the shot's damage, how close it passes or lands, and the target's nerves and mood. Armor resists bullets that cannot match its rating, so weak rounds barely trouble a power-armored trooper. Explosions and the Suppression fire mode suppress more. Active shield belts, mechanoids and animals are unaffected.\n\nPinning takes sustained fire: suppression starts fading half a second after the last nearby hit.</VCO_Suppression_Tip>
   <VCO_SuppressionPinning>Pinned pawns hit the dirt</VCO_SuppressionPinning>
   <VCO_SuppressionPinning_Tip>A pinned pawn stops what it is doing, drops prone and holds fire until the shooting eases, staying down for at least four seconds. Enemies and allies crawl to nearby cover first; your colonists drop where they stand.\n\nA pinned pawn that moves crawls, at 65% speed. Order a pinned colonist to move and they crawl there without being pinned down again on the way.\n\nLying down makes a pawn much harder to hit from 4.5 cells or more, but point-blank shots hit far more easily, and a pawn attacked in melee gets up to fight.\n\nWith this off, pinned pawns only aim worse.</VCO_SuppressionPinning_Tip>
   <VCO_SuppressionMood>Being under fire hurts mood</VCO_SuppressionMood>
@@ -86,10 +90,11 @@
   <VCO_SuppressionRead>Suppressed: {0}</VCO_SuppressionRead>
   <VCO_StatPart_Suppressed>Suppressed</VCO_StatPart_Suppressed>
   <VCO_StatPart_Crawling>Crawling under fire</VCO_StatPart_Crawling>
+  <VCO_StatPart_SuppressionThreshold>From mood and nerves, suppressed at {0} suppression and pinned at {1}</VCO_StatPart_SuppressionThreshold>
 
   <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>
   <VCO_FireModes>Drafted pawns can choose a fire mode</VCO_FireModes>
-  <VCO_FireModes_Tip>Drafted colonists with a gun get a fire mode button.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim, quicker to fire.\nSuppression: many more rounds, much worse aim, fast to aim but slow to recover.\nAuto: picks one of those by distance to the target.\n\nThe mode only applies while drafted, so hunting and undrafted self-defence fire normally. Explosives, one-use launchers and abilities are never affected, and single-shot and beam weapons only offer Default and Precision.</VCO_FireModes_Tip>
+  <VCO_FireModes_Tip>Drafted colonists with a gun get a fire mode button.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim, quicker to fire.\nSuppression: many more rounds, much worse aim, fast to aim but slow to recover.\nAuto: picks one of those by distance to the target.\n\nThe mode only applies while drafted, so hunting and undrafted self-defense fire normally. Explosives, one-use launchers and abilities are never affected, and single-shot and beam weapons only offer Default and Precision.</VCO_FireModes_Tip>
   <VCO_FireModesNpc>Other factions use fire modes too</VCO_FireModesNpc>
   <VCO_FireModesNpc_Tip>Raiders, visitors and allies pick a fire mode by distance, the same way a colonist on Auto does.</VCO_FireModesNpc_Tip>
   <VCO_FireModeShortBurstRange>Auto uses Short Burst from {0} cells</VCO_FireModeShortBurstRange>
@@ -118,12 +123,12 @@
 
   <VCO_Section_Apparel>Apparel and coverage</VCO_Section_Apparel>
   <VCO_ApparelCoverage>Improved apparel coverage and layering</VCO_ApparelCoverage>
-  <VCO_ApparelCoverage_Tip>Applies the complete coverage pack: sensible protection for hands, feet and faces; corrected acid and thump armour types; and improved layering for glasses, masks, helmets and headsets.</VCO_ApparelCoverage_Tip>
+  <VCO_ApparelCoverage_Tip>Applies the complete coverage pack: sensible protection for hands, feet and faces; corrected acid and thump armor types; and improved layering for glasses, masks, helmets and headsets.</VCO_ApparelCoverage_Tip>
 
   <VCO_Section_AutoEquip>Loadouts</VCO_Section_AutoEquip>
   <VCO_AutoEquip_Intro>Each colonist follows a loadout, chosen in the Loadout column of the Assign tab. A loadout sets which weapons the colonist may use, whether it carries a backup melee weapon, and which items it keeps in its inventory.</VCO_AutoEquip_Intro>
   <VCO_AutoEquip>Loadouts</VCO_AutoEquip>
-  <VCO_AutoEquip_Tip>Colonists equip and upgrade their primary weapon, carry a melee sidearm and stock items as their loadout says. Selection considers damage, accuracy, armour penetration, condition, and the colonist's shooting or melee skill. Drafted colonists are never sent to fetch gear.\n\nManually equipping a weapon locks that choice until you use the colonist's Allow weapon upgrades command.\n\nTurn this off to use another mod's loadout or sidearm system. The Assign tab column needs a restart to appear or disappear.</VCO_AutoEquip_Tip>
+  <VCO_AutoEquip_Tip>Colonists equip and upgrade their primary weapon, carry a melee sidearm and stock items as their loadout says. Selection considers damage, accuracy, armor penetration, condition, and the colonist's shooting or melee skill. Drafted colonists are never sent to fetch gear.\n\nManually equipping a weapon locks that choice until you use the colonist's Allow weapon upgrades command.\n\nTurn this off to use another mod's loadout or sidearm system. The Assign tab column needs a restart to appear or disappear.</VCO_AutoEquip_Tip>
   <VCO_AutoEquip_Unlock>Allow weapon upgrades</VCO_AutoEquip_Unlock>
   <VCO_AutoEquip_Unlock_Tip>This weapon was equipped manually. Remove that lock and allow automatic upgrades again.</VCO_AutoEquip_Unlock_Tip>
 
@@ -162,12 +167,12 @@
   <VCO_Loadout_Switch>Switch to {0}</VCO_Loadout_Switch>
   <VCO_Loadout_Switch_Tip>Swap between the primary weapon and the backup weapon carried in the inventory.</VCO_Loadout_Switch_Tip>
 
-  <VCO_AdjWeapon>Weapon w/ skill</VCO_AdjWeapon>
-  <VCO_AdjWeather>Weather w/ skill</VCO_AdjWeather>
+  <VCO_AdjWeapon>Weapon, with skill</VCO_AdjWeapon>
+  <VCO_AdjWeather>Weather, with skill</VCO_AdjWeather>
   <VCO_EvasionRead>Evasion</VCO_EvasionRead>
-  <VCO_AdjEvasionRead>Evasion w/ skill</VCO_AdjEvasionRead>
+  <VCO_AdjEvasionRead>Evasion, with skill</VCO_AdjEvasionRead>
   <VCO_TargetSide>Target side</VCO_TargetSide>
-  <VCO_HeightChance>Chance to hit </VCO_HeightChance>
+  <VCO_HeightChance>Chance to hit the {0}: {1}</VCO_HeightChance>
   <VCO_MeleeHitTotal>Final melee hit chance: {0}</VCO_MeleeHitTotal>
   <VCO_MeleeHitChance>Melee hit chance: {0}</VCO_MeleeHitChance>
   <VCO_TargetDodgeChance>Target dodge chance: {0}</VCO_TargetDodgeChance>

@@ -9,7 +9,7 @@ namespace VanillaCombatOverhaul
     /// <summary>
     /// Incoming fire builds suppression on nearby hostile humanlikes. Suppressed pawns aim worse and
     /// slower; pinned pawns drop prone. Works from any projectile's damage, so modded weapons need no
-    /// patches. Amount, armour reduction, threshold and fading follow Combat Extended's rules.
+    /// patches. Amount, armor reduction, threshold and fading follow Combat Extended's rules.
     /// </summary>
     [StaticConstructorOnStartup]
     public static class SuppressionUtility
@@ -35,7 +35,7 @@ namespace VanillaCombatOverhaul
         // Combat Extended's fading: starts 30 ticks after the last hit, 4 per tick.
         public const int DecayDelayTicks = 30;
         public const float DecayPerSecond = 240f;
-        // Weight of overall sharp armour against raw armour penetration; Combat Extended's 0.5 rescaled for vanilla's units.
+        // Weight of overall sharp armor against raw armor penetration; Combat Extended's 0.5 rescaled for vanilla's units.
         public const float ArmorWeight = 0.1f;
         public const int ArmorCacheTicks = 60;
         public const float MinAccuracy = 0.5f;
@@ -49,6 +49,9 @@ namespace VanillaCombatOverhaul
         private static readonly Dictionary<int, KeyValuePair<int, float>> ArmorCache = new Dictionary<int, KeyValuePair<int, float>>();
 
         public static bool Enabled => VCOMod.Settings?.enableSuppression ?? false;
+
+        /// <summary>Forgets cached armor, which is stamped with ticks of the game it was read in.</summary>
+        public static void ResetState() => ArmorCache.Clear();
 
         /// <summary>Raw suppression at which a pawn is suppressed; a pawn at or below its major break threshold is suppressed by any shot.</summary>
         public static float ThresholdFor(float mood, float majorBreakThreshold) =>
@@ -87,7 +90,7 @@ namespace VanillaCombatOverhaul
         public static float Decay(float level, int ticks) =>
             Mathf.Max(0f, level - DecayPerSecond * ticks / 60f);
 
-        /// <summary>Combat Extended's armour reduction: 1 - clamp(armour * weight / penetration); no penetration means no suppression.</summary>
+        /// <summary>Combat Extended's armor reduction: 1 - clamp(armor * weight / penetration); no penetration means no suppression.</summary>
         public static float ArmorFactor(float overallSharpArmor, float rawPenetration)
         {
             if (rawPenetration <= 0f)
@@ -97,7 +100,7 @@ namespace VanillaCombatOverhaul
             return 1f - Mathf.Clamp01(overallSharpArmor * ArmorWeight / rawPenetration);
         }
 
-        /// <summary>Overall sharp armour as the Gear tab shows it (0 to 2), cached briefly per pawn.</summary>
+        /// <summary>Overall sharp armor as the Gear tab shows it (0 to 2), cached briefly per pawn.</summary>
         public static float OverallSharpArmor(Pawn pawn)
         {
             var now = Find.TickManager.TicksGame;
@@ -140,10 +143,10 @@ namespace VanillaCombatOverhaul
             return Mathf.Clamp(total * 2f, 0f, 2f);
         }
 
-        /// <summary>The projectile's armour penetration before this mod's penetrationScale.</summary>
+        /// <summary>The projectile's armor penetration before this mod's penetrationScale.</summary>
         public static float RawPenetration(Projectile projectile) => RawPenetration(projectile.ArmorPenetration);
 
-        /// <summary>Armour penetration as shown on the weapon, with penetrationScale removed.</summary>
+        /// <summary>Armor penetration as shown on the weapon, with penetrationScale removed.</summary>
         public static float RawPenetration(float shown)
         {
             var settings = VCOMod.Settings;
@@ -213,7 +216,7 @@ namespace VanillaCombatOverhaul
                 damage *= ExplosionFactor;
                 radius = Mathf.Max(radius, props.explosionRadius + ExplosionRadiusBonus);
             }
-            // Armour only resists bullets, as in Combat Extended.
+            // Armor only resists bullets, as in Combat Extended.
             var penetration = RawPenetration(projectile);
 
             var center = position.ToIntVec3();

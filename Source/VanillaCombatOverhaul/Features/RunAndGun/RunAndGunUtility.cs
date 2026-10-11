@@ -27,6 +27,8 @@ namespace VanillaCombatOverhaul
 
         public static bool AnyActive => Active.Count > 0;
 
+        public static void ResetState() => Active.Clear();
+
         /// <summary>Called from the pather for a moving pawn every CheckInterval ticks.</summary>
         public static void TryShoot(Pawn pawn)
         {

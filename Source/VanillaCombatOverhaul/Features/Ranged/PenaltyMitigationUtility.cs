@@ -8,51 +8,55 @@ namespace VanillaCombatOverhaul
     public static class PenaltyMitigationUtility
     {
         /// <summary>Raises a penalty factor toward 1 by shooter skill; skill factor 1 leaves it unchanged.</summary>
+        // Shot reports are built many times a tick while AI picks targets; skill changes far more slowly.
+        private const int SkillCacheTicks = 60;
+
         public static float MitigatePenalty(float factor, Thing shooter, float scale)
         {
             if (factor >= 1f || shooter == null || scale <= 0f)
             {
                 return factor;
             }
+            return MitigateBySkill(factor, ShooterSkillFactor(shooter, scale));
+        }
 
-            var skillFactor = ShooterSkillFactor(shooter, scale);
-            if (skillFactor <= 1f)
+        /// <summary>Raises a penalty factor toward 1 by an already worked-out skill factor.</summary>
+        public static float MitigateBySkill(float factor, float skillFactor)
+        {
+            if (factor >= 1f || skillFactor <= 1f)
             {
                 return factor;
             }
-
             return Mathf.Pow(Mathf.Clamp01(factor), 1f / skillFactor);
         }
 
+        /// <summary>Pawns read VCO_AccuracyMitigation, so mods that change it apply; turrets read their unfinalized accuracy.</summary>
         public static float ShooterSkillFactor(Thing shooter, float scale)
         {
-            float stat;
-            if (shooter is Pawn pawn)
-            {
-                stat = StatDefOf.ShootingAccuracyPawn.Worker.GetValue(StatRequest.For(pawn), false);
-            }
-            else
-            {
-                stat = StatDefOf.ShootingAccuracyTurret.Worker.GetValue(StatRequest.For(shooter), false);
-            }
-
+            var stat = shooter is Pawn pawn
+                ? pawn.GetStatValue(VCO_StatDefOf.VCO_AccuracyMitigation, true, SkillCacheTicks)
+                : StatDefOf.ShootingAccuracyTurret.Worker.GetValue(StatRequest.For(shooter), false);
             return Mathf.Max(1f, stat / scale);
         }
 
         public static void ApplyToShotReport(ref ShotReport report, Thing caster)
         {
             var settings = VCOMod.Settings;
-            if (settings == null || !settings.enableAdvancedAccuracy || caster == null)
+            if (settings == null || !settings.enableAdvancedAccuracy || caster == null || settings.accuracyScale <= 0f)
             {
                 return;
             }
 
-            var scale = settings.accuracyScale;
             var equipment = ShotReportAccess.GetEquipmentFactor(ref report);
             var weather = ShotReportAccess.GetWeatherFactor(ref report);
+            if (equipment >= 1f && weather >= 1f)
+            {
+                return;
+            }
 
-            var mitigatedEquipment = MitigatePenalty(equipment, caster, scale);
-            var mitigatedWeather = MitigatePenalty(weather, caster, scale);
+            var skillFactor = ShooterSkillFactor(caster, settings.accuracyScale);
+            var mitigatedEquipment = MitigateBySkill(equipment, skillFactor);
+            var mitigatedWeather = MitigateBySkill(weather, skillFactor);
 
             if (!Mathf.Approximately(equipment, mitigatedEquipment))
             {

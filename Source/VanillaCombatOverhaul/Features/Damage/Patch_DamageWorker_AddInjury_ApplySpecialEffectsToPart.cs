@@ -25,10 +25,33 @@ namespace VanillaCombatOverhaul
                         typeof(DamageWorker.DamageResult)
                     }));
 
+        private delegate void DuplicateOuter(DamageWorker_AddInjury worker, DamageInfo dinfo, Pawn pawn,
+            float totalDamage, DamageWorker.DamageResult result);
+
         private static readonly ReduceOutside ReduceDamageToPreserveOutsideParts =
             AccessTools.MethodDelegate<ReduceOutside>(
                 AccessTools.DeclaredMethod(typeof(DamageWorker_AddInjury),
                     "ReduceDamageToPreserveOutsideParts"));
+
+        private static readonly DuplicateOuter CheckDuplicateDamageToOuterParts =
+            AccessTools.MethodDelegate<DuplicateOuter>(
+                AccessTools.DeclaredMethod(typeof(DamageWorker_AddInjury),
+                    "CheckDuplicateDamageToOuterParts"));
+
+        /// <summary>
+        /// One wound, as vanilla's ApplySpecialEffectsToPart makes it: outside parts are spared unless overkilled,
+        /// and an inside hit also wounds the parts around it unless <paramref name="toOuterParts"/> is false.
+        /// </summary>
+        private static void AddWound(DamageWorker_AddInjury worker, Pawn pawn, float damage, DamageInfo dinfo,
+                                     DamageWorker.DamageResult result, bool toOuterParts = true)
+        {
+            damage = ReduceDamageToPreserveOutsideParts(worker, damage, dinfo, pawn);
+            FinalizeAndAddInjury(worker, pawn, damage, dinfo, result);
+            if (toOuterParts)
+            {
+                CheckDuplicateDamageToOuterParts(worker, dinfo, pawn, damage, result);
+            }
+        }
 
         public static bool Prefix(DamageWorker_AddInjury __instance, Pawn pawn, float totalDamage,
                                   DamageInfo dinfo, DamageWorker.DamageResult result)
@@ -86,11 +109,13 @@ namespace VanillaCombatOverhaul
         private static void ApplyBullet(DamageWorker_AddInjury worker, Pawn pawn, float totalDamage,
                                         DamageInfo dinfo, DamageWorker.DamageResult result, float cap)
         {
-            totalDamage /= 2f;
-            FinalizeAndAddInjury(worker, pawn, totalDamage, dinfo, result);
-
             var stoppingPower = ProjectileWoundUtility.StoppingPowerFor(dinfo);
             var kind = ProjectileWoundUtility.KindFor(stoppingPower);
+            // A pass-through wounds the parts around the hit itself, so vanilla's outer-layer copy is skipped.
+            var toOuterParts = kind != BulletWoundKind.PassThrough;
+
+            totalDamage /= 2f;
+            AddWound(worker, pawn, totalDamage, dinfo, result, toOuterParts);
             var parts = RentParts();
             try
             {
@@ -133,7 +158,7 @@ namespace VanillaCombatOverhaul
                 {
                     var slice = dinfo;
                     slice.SetHitPart(parts[i]);
-                    FinalizeAndAddInjury(worker, pawn, share, slice, result);
+                    AddWound(worker, pawn, share, slice, result, toOuterParts);
                 }
             }
             finally
@@ -147,7 +172,7 @@ namespace VanillaCombatOverhaul
         {
             if (dinfo.HitPart.depth == BodyPartDepth.Inside)
             {
-                FinalizeAndAddInjury(worker, pawn, totalDamage, dinfo, result);
+                AddWound(worker, pawn, totalDamage, dinfo, result);
                 VCODiagnostics.Count("wound.arrow.internal");
                 return;
             }
@@ -169,23 +194,17 @@ namespace VanillaCombatOverhaul
 
             if (neighbor == null)
             {
-                FinalizeAndAddInjury(worker, pawn,
-                    ReduceDamageToPreserveOutsideParts(worker, totalDamage, dinfo, pawn),
-                    dinfo, result);
+                AddWound(worker, pawn, totalDamage, dinfo, result);
                 VCODiagnostics.Count("wound.arrow.single");
                 return;
             }
 
             var split = totalDamage * ProjectileWoundUtility.ArrowScratchSplit;
-            FinalizeAndAddInjury(worker, pawn,
-                ReduceDamageToPreserveOutsideParts(worker, split, dinfo, pawn),
-                dinfo, result);
+            AddWound(worker, pawn, split, dinfo, result);
 
             var second = dinfo;
             second.SetHitPart(neighbor);
-            FinalizeAndAddInjury(worker, pawn,
-                ReduceDamageToPreserveOutsideParts(worker, split, second, pawn),
-                second, result);
+            AddWound(worker, pawn, split, second, result);
             VCODiagnostics.Count("wound.arrow.split");
         }
     }

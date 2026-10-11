@@ -59,7 +59,7 @@ namespace VanillaCombatOverhaul
             {
                 settings.enablePointBlank = spec.pointBlankOverride > 0;
             }
-            PointBlankUtility.IgnorePlayerForcedForTesting = spec.IsPointBlank && !spec.pointBlankHonourOrders;
+            PointBlankUtility.IgnorePlayerForcedForTesting = spec.IsPointBlank && !spec.pointBlankHonorOrders;
 
             try
             {
@@ -161,7 +161,7 @@ namespace VanillaCombatOverhaul
                                             List<Pawn> attackers, List<int> attackerTarget,
                                             List<Pawn> defenders)
         {
-            var centre = map.Center;
+            var center = map.Center;
             var perDefender = Mathf.Clamp(spec.attackersPerDefender, 1, RingOffsets.Length);
             var used = new HashSet<IntVec3>();
 
@@ -170,7 +170,7 @@ namespace VanillaCombatOverhaul
 
             for (var i = 0; i < spec.pairs; i++)
             {
-                if (!CellFinder.TryFindRandomCellNear(centre, map, radius,
+                if (!CellFinder.TryFindRandomCellNear(center, map, radius,
                         c => IsFree(c, map, used) && FreeAdjacentCount(c, map, used) >= perDefender,
                         out var cell))
                 {
@@ -262,7 +262,9 @@ namespace VanillaCombatOverhaul
             // Pawns whose skill cannot be set exactly are discarded.
             for (var attempt = 0; attempt < GenerationAttempts; attempt++)
             {
-                var candidate = PawnGenerator.GeneratePawn(kind, faction);
+                // Baseliners, as a random world's faction can bring genes that change melee speed and stats.
+                var candidate = PawnGenerator.GeneratePawn(new PawnGenerationRequest(kind, faction,
+                    forcedXenotype: ModsConfig.BiotechActive ? XenotypeDefOf.Baseliner : null));
                 if (candidate == null)
                 {
                     continue;

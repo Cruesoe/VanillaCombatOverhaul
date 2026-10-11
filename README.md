@@ -14,7 +14,7 @@ game's familiar systems and broad mod compatibility.
 - Run and gun: shooters fire on the move instead of stopping.
 - Suppression: incoming fire makes pawns aim worse and slower, and pins them flat in cover.
 - Distinct bullet and arrow wounds.
-- Armour that can reduce damage even when it does not stop a hit completely.
+- Armor that can reduce damage even when it does not stop a hit completely.
 - Improved coverage for gloves, boots, masks, helmets, glasses, and similar apparel.
 - Loadouts in the Assign tab: allowed weapons, a backup melee weapon swapped in when enemies close in, medicine and items to carry, and Progression: Ammunition refills matched to each colonist's weapon.
 

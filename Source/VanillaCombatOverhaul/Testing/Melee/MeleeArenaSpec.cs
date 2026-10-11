@@ -30,7 +30,7 @@ namespace VanillaCombatOverhaul
         public int pointBlankOverride = 0;
 
         /// <summary>On, the player-order exclusion applies to the arena's ordered attacks; off, it is waived so rolls can be measured.</summary>
-        public bool pointBlankHonourOrders = false;
+        public bool pointBlankHonorOrders = false;
 
         public bool IsPointBlank => pointBlankOverride != 0;
 
@@ -58,7 +58,7 @@ namespace VanillaCombatOverhaul
             {
                 yield return new KeyValuePair<string, string>("attackerShootingSkill", attackerShootingSkill.ToString());
                 yield return new KeyValuePair<string, string>("pointBlankOverride", pointBlankOverride.ToString());
-                yield return new KeyValuePair<string, string>("pointBlankHonourOrders", pointBlankHonourOrders.ToString());
+                yield return new KeyValuePair<string, string>("pointBlankHonorOrders", pointBlankHonorOrders.ToString());
             }
             yield return new KeyValuePair<string, string>("ticks", ticks.ToString());
             yield return new KeyValuePair<string, string>("seed", seed.ToString());

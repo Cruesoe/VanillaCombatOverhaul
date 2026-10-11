@@ -1,6 +1,6 @@
-[b]Deeper, more tactical combat that keeps RimWorld's own weapons, armour and rules.[/b]
+[b]Deeper, more tactical combat that keeps RimWorld's own weapons, armor and rules.[/b]
 
-The depth of Combat Extended without its ammo, calibres or compatibility patches: every system reads vanilla stats, so modded weapons and apparel work as they are.
+The depth of Combat Extended without its ammo, calibers or compatibility patches: every system reads vanilla stats, so modded weapons and apparel work as they are.
 
 [h2]Melee[/h2]
 [list]
@@ -23,12 +23,12 @@ The depth of Combat Extended without its ammo, calibres or compatibility patches
 [list]
 [*]Bullets landing near or flying past a pawn suppress them, making them aim worse and slower.
 [*]Sustained fire pins pawns, sending them diving for cover and flat on the ground.
-[*]Armour shrugs off rounds that cannot match it, and being under fire hurts mood.
+[*]Armor shrugs off rounds that cannot match it, and being under fire hurts mood.
 [/list]
 
-[h2]Armour and gear[/h2]
+[h2]Armor and gear[/h2]
 [list]
-[*]Good armour stops weak hits outright instead of turning them into bruises.
+[*]Good armor stops weak hits outright instead of turning them into bruises.
 [*]Gloves, boots, masks, helmets and glasses protect the parts they cover and layer sensibly.
 [*]Loadouts in the Assign tab set each colonist's weapons, a backup melee weapon, medicine and other supplies.
 [*]Colonists upgrade their weapons by skill and draw their sidearm when an enemy reaches them.
@@ -43,7 +43,7 @@ Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Van
 Safe to add to an existing save, though a new game is recommended (see below).
 
 [h2]New game recommended[/h2]
-Existing saves load fine: old weapon policies become loadouts and colonists keep their medicine settings. But combat plays very differently, and a colony armed and armoured for vanilla fights will feel the change, so a fresh start gives the best experience.
+Existing saves load fine: old weapon policies become loadouts and colonists keep their medicine settings. But combat plays very differently, and a colony armed and armored for vanilla fights will feel the change, so a fresh start gives the best experience.
 
 [h2]Feedback[/h2]
 This mod is still being tuned, and your feedback is needed and much appreciated. If a fight feels off, a number seems wrong or something breaks, please leave a comment with what happened and, for errors, the red text from the log.

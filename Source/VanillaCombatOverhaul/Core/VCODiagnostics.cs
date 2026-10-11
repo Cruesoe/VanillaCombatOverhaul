@@ -50,7 +50,7 @@ namespace VanillaCombatOverhaul
         private static bool Accepts(Pawn subject) =>
             SubjectFilter == null || subject == null || SubjectFilter(subject);
 
-        /// <summary>Counts an event attributed to a specific pawn, honouring the subject filter.</summary>
+        /// <summary>Counts an event attributed to a specific pawn, honoring the subject filter.</summary>
         public static void CountFor(Pawn subject, string key, long amount = 1)
         {
             if (!Enabled || !Accepts(subject))
@@ -60,7 +60,7 @@ namespace VanillaCombatOverhaul
             Count(key, amount);
         }
 
-        /// <summary>Samples a value attributed to a specific pawn, honouring the subject filter.</summary>
+        /// <summary>Samples a value attributed to a specific pawn, honoring the subject filter.</summary>
         public static void SampleFor(Pawn subject, string key, float value)
         {
             if (!Enabled || !Accepts(subject))
@@ -133,8 +133,8 @@ namespace VanillaCombatOverhaul
             Samples.Clear();
         }
 
-        /// <summary>Ordered key/value pairs for display in the settings window.</summary>
-        public static IEnumerable<KeyValuePair<string, string>> Lines()
+        /// <summary>Ordered key/value pairs for the report.</summary>
+        private static IEnumerable<KeyValuePair<string, string>> Lines()
         {
             foreach (var kv in Counters.OrderBy(k => k.Key))
             {

@@ -3,7 +3,7 @@
 
     - Every translation key the code uses exists in the English keyed file, and every key in it is used.
     - XML patches gate optional content by def or package ID, never by mod display name.
-    - Every texture the code loads with ContentFinder exists.
+    - Every texture the code loads with ContentFinder or MaterialPool exists.
 
     The in-game combat suite is slower and separate: Tools\Run-CombatTest.ps1.
 #>
@@ -64,9 +64,9 @@ Get-ChildItem (Join-Path $repo '1.6') -Recurse -Filter *.xml | ForEach-Object {
 
 # --- textures -------------------------------------------------------------------
 $textureRoots = @('Textures', '1.6\Textures') | ForEach-Object { Join-Path $repo $_ } | Where-Object { Test-Path $_ }
-foreach ($m in [regex]::Matches($allCode, 'ContentFinder<Texture2D>\.Get\("([^"]+)"')) {
+foreach ($m in [regex]::Matches($allCode, '(?:ContentFinder<Texture2D>\.Get|MaterialPool\.MatFrom)\("([^"]+)"')) {
     $path = $m.Groups[1].Value
-    if ($path -notmatch '^UI/Commands/VCO_') { continue }
+    if ($path -notmatch '/VCO_') { continue }
     $found = $textureRoots | Where-Object { Test-Path (Join-Path $_ ($path.Replace('/', '\') + '.png')) }
     if (-not $found) { $failures.Add("Missing texture: $path") }
 }

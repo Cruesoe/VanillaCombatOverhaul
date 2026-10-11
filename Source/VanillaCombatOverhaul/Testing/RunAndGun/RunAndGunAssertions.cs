@@ -36,7 +36,7 @@ namespace VanillaCombatOverhaul
             {
                 if (!TryFindArena(map, out var origin))
                 {
-                    results.Add(Check("run and gun arena set up", false, "no clear strip of ground near the map centre"));
+                    results.Add(Check("run and gun arena set up", false, "no clear strip of ground near the map center"));
                     return results;
                 }
                 var shooter = RangedCombatArena.SpawnShooter(map, origin, 10, rifle);

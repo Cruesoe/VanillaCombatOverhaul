@@ -54,7 +54,7 @@ namespace VanillaCombatOverhaul
             return new Scope(true);
         }
 
-        /// <summary>Clears all context. Called on map load and game start.</summary>
+        /// <summary>Clears all context. Called when a game is created or loaded.</summary>
         public static void Reset() => depth = 0;
 
         public readonly struct Scope : IDisposable

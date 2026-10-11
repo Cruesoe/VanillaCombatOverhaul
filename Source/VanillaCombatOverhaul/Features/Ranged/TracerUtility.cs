@@ -6,14 +6,14 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>Draws a short glowing streak behind in-flight projectiles, coloured by damage type.</summary>
+    /// <summary>Draws a short glowing streak behind in-flight projectiles, colored by damage type.</summary>
     public static class TracerUtility
     {
         // Streak size at tracerScale 1, in cells.
         private const float BaseLength = 1.1f;
         private const float BaseWidth = 0.07f;
 
-        public static void Draw(Projectile projectile, Vector3 drawLoc, float travelled)
+        public static void Draw(Projectile projectile, Vector3 drawLoc, float traveled)
         {
             var settings = VCOMod.Settings;
             if (settings == null || !settings.enableVisibleTracers || projectile?.def?.projectile == null)
@@ -33,7 +33,7 @@ namespace VanillaCombatOverhaul
 
             var sizeScale = Mathf.Clamp(settings.tracerScale, 0.5f, 2f);
             // The tail never reaches back past the muzzle.
-            var length = Mathf.Min(BaseLength * sizeScale, travelled);
+            var length = Mathf.Min(BaseLength * sizeScale, traveled);
             if (length < 0.05f)
             {
                 return;
@@ -103,7 +103,26 @@ namespace VanillaCombatOverhaul
             return result;
         }
 
-        private static Material MatFor(Projectile projectile) =>
+        // Color depends only on the damage type, so one material per type; untyped projectiles share the fallback.
+        private static readonly Dictionary<DamageDef, Material> Materials = new Dictionary<DamageDef, Material>();
+        private static Material untypedMaterial;
+
+        private static Material MatFor(Projectile projectile)
+        {
+            var def = projectile.def.projectile.damageDef;
+            if (def == null)
+            {
+                return untypedMaterial ??= MakeMaterial(projectile);
+            }
+            if (!Materials.TryGetValue(def, out var material))
+            {
+                material = MakeMaterial(projectile);
+                Materials[def] = material;
+            }
+            return material;
+        }
+
+        private static Material MakeMaterial(Projectile projectile) =>
             MaterialPool.MatFrom(BaseContent.WhiteTex, ShaderDatabase.MoteGlow, ColorFor(projectile), 0);
     }
 }

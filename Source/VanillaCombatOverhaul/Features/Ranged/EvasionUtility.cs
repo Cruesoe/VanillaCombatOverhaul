@@ -30,8 +30,8 @@ namespace VanillaCombatOverhaul
             var baseFactor = Mathf.Clamp(settings.evasionFactor, 0.01f, 1f);
             var rawMult = Mathf.Pow(baseFactor, excess);
 
-            // The VCO_Evasion stat, which other mods can modify, can raise evasion further.
-            var statReduction = target.GetStatValue(VCO_StatDefOf.VCO_Evasion);
+            // The VCO_Evasion stat, which other mods can modify, can raise evasion further; cached for the tick.
+            var statReduction = target.GetStatValue(VCO_StatDefOf.VCO_Evasion, true, 1);
             if (statReduction > 0f)
             {
                 rawMult = Mathf.Min(rawMult, 1f - statReduction);

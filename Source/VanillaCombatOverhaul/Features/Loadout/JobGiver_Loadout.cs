@@ -16,6 +16,13 @@ namespace VanillaCombatOverhaul
         private static readonly Dictionary<int, int> WeaponRetryAfterTick = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> NextItemCheckTick = new Dictionary<int, int>();
 
+        /// <summary>Forgets retry times, which are ticks of the game they were set in.</summary>
+        public static void ResetState()
+        {
+            WeaponRetryAfterTick.Clear();
+            NextItemCheckTick.Clear();
+        }
+
         /// <summary>Priority under the colonist priority sorter: above scheduled work (9), below urgent food (9.5).</summary>
         public override float GetPriority(Pawn pawn) =>
             LoadoutUtility.Enabled && CanConsider(pawn) ? 9.25f : 0f;
@@ -231,8 +238,7 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            var rangedVerb = candidate.def.Verbs?.Find(v => v.isPrimary && v.LaunchesProjectile)
-                             ?? candidate.def.Verbs?.Find(v => v.LaunchesProjectile);
+            var rangedVerb = WeaponScoreUtility.RangedVerbFor(candidate.def);
             if (rangedVerb == null)
             {
                 return true;

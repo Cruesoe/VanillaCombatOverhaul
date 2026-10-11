@@ -57,7 +57,7 @@ namespace VanillaCombatOverhaul
             }
 
             AssertChanceMatchesCurve(r);
-            AssertRollHonoursChance(r);
+            AssertRollHonorsChance(r);
         }
 
         /// <summary>The combatants' melee skills must match the scenario.</summary>
@@ -197,14 +197,14 @@ namespace VanillaCombatOverhaul
                 : -1;
 
         /// <summary>The success rate of the rolls must track the average chance offered.</summary>
-        private static void AssertRollHonoursChance(MeleeArenaResult r)
+        private static void AssertRollHonorsChance(MeleeArenaResult r)
         {
             var success = r.Counter("parry.success");
             var failed = r.Counter("parry.reject.rollFailed");
             var rolls = success + failed;
             if (rolls == 0)
             {
-                r.Assertions.Add(Check("roll honours chance", false, "no parry rolls were taken"));
+                r.Assertions.Add(Check("roll honors chance", false, "no parry rolls were taken"));
                 return;
             }
 
@@ -217,7 +217,7 @@ namespace VanillaCombatOverhaul
             var tolerance = Math.Max(RateTolerance, SigmaTolerance * sigma);
 
             r.Assertions.Add(Check(
-                "roll honours chance",
+                "roll honors chance",
                 delta <= tolerance,
                 $"{success:N0}/{rolls:N0} = {observedRate:P1} against an offered {offered:P1} "
                 + $"(delta {delta:P1}, allowed {tolerance:P1} = max of {RateTolerance:P1} "

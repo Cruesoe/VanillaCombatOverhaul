@@ -19,6 +19,7 @@ namespace VanillaCombatOverhaul
 
         private readonly ThingFilterUI.UIState weaponFilterState = new ThingFilterUI.UIState();
         private readonly ThingFilterUI.UIState sidearmFilterState = new ThingFilterUI.UIState();
+        private readonly ThingFilter inertSidearmFilter = new ThingFilter();
         private readonly Dictionary<LoadoutItem, string> countBuffers = new Dictionary<LoadoutItem, string>();
         private Tab tab = Tab.Weapons;
         private Vector2 itemScroll;
@@ -99,22 +100,27 @@ namespace VanillaCombatOverhaul
             Widgets.CheckboxLabeled(check, "VCO_Loadout_CarrySidearm".Translate(), ref policy.carrySidearm, byOtherMod);
             TooltipHandler.TipRegion(check, (byOtherMod ? "VCO_Loadout_SidearmsByOtherMod" : "VCO_Loadout_CarrySidearm_Tip").Translate());
             rect.yMin += CheckboxHeight + 4f;
-            if (byOtherMod)
+            if (!byOtherMod && policy.carrySidearm)
             {
-                GUI.color = Color.gray;
-                Widgets.Label(rect, "VCO_Loadout_SidearmsByOtherMod".Translate());
-                GUI.color = Color.white;
+                ThingFilterUI.DoThingFilterConfigWindow(rect, sidearmFilterState, policy.sidearmFilter,
+                    LoadoutUtility.MeleeParentFilter, 16);
                 return;
             }
-            if (!policy.carrySidearm)
-            {
-                GUI.color = Color.gray;
-                Widgets.Label(rect, "VCO_Loadout_SidearmOff".Translate());
-                GUI.color = Color.white;
-                return;
-            }
-            ThingFilterUI.DoThingFilterConfigWindow(rect, sidearmFilterState, policy.sidearmFilter,
+
+            // Shown grayed out and inert: the filter drawn is a copy, so clicks change nothing.
+            var reason = (byOtherMod ? "VCO_Loadout_SidearmsByOtherMod" : "VCO_Loadout_SidearmOff").Translate();
+            var note = new Rect(rect.x, rect.y, rect.width, Text.CalcHeight(reason, rect.width));
+            GUI.color = Color.gray;
+            Widgets.Label(note, reason);
+            rect.yMin = note.yMax + 4f;
+            inertSidearmFilter.CopyAllowancesFrom(policy.sidearmFilter);
+            var wasEnabled = GUI.enabled;
+            GUI.enabled = false;
+            ThingFilterUI.DoThingFilterConfigWindow(rect, sidearmFilterState, inertSidearmFilter,
                 LoadoutUtility.MeleeParentFilter, 16);
+            GUI.enabled = wasEnabled;
+            GUI.color = Color.white;
+            TooltipHandler.TipRegion(rect, reason);
         }
 
         private void DoItems(Rect rect, LoadoutPolicy policy)

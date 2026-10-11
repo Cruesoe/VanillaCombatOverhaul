@@ -110,11 +110,20 @@ namespace VanillaCombatOverhaul
                 pile.stackCount = 5;
                 GenPlace.TryPlaceThing(pile, pawn.Position + IntVec3.South * 2, map, ThingPlaceMode.Near);
                 spawned.Add(pile);
+                // The pawn's own think tree may have checked its items while it still had them, which delays the next check.
+                JobGiver_Loadout.ResetState();
                 var package = new JobGiver_Loadout().TryIssueJobPackage(pawn, default(JobIssueParams));
                 var job = package.Job;
                 results.Add(Check("a colonist short of an item fetches it",
                     job?.def == JobDefOf.TakeCountToInventory && job.targetA.Thing?.def == medicine && job.count == 2,
-                    job == null ? "no job" : $"{job.def.defName} {job.targetA.Thing?.def.defName} x{job.count}"));
+                    job == null
+                        ? $"no job; spawned {pawn.Spawned}, drafted {pawn.Drafted}, downed {pawn.Downed}, mental {pawn.InMentalState}, "
+                          + $"carrying {pawn.carryTracker?.CarriedThing?.def.defName ?? "nothing"}, swapped {comp.SwappedPrimary?.def.defName ?? "none"}, "
+                          + $"has {pawn.inventory.Count(medicine)} of {policy.CountFor(medicine)}, unload {pawn.inventory.UnloadEverything}, "
+                          + $"pile {(pile.Spawned ? pile.Position.ToString() : "gone")} x{pile.stackCount}, reserve {pawn.CanReserve(pile, 10, 1)}, "
+                          + $"reach {pawn.CanReach(pile, Verse.AI.PathEndMode.ClosestTouch, Danger.Deadly)}, forbidden {pile.IsForbidden(pawn)}, "
+                          + $"job {pawn.CurJobDef?.defName}"
+                        : $"{job.def.defName} {job.targetA.Thing?.def.defName} x{job.count}"));
 
                 // Migration of an old apparel-policy weapon filter.
                 var apparel = pawn.outfits.CurrentApparelPolicy;

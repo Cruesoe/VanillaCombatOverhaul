@@ -3,10 +3,10 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>Draws projectiles along a path from the weapon's muzzle instead of the shooter's centre, where vanilla launches them.</summary>
+    /// <summary>Draws projectiles along a path from the weapon's muzzle instead of the shooter's center, where vanilla launches them.</summary>
     public static class MuzzleUtility
     {
-        // Share of the weapon texture's length between its centre and the muzzle.
+        // Share of the weapon texture's length between its center and the muzzle.
         private const float BarrelShare = 0.45f;
 
         /// <summary>Distance in cells from the launch origin to the muzzle, along the line of fire.</summary>
@@ -32,7 +32,7 @@ namespace VanillaCombatOverhaul
             return 0f;
         }
 
-        /// <summary>Moves drawLoc onto the muzzle-to-destination path; returns how far the projectile has travelled from the muzzle.</summary>
+        /// <summary>Moves drawLoc onto the muzzle-to-destination path; returns how far the projectile has traveled from the muzzle.</summary>
         public static float ShiftToMuzzle(Projectile projectile, ref Vector3 drawLoc)
         {
             var origin = ProjectileAccess.Origin(projectile);

@@ -34,7 +34,7 @@ Every system below can be switched on or off in the mod settings (Options > Mod 
 [*]Good shooters partly overcome a weapon's poor accuracy at range and bad weather. Cover, smoke and target size are unchanged.
 [*]A pawn running at speed is harder to hit, and better shooters are less put off by it. Standing still gives no protection, so moving and shooting back are a trade-off.
 [*]Missed shots spread in a cone, so shots from far away miss wider and closing the distance pays off.
-[*]A short glowing streak follows each bullet and arrow, coloured by damage type: yellow bullets, orange arrows, red fire, cyan stun.
+[*]A short glowing streak follows each bullet and arrow, colored by damage type: yellow bullets, orange arrows, red fire, cyan stun.
 [*]Run and gun: drafted colonists with Fire at Will on shoot at enemies while walking where you send them, at 10% worse accuracy and 10% slower walking while they aim and fire (40% with a heavy weapon of 5 kg or more, such as the LMG or minigun). Turn off Fire at Will to move without shooting. Enemies and allies run and gun to their firing positions too. Suppressed pawns, explosives and one-use weapons do not.
 [/list]
 
@@ -48,7 +48,7 @@ Drafted colonists holding a gun get a fire mode button:
 [/table]
 [list]
 [*]Auto picks by distance: Suppression under 12 cells, Short Burst from 12, Precision from 25.
-[*]Modes only apply while drafted, so hunting and undrafted self-defence fire normally. Single-shot and beam weapons offer only Default and Precision; explosives, one-use launchers and abilities are never affected.
+[*]Modes only apply while drafted, so hunting and undrafted self-defense fire normally. Single-shot and beam weapons offer only Default and Precision; explosives, one-use launchers and abilities are never affected.
 [*]Raiders, visitors and allies choose a mode by distance, as Auto does.
 [*]Suppression fire suppresses half again as much as normal fire.
 [/list]
@@ -62,15 +62,15 @@ Drafted colonists holding a gun get a fire mode button:
 [h3]Wounds[/h3]
 [list]
 [*]Bullets wound by stopping power: light rounds fragment into nearby body parts, medium rounds pass through to the parts behind, and heavy rounds mushroom into one deeper wound.
-[*]Arrows either stab inward or slice across a neighbouring outer part.
-[*]Armour that already reduced the hit stops these extra effects.
+[*]Arrows either stab inward or slice across a neighboring outer part.
+[*]Armor that already reduced the hit stops these extra effects.
 [/list]
 
 [h2]Suppression[/h2]
 [list]
 [*]Bullets that land near a pawn, or fly within three cells of them, build suppression. Explosions build twice as much. Shots from the pawn's own side never suppress them.
-[*]How much each round adds depends on its damage and how close it passes. How much a pawn can take depends on how far their mood is above their major mental break threshold, as in Combat Extended: steady nerves (such as Iron-willed) and a good mood hold out longer, while Nervous, Volatile or unhappy pawns are easily suppressed, and a pawn about to break is suppressed by any shot. It takes four times as much to pin a pawn as to suppress them.
-[*]Armour resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmoured one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
+[*]How much each round adds depends on its damage and how close it passes. How much a pawn can take depends on how far their mood is above their major mental break threshold, as in Combat Extended: steady nerves (such as Iron-willed) and a good mood hold out longer, while Nervous, Volatile or unhappy pawns are easily suppressed, and a pawn about to break is suppressed by any shot. It takes four times as much to pin a pawn as to suppress them; both amounts are shown under suppressability on their Stats tab.
+[*]Armor resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmored one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
 [*]Active shield belts, mechanoids and animals are never suppressed.
 [*]A suppressed pawn aims worse and takes longer to aim. An amber icon stays over their head while it lasts, and their inspect panel shows how close they are to being pinned.
 [*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies crawl to nearby cover first, and your colonists drop where they stand. A pinned pawn that moves crawls at 65% speed; order a pinned colonist to move and they crawl there without being pinned down again on the way. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
@@ -78,17 +78,17 @@ Drafted colonists holding a gun get a fire mode button:
 [*]Being shot at hurts mood while it lasts: -5 under fire, -10 suppressed, -15 pinned.
 [/list]
 
-[h2]Armour[/h2]
+[h2]Armor[/h2]
 [list]
-[*]In vanilla, armour that beats a weapon's penetration usually turns the hit into a bruise. Here, armour with 100% to spare stops it outright. Armour that only matches the weapon still does nothing, so a charge rifle still goes through a flak vest.
-[*]Weapons show double their vanilla armour penetration to keep the same weapons beating the same armour.
+[*]In vanilla, armor that beats a weapon's penetration usually turns the hit into a bruise. Here, armor with 100% to spare stops it outright. Armor that only matches the weapon still does nothing, so a charge rifle still goes through a flak vest.
+[*]Weapons show double their vanilla armor penetration to keep the same weapons beating the same armor.
 [/list]
 
 [h2]Clothing and coverage[/h2]
 [list]
 [*]Gloves protect the hands and boots the feet, and both layer properly with other gear.
 [*]Gas masks, visage masks, war masks and veils cover the face as they look; glasses and the array headset sit on the eyes and can be worn with a helmet. Gunlink, airwire and integrator headsets can be worn with a helmet.
-[*]Acid burns count against heat armour and thumps against blunt armour.
+[*]Acid burns count against heat armor and thumps against blunt armor.
 [*]Pawns can arrive wearing glasses or masks under their helmet.
 [*]Switching the coverage changes on or off needs a restart.
 [/list]
@@ -98,7 +98,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 
 [h3]Weapons[/h3]
 [list]
-[*]Choose which weapons a loadout allows. With "Choose primary weapon automatically" on, colonists equip the best allowed weapon they can reach and swap when a clearly better one (10% or more) turns up, judging damage, accuracy, armour penetration, condition and their own skill. Off, they keep what you give them.
+[*]Choose which weapons a loadout allows. With "Choose primary weapon automatically" on, colonists equip the best allowed weapon they can reach and swap when a clearly better one (10% or more) turns up, judging damage, accuracy, armor penetration, condition and their own skill. Off, they keep what you give them.
 [*]Equipping a weapon by hand locks it until you use the colonist's "Allow weapon upgrades" button.
 [*]New games start with Anything, Ranged with sidearm, Melee and Manual weapons loadouts.
 [/list]
@@ -122,13 +122,13 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [h2]New game recommended[/h2]
 [list]
 [*]The mod can be added to an existing save. Each apparel policy's old weapon settings become a loadout with the same name, assigned to the same colonists, and colonists keep their current medicine settings.
-[*]Even so, a new game is recommended. Armour, accuracy, suppression and loadouts change how fights play out, and a colony armed and armoured for vanilla combat will feel it. Starting fresh lets you build around the new rules from the first raid.
+[*]Even so, a new game is recommended. Armor, accuracy, suppression and loadouts change how fights play out, and a colony armed and armored for vanilla combat will feel it. Starting fresh lets you build around the new rules from the first raid.
 [/list]
 
 [h2]Other mods[/h2]
 [list]
 [*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
-[*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is greyed out. Loadouts still handle weapons and supplies.
+[*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is grayed out. Loadouts still handle weapons and supplies.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
 [*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, which control the same systems.
 [/list]

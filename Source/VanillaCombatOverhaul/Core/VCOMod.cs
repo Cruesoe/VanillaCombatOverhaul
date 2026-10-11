@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
@@ -22,6 +23,9 @@ namespace VanillaCombatOverhaul
 
         // Expanded section keys; sections start collapsed.
         private static readonly HashSet<string> ExpandedSections = new HashSet<string>();
+
+        // Requirement key for the options being drawn, while their parent switch is off; null otherwise.
+        private static string requirement;
 
         public VCOMod(ModContentPack content) : base(content)
         {
@@ -101,10 +105,8 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Melee"))
             {
                 Toggle(l, "VCO_Parry", ref s.enableParry);
-                if (s.enableParry)
-                {
-                    Toggle(l, "VCO_Counter", ref s.enableCounterAttack);
-                }
+                Toggle(l, "VCO_Counter", ref s.enableCounterAttack,
+                       requirementKey: s.enableParry ? null : "VCO_RequiresParry");
                 Toggle(l, "VCO_PointBlank", ref s.enablePointBlank);
             }
 
@@ -116,10 +118,8 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Damage"))
             {
                 Toggle(l, "VCO_DirectionalDamage", ref s.enableDirectionalDamage, restartRequired: true);
-                if (s.enableDirectionalDamage)
-                {
-                    Toggle(l, "VCO_MeleeFlanking", ref s.enableMeleeFlanking);
-                }
+                Toggle(l, "VCO_MeleeFlanking", ref s.enableMeleeFlanking,
+                       requirementKey: s.enableDirectionalDamage ? null : "VCO_RequiresDirectionalDamage");
                 Toggle(l, "VCO_HeightTargeting", ref s.enableHeightTargeting);
             }
 
@@ -149,22 +149,19 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Suppression"))
             {
                 Toggle(l, "VCO_Suppression", ref s.enableSuppression);
-                if (s.enableSuppression)
+                DependentOptions(s.enableSuppression, "VCO_RequiresSuppression", () =>
                 {
                     Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
                     Toggle(l, "VCO_SuppressionMood", ref s.enableSuppressionMood);
                     s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
                                                    0.25f, 3f, 0.05f, "0.00");
-                }
+                });
             }
 
             if (Section(l, "VCO_Section_FireModes"))
             {
                 Toggle(l, "VCO_FireModes", ref s.enableFireModes);
-                if (s.enableFireModes)
-                {
-                    DrawFireModes(l, s);
-                }
+                DependentOptions(s.enableFireModes, "VCO_RequiresFireModes", () => DrawFireModes(l, s));
             }
         }
 
@@ -185,10 +182,13 @@ namespace VanillaCombatOverhaul
             DrawTuning(l, FireMode.Suppression, s.suppressionTuning);
 
             l.Gap(6f);
-            if (l.ButtonText("VCO_FireModeReset".Translate()))
+            var wasEnabled = GUI.enabled;
+            GUI.enabled = requirement == null;
+            if (l.ButtonText("VCO_FireModeReset".Translate()) && requirement == null)
             {
                 s.ResetFireModes();
             }
+            GUI.enabled = wasEnabled;
         }
 
         private static void DrawTuning(Listing_Standard l, FireMode mode, FireModeTuning t)
@@ -271,7 +271,7 @@ namespace VanillaCombatOverhaul
             return expanded;
         }
 
-        /// <summary>A labelled checkbox with the key plus "_Tip" as its tooltip.</summary>
+        /// <summary>A labeled checkbox with the key plus "_Tip" as its tooltip.</summary>
         private static void Toggle(Listing_Standard l, string key, ref bool value,
                                    bool restartRequired = false, string requirementKey = null)
         {
@@ -284,7 +284,8 @@ namespace VanillaCombatOverhaul
                 tip += "\n\n" + "VCO_RestartTag_Tip".Translate();
             }
 
-            // A requirement greys the option out and makes it inert.
+            // A requirement grays the option out and makes it inert.
+            requirementKey ??= requirement;
             var wasEnabled = GUI.enabled;
             if (requirementKey != null)
             {
@@ -304,14 +305,36 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>A labelled slider snapped to <paramref name="step"/>; the label takes the value as {0}.</summary>
+        /// <summary>A labeled slider snapped to <paramref name="step"/>; the label takes the value as {0}. Inert while a requirement is set.</summary>
         private static float Slider(Listing_Standard l, string key, float value, float min, float max,
                                     float step, string format)
         {
             var label = key.Translate(value.ToString(format)).ToString();
             var tip = (key + "_Tip").Translate().ToString();
+            var wasEnabled = GUI.enabled;
+            if (requirement != null)
+            {
+                tip += "\n\n" + requirement.Translate();
+                GUI.enabled = false;
+            }
             var result = l.SliderLabeled(label, value, min, max, 0.6f, tip);
-            return Mathf.Clamp(GenMath.RoundTo(result, step), min, max);
+            GUI.enabled = wasEnabled;
+            return requirement != null ? value : Mathf.Clamp(GenMath.RoundTo(result, step), min, max);
+        }
+
+        /// <summary>Draws options that depend on a switch, grayed out and inert with the requirement in their tooltip while it is off.</summary>
+        private static void DependentOptions(bool available, string requirementKey, Action draw)
+        {
+            var previous = requirement;
+            requirement = available ? previous : requirementKey;
+            try
+            {
+                draw();
+            }
+            finally
+            {
+                requirement = previous;
+            }
         }
 
     }

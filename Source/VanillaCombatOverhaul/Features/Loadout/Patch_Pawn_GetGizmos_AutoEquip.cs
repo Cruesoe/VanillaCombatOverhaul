@@ -1,23 +1,9 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using RimWorld;
 using Verse;
-using Verse.AI;
 
 namespace VanillaCombatOverhaul
 {
-    [HarmonyPatch(typeof(JobDriver_Equip), nameof(JobDriver_Equip.Notify_Starting))]
-    public static class Patch_JobDriverEquip_NotifyStarting
-    {
-        public static void Postfix(JobDriver_Equip __instance)
-        {
-            if (__instance.job?.playerForced == true && __instance.job.targetA.Thing != null)
-            {
-                AutoEquipPolicyComponent.Current?.ForceWeapon(__instance.pawn, __instance.job.targetA.Thing);
-            }
-        }
-    }
-
     [HarmonyPatch(typeof(Pawn), nameof(Pawn.GetGizmos))]
     public static class Patch_Pawn_GetGizmos_AutoEquip
     {

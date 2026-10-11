@@ -37,6 +37,14 @@ namespace VanillaCombatOverhaul
 
         public static bool Enabled => VCOMod.Settings?.enablePointBlank ?? false;
 
+        public static void ResetState()
+        {
+            burstingVerbs.Clear();
+            startingVerb = null;
+            meleeAttacker = null;
+            meleeTarget = null;
+        }
+
         public static float ChanceFor(int shootingLevel)
         {
             if (shootingLevel < 0)

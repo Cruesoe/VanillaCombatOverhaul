@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <loadFolders>
-  <!-- Version-specific content lives in numbered folders; shared content in "/".
-       Adding 1.7 later means adding a block here, not restructuring the mod. -->
   <v1.6>
     <li>/</li>
     <li>1.6</li>

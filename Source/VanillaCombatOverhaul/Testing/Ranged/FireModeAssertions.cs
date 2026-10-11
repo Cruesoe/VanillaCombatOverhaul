@@ -14,7 +14,7 @@ namespace VanillaCombatOverhaul
         private const string BurstWeapon = "Gun_AssaultRifle";
         private const string SingleShotWeapon = "Gun_BoltActionRifle";
         private const int ShooterSkill = 10;
-        // The arena puts the shooter two cells west of centre, so this is 20 cells apart.
+        // The arena puts the shooter two cells west of center, so this is 20 cells apart.
         private const int TargetOffset = 18;
 
         public static List<AssertionResult> SelfTests()
