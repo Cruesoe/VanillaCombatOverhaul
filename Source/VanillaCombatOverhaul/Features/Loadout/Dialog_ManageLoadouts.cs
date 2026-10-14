@@ -225,7 +225,12 @@ namespace VanillaCombatOverhaul
             {
                 return "VCO_Loadout_Ammunition".Translate();
             }
-            return group.label.NullOrEmpty() ? group.defName : group.LabelCap.ToString();
+            if (!group.label.NullOrEmpty())
+            {
+                return group.LabelCap.ToString();
+            }
+            // Groups made in code without a label (Dubs Mint Menus' meal and drug stock) take their default item's category.
+            return group.DefaultThingDef?.FirstThingCategory?.LabelCap.ToString() ?? group.defName;
         }
 
         /// <summary>Draws one carried item; returns true when its remove button was clicked.</summary>
