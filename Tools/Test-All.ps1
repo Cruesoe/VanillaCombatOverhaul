@@ -55,7 +55,7 @@ foreach ($key in $defined.Keys) {
 }
 
 # --- XML gating -----------------------------------------------------------------
-Get-ChildItem (Join-Path $repo '1.6') -Recurse -Filter *.xml | ForEach-Object {
+Get-ChildItem (Join-Path $repo 'Common') -Recurse -Filter *.xml | ForEach-Object {
     $text = [System.IO.File]::ReadAllText($_.FullName)
     if ($text -match 'PatchOperationFindMod') {
         $failures.Add("$($_.Name): PatchOperationFindMod matches display names; gate by def (PatchOperationConditional) or package ID")
@@ -63,7 +63,7 @@ Get-ChildItem (Join-Path $repo '1.6') -Recurse -Filter *.xml | ForEach-Object {
 }
 
 # --- textures -------------------------------------------------------------------
-$textureRoots = @('Textures', '1.6\Textures') | ForEach-Object { Join-Path $repo $_ } | Where-Object { Test-Path $_ }
+$textureRoots = @('Textures', 'Common\Textures') | ForEach-Object { Join-Path $repo $_ } | Where-Object { Test-Path $_ }
 foreach ($m in [regex]::Matches($allCode, '(?:ContentFinder<Texture2D>\.Get|MaterialPool\.MatFrom)\("([^"]+)"')) {
     $path = $m.Groups[1].Value
     if ($path -notmatch '/VCO_') { continue }
