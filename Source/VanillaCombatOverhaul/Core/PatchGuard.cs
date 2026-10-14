@@ -4,12 +4,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// A Harmony transpiler that fails to find its target emits the original method and
-    /// reports no error, so the feature silently stops working after a RimWorld update.
-    /// Every transpiler in this mod declares a guard and reports its splices; the guards
-    /// are checked once after patching so a broken patch is loud instead of invisible.
-    /// </summary>
+    /// <summary>Expected splice count for a transpiler; checked after patching so a transpiler that finds no target logs an error.</summary>
     public sealed class TranspilerGuard
     {
         public readonly string Id;
@@ -33,10 +28,7 @@ namespace VanillaCombatOverhaul
         private static readonly Dictionary<string, TranspilerGuard> Guards =
             new Dictionary<string, TranspilerGuard>();
 
-        /// <summary>
-        /// Declares an expected number of IL splices for a named patch. Call this from the
-        /// transpiler's declaring type so the guard exists before Harmony runs the patch.
-        /// </summary>
+        /// <summary>Declares the expected splice count for a named transpiler, from a static field of its patch class.</summary>
         public static TranspilerGuard Declare(string id, int expected = 1)
         {
             if (Guards.TryGetValue(id, out var existing))
@@ -48,10 +40,7 @@ namespace VanillaCombatOverhaul
             return guard;
         }
 
-        /// <summary>
-        /// Reports any transpiler that did not splice the expected number of times.
-        /// Harmony applies transpilers during PatchAll, so this is accurate immediately after.
-        /// </summary>
+        /// <summary>Logs an error for each transpiler that did not splice the expected number of times; call after PatchAll.</summary>
         public static void VerifyAll()
         {
             var broken = Guards.Values.Where(g => !g.Satisfied).ToList();

@@ -3,13 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// A pawn's parry aptitude is their melee ability.
-    ///
-    /// Deliberately read from the vanilla MeleeHitChance stat rather than the Melee skill
-    /// record, so traits, hediffs, genes, bionics, age and anything a mod adds all feed in
-    /// without knowing this mod exists.
-    /// </summary>
+    /// <summary>Sets parry aptitude to the pawn's MeleeHitChance, so everything that modifies that stat applies.</summary>
     public class StatPart_ParryAptitudeFromMelee : StatPart
     {
         public override void TransformValue(StatRequest req, ref float val)

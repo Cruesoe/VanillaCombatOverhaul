@@ -87,10 +87,7 @@ namespace VanillaCombatOverhaul
                     return result;
                 }
 
-                // Checked before any mechanic is measured, so a scenario that could not set
-                // itself up says exactly that. Without this the same two failures read as
-                // "high skill did not improve the weapon factor" and "a moving target had no
-                // evasion" -- both of which point at the mod rather than at the harness.
+                // Setup checks first, so a scenario that could not set itself up says so.
                 var pinned = shooter.skills?.GetSkill(SkillDefOf.Shooting);
                 result.Assertions.Add(new AssertionResult
                 {
@@ -153,19 +150,10 @@ namespace VanillaCombatOverhaul
             return def?.IsWeapon ?? false ? def : null;
         }
 
-        // Matches the melee arena. A generated pawn can have Shooting disabled by its
-        // backstory or shifted by an aptitude gene, so unsuitable ones are discarded.
+        // Generated pawns with Shooting disabled or shifted by aptitude are discarded.
         private const int GenerationAttempts = 40;
 
-        /// <summary>
-        /// Assigning SkillRecord.Level is not enough on its own.
-        ///
-        /// The getter adds an aptitude offset on top of the stored value, and on a pawn whose
-        /// backstory disables Shooting the setter does nothing at all. The melee arena learned
-        /// this and reads the value back; this one did not, which is how a scenario asking for
-        /// skill 20 could quietly run at whatever the generator felt like and report that high
-        /// skill had failed to improve anything.
-        /// </summary>
+        /// <summary>Sets Shooting and reads it back, since aptitudes and disabled skills change the result.</summary>
         private static bool TryPinShootingSkill(Pawn pawn, int level)
         {
             var shooting = pawn.skills?.GetSkill(SkillDefOf.Shooting);
@@ -179,11 +167,7 @@ namespace VanillaCombatOverhaul
             return shooting.Level == level;
         }
 
-        /// <summary>
-        /// A pawn stripped of everything that would move ShootingAccuracyPawn or MoveSpeed
-        /// around between runs -- hediffs, traits and apparel -- so the only variables left
-        /// are the ones the spec sets.
-        /// </summary>
+        /// <summary>A colonist with hediffs, traits and apparel removed.</summary>
         private static Pawn MakeCleanPawn(int shootingSkill, bool requireSkill)
         {
             for (var attempt = 0; attempt < GenerationAttempts; attempt++)
@@ -237,14 +221,7 @@ namespace VanillaCombatOverhaul
             return pawn;
         }
 
-        /// <summary>
-        /// Gets the target genuinely moving, trying each direction until one takes.
-        ///
-        /// A single hardcoded destination can be unreachable -- water, rock, the map edge --
-        /// in which case the pawn just stands there, evasion reads 1.0, and the scenario
-        /// reports that a moving target had no evasion. That is a harness failure wearing a
-        /// mechanic's clothes. The caller checks IsMoving and says so plainly instead.
-        /// </summary>
+        /// <summary>Starts the target moving, trying each direction until one is reachable.</summary>
         private static void StartMoving(Pawn pawn, Map map, IntVec3 from)
         {
             foreach (var dir in new[] { IntVec3.North, IntVec3.South, IntVec3.East, IntVec3.West })

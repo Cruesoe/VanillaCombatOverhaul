@@ -7,10 +7,7 @@ namespace VanillaCombatOverhaul
     {
         public const int TypeCount = 6;
 
-        /// <summary>
-        /// Scales wild-miss radius with distance. Types 0–5 are Vanilla Combat Reloaded's
-        /// six distributions; type 0 is the default and the one VCO originally shipped.
-        /// </summary>
+        /// <summary>Scales the wild-miss radius with distance, using one of Vanilla Combat Reloaded's six distributions.</summary>
         public static float AdjustMissRadius(float vanillaRadius, IntVec3 dest, IntVec3 source,
                                              float arcDegrees, int arcType = 0)
         {

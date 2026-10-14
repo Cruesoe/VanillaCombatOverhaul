@@ -6,22 +6,17 @@
 *.userosscache
 *.sln.docstates
 .vs/
+.idea/
 MigrationBackup/
-
-# The compiled mod assembly is a build artifact, not source.
-# Remove this line if you prefer to commit release binaries.
 1.6/Assemblies/*.dll
 1.6/Assemblies/*.pdb
 
-# Never ship editor or backup cruft inside a loadable mod folder.
+# Editor and backup files
 *.bak
 *.orig
 *.tmp
 
-# Steam upload staging, produced by Tools/package-steam.ps1
-Dist/
-
-# Local clone of Vanilla Combat Reloaded, kept for reference only. Not ours to redistribute.
+# Local reference clone of Vanilla Combat Reloaded
 _vcr_ref/
 
 # Local build files and agent notes, kept on disk but never tracked
@@ -30,3 +25,6 @@ Directory.Build.targets
 *.slnx
 AGENTS.md
 CLAUDE.md
+
+# Raw screenshots used for preview art
+Screenshots/

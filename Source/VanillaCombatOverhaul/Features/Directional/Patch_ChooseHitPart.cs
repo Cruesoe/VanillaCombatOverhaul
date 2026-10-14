@@ -6,24 +6,13 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Redirects hit location to the side an attack arrives from.
-    ///
-    /// Vanilla Combat Reloaded achieved this by replacing the workerClass on the Bullet and
-    /// Arrow DamageDefs and transpiling the five melee workers. Replacing a workerClass claims
-    /// ownership of a vanilla def, so any other mod wanting the same def loses -- and both
-    /// Bullet and Arrow turn out to use DamageWorker_AddInjury directly, which means a postfix
-    /// on the base method covers them with no def edit at all.
-    ///
-    /// Six methods, six postfixes, zero defs rewritten and no IL rewritten.
-    /// </summary>
+    /// <summary>Redirects hit location to the side an attack arrives from, on every vanilla ChooseHitPart.</summary>
     [HarmonyPatch]
     public static class Patch_ChooseHitPart
     {
         public static IEnumerable<MethodBase> TargetMethods()
         {
-            // DamageWorker_AddInjury covers Bullet, Arrow, Bomb, Burn and everything else that
-            // does not override; the five subclasses below each provide their own.
+            // The base covers every worker that does not override; the subclasses below do.
             yield return Target(typeof(DamageWorker_AddInjury));
             yield return Target(typeof(DamageWorker_Bite));
             yield return Target(typeof(DamageWorker_Blunt));
@@ -46,8 +35,7 @@ namespace VanillaCombatOverhaul
             {
                 __result = directional;
             }
-            // Null means "no opinion" -- vanilla's choice stands, so this can never turn a
-            // valid hit part into a null one.
+            // Null keeps vanilla's choice.
         }
     }
 }

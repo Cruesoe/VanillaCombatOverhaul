@@ -4,23 +4,12 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// Vanilla Combat Reloaded's leftover stretch: the armor roll is unchanged, both of its
-    /// inputs are scaled so leftover armor becomes a hard stop at 100% instead of 200%.
-    ///
-    /// Vanilla always-blocks when leftover * 0.5 &gt;= 1, i.e. leftover &gt;= 200%. Stretching
-    /// leftover by <c>armorScale</c> (default 2) moves that wall to 200 / scale percent.
-    /// Armor that merely matches AP still does nothing: leftover stays zero.
-    ///
-    /// A StatPart on armor rating cannot do this. Leftover is rating minus AP, and scaling
-    /// only one side would create protection from a match. Both numbers have to move together
-    /// at the point vanilla subtracts them, which is <see cref="ArmorUtility"/>.ApplyArmor.
+    /// Vanilla Combat Reloaded's leftover stretch: both ApplyArmor inputs are multiplied by
+    /// <c>armorScale</c>, so vanilla's always-block at 200% leftover moves to 200 / scale percent.
     /// </summary>
     public static class AdvancedArmorUtility
     {
-        /// <summary>
-        /// Vanilla <see cref="ArmorUtility.MaxArmorRating"/>: leftover at or above this always
-        /// deflects, because leftover * <see cref="VanillaDeflectThresholdFactor"/> reaches 1.
-        /// </summary>
+        /// <summary>Vanilla <see cref="ArmorUtility.MaxArmorRating"/>: leftover at or above this always deflects.</summary>
         public const float VanillaAlwaysBlockLeftover = 2f;
 
         /// <summary>Vanilla <see cref="ArmorUtility.DeflectThresholdFactor"/>.</summary>
@@ -35,18 +24,11 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// Displayed leftover at which a hit always bounces, for the given stretch.
-        /// Default stretch 2 → 100%. Stretch 1 is vanilla's 200%.
-        /// </summary>
+        /// <summary>Displayed leftover at which a hit always bounces, for the given stretch.</summary>
         public static float AlwaysBlockDisplayedLeftover(float stretch) =>
             stretch > 0f ? VanillaAlwaysBlockLeftover / stretch : VanillaAlwaysBlockLeftover;
 
-        /// <summary>
-        /// Leftover vanilla will roll against after stretching both inputs.
-        /// <paramref name="displayedPenetration"/> is AP after penetrationScale, which is what
-        /// the weapon inspect shows and what DamageInfo carries into ApplyArmor.
-        /// </summary>
+        /// <summary>Leftover vanilla rolls against after stretching; <paramref name="displayedPenetration"/> is AP after penetrationScale.</summary>
         public static float StretchedLeftover(float rating, float displayedPenetration, float stretch) =>
             Mathf.Max(stretch * (rating - displayedPenetration), 0f);
 
@@ -61,11 +43,7 @@ namespace VanillaCombatOverhaul
             return Mathf.Max(0f, atLeastHalf - BlockChance(leftover));
         }
 
-        /// <summary>
-        /// Multiplies both ApplyArmor inputs by the leftover stretch. Harmony's prefix can
-        /// take <c>ref</c> on by-value arguments, so each layer is scaled from the caller's
-        /// numbers once; AP does not compound across apparel.
-        /// </summary>
+        /// <summary>Multiplies both ApplyArmor inputs by the stretch, once per apparel layer.</summary>
         public static void ScaleLeftoverInputs(ref float armorPenetration, ref float armorRating)
         {
             var settings = VCOMod.Settings;
@@ -92,12 +70,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        /// <summary>
-        /// Inspect and DamageInfo AP. ApplyArmor then stretches this together with rating, so
-        /// the number on the weapon is the number subtracted from armor before the leftover
-        /// wall. Reloaded 1.6 targeted a GetArmorPenetration overload that 1.6 no longer has;
-        /// this is the live (Thing, StringBuilder) getter plus the melee equivalents.
-        /// </summary>
+        /// <summary>AP shown on weapons and carried by DamageInfo, multiplied by penetrationScale.</summary>
         public static float ScaleDisplayedPenetration(float armorPenetration)
         {
             var settings = VCOMod.Settings;

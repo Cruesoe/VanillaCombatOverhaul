@@ -10,10 +10,10 @@ namespace VanillaCombatOverhaul
         public static List<AssertionResult> SelfTests()
         {
             var results = new List<AssertionResult>();
-            var priorityMethod = typeof(JobGiver_AutoEquipPrimary).GetMethod(
-                nameof(JobGiver_AutoEquipPrimary.GetPriority));
+            var priorityMethod = typeof(JobGiver_Loadout).GetMethod(
+                nameof(JobGiver_Loadout.GetPriority));
             results.Add(Check("automatic weapon job supplies sorter priority",
-                priorityMethod?.DeclaringType == typeof(JobGiver_AutoEquipPrimary),
+                priorityMethod?.DeclaringType == typeof(JobGiver_Loadout),
                 priorityMethod?.DeclaringType?.Name ?? "missing"));
 
             var baseline = WeaponScoreUtility.RangedScore(10f, 1, 2f, 0.5f, 0f);

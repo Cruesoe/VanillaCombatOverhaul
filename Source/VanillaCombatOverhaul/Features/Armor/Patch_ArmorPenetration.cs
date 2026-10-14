@@ -9,11 +9,8 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>
-    /// Scales AP at the getters that fill both the inspect card and DamageInfo.
-    ///
-    /// <see cref="VerbProperties.AdjustedArmorPenetration(Verb, Pawn)"/> is not patched: it
-    /// only forwards to the (Tool, Pawn, Thing, HediffComp_VerbGiver) overload, and a postfix
-    /// on both would apply penetrationScale twice.
+    /// Scales AP at the getters that fill both the inspect card and DamageInfo. The (Verb, Pawn)
+    /// overload is not patched because it forwards to a patched one.
     /// </summary>
     [HarmonyPatch]
     public static class Patch_ArmorPenetration

@@ -4,10 +4,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Evasion only exists while the pawn is moving. The stat shows the current reduction;
-    /// stationary pawns read zero.
-    /// </summary>
+    /// <summary>Evasion from current movement; zero while stationary.</summary>
     public class StatPart_EvasionFromMovement : StatPart
     {
         public override void TransformValue(StatRequest req, ref float val)

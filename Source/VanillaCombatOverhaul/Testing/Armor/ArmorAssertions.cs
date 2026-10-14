@@ -5,10 +5,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Direct checks of the leftover-stretch maths. No pawns, no map: the interesting claims
-    /// are about chances derived from rating and AP, which are pure numbers.
-    /// </summary>
+    /// <summary>Checks of the leftover-stretch maths, without pawns or a map.</summary>
     public static class ArmorAssertions
     {
         private const double Tolerance = 0.0005;

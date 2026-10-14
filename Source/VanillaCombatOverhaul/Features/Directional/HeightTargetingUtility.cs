@@ -28,34 +28,7 @@ namespace VanillaCombatOverhaul
         private static readonly Texture2D IconTop =
             ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimHead");
 
-        static HeightTargetingUtility()
-        {
-            foreach (var def in DefDatabase<ThingDef>.AllDefs)
-            {
-                if (def.race == null || (!def.race.Humanlike && !def.race.ToolUser))
-                {
-                    continue;
-                }
-                if (def.HasComp(typeof(CompHeightTarget)))
-                {
-                    continue;
-                }
-                if (def.comps == null)
-                {
-                    def.comps = new List<CompProperties>();
-                }
-                def.comps.Add(new CompProperties_HeightTarget());
-            }
-        }
-
-        /// <summary>
-        /// The height band this attacker is aiming for, or Undefined for "no opinion".
-        ///
-        /// Runs once per damage instance. Fetching the comp first answers the "has one at all"
-        /// question that CanUse's HasComp check used to ask separately -- both are linear scans
-        /// of a comp list -- and a pawn that is not aiming anywhere leaves before the verb
-        /// lookups that CanUse does.
-        /// </summary>
+        /// <summary>The height band this attacker is aiming for, or Undefined.</summary>
         public static BodyPartHeight GetTargetHeight(Thing instigator)
         {
             var comp = instigator?.TryGetComp<CompHeightTarget>();
@@ -75,11 +48,6 @@ namespace VanillaCombatOverhaul
             if (instigator is Pawn pawn
                 && (!MeetsShootingRequirement(pawn)
                     || (pawn.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true)))
-            {
-                return false;
-            }
-            if (instigator is Building_Turret turret
-                && (turret.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true))
             {
                 return false;
             }
@@ -147,11 +115,7 @@ namespace VanillaCombatOverhaul
                 comp = comp
             };
 
-        /// <summary>
-        /// Chance the targeted height band actually lands, given leftover coverage on that
-        /// side. Skill pushes the chance up when advanced accuracy is on, matching Reloaded's
-        /// <c>statpush</c>. A zero denominator returns 0 rather than NaN.
-        /// </summary>
+        /// <summary>Chance the targeted height band lands, from its share of coverage on that side, raised by skill with advanced accuracy on.</summary>
         public static float ChanceToLand(Thing caster, Pawn target, BodyPartGroupDef side,
                                          BodyPartHeight height, DamageDef damage, bool melee)
         {
@@ -187,12 +151,7 @@ namespace VanillaCombatOverhaul
             return Mathf.Clamp01(1f - Mathf.Pow(1f - relative, skill));
         }
 
-        /// <summary>
-        /// Weighted coverage on one side at one height. Kept as the reference implementation
-        /// the arena checks <see cref="CoveragePair"/> against; the live path uses the fused
-        /// version. The group filter is inlined rather than a LINQ Where because this runs
-        /// once per damage instance and the closure alone cost more than the arithmetic.
-        /// </summary>
+        /// <summary>Weighted coverage on one side at one height; the reference the tests check <see cref="CoveragePair"/> against.</summary>
         public static float Coverage(Pawn target, BodyPartGroupDef side, DamageDef damage,
                                      BodyPartHeight height)
         {
@@ -208,14 +167,7 @@ namespace VanillaCombatOverhaul
             return total;
         }
 
-        /// <summary>
-        /// Both sums ChanceToLand needs, from a single walk of the body.
-        ///
-        /// The two Coverage calls it replaces differ only in their height filter, and every
-        /// part carries its own height, so one pass over the unfiltered set can total both.
-        /// Measured at roughly 1.5us against 0.45us for the pair, on a path that runs on every
-        /// damage instance in the game. HeightAssertions checks the two agree on real bodies.
-        /// </summary>
+        /// <summary>Coverage at the height and at any height on one side, from a single walk of the body.</summary>
         public static void CoveragePair(Pawn target, BodyPartGroupDef side, DamageDef damage,
                                         BodyPartHeight height, out float atHeight, out float anyHeight)
         {

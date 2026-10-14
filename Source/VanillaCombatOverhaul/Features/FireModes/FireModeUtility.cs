@@ -30,10 +30,7 @@ namespace VanillaCombatOverhaul
         private static readonly Texture2D IconSuppression =
             ContentFinder<Texture2D>.Get("UI/Commands/VCO_FireSuppression");
 
-        // Per-def answers to the reflection-backed checks IsModeVerb needs (IsMeleeAttack,
-        // CausesExplosion, IsRangedWeapon). They run for every AI target score and every aim
-        // and cooldown stat read, and defs do not change after load. Built once here and only
-        // read afterwards, so no locking; anything created later is checked directly.
+        // IsModeVerb's checks cached per def at startup; verbs created later are checked directly.
         private static readonly Dictionary<VerbProperties, bool> ModeVerbProps =
             new Dictionary<VerbProperties, bool>();
         private static readonly Dictionary<ThingDef, bool> RangedWeaponDefs =
@@ -55,20 +52,6 @@ namespace VanillaCombatOverhaul
                         NoteVerbProps(props);
                     }
                 }
-
-                if (def.race == null || (!def.race.Humanlike && !def.race.ToolUser))
-                {
-                    continue;
-                }
-                if (def.HasComp(typeof(CompFireMode)))
-                {
-                    continue;
-                }
-                if (def.comps == null)
-                {
-                    def.comps = new List<CompProperties>();
-                }
-                def.comps.Add(new CompProperties_FireMode());
             }
         }
 
@@ -93,18 +76,13 @@ namespace VanillaCombatOverhaul
 
         public static Verb PrimaryVerb(Pawn pawn) => pawn?.equipment?.PrimaryEq?.PrimaryVerb;
 
-        /// <summary>
-        /// Whether a mode can apply to this verb at all: a ranged verb of the pawn's own
-        /// primary weapon. Abilities, apparel verbs, melee, explosives and one-use launchers
-        /// always fire as Default.
-        /// </summary>
+        /// <summary>True for a non-explosive ranged verb of the pawn's primary weapon; everything else fires as Default.</summary>
         public static bool IsModeVerb(Pawn pawn, Verb verb)
         {
             if (pawn == null || verb?.verbProps == null)
             {
                 return false;
             }
-            // Cheapest first: most verbs asked about are not the primary weapon's.
             var primary = pawn.equipment?.Primary;
             if (primary == null || verb.EquipmentSource != primary || verb is Verb_ShootOneUse)
             {
@@ -113,10 +91,7 @@ namespace VanillaCombatOverhaul
             return IsModeVerbProps(verb.verbProps) && IsRangedWeapon(primary.def);
         }
 
-        /// <summary>
-        /// Whether any mode could apply to this pawn right now, before looking at its verb:
-        /// colonists only while drafted, everyone else only with NPC fire modes on.
-        /// </summary>
+        /// <summary>Colonists while drafted; everyone else when NPC fire modes are on.</summary>
         public static bool ModesApplyTo(Pawn pawn)
         {
             var settings = VCOMod.Settings;
@@ -127,11 +102,7 @@ namespace VanillaCombatOverhaul
             return pawn.Faction == Faction.OfPlayer ? pawn.Drafted : settings.fireModesForNpcs;
         }
 
-        /// <summary>
-        /// Burst modes need a burst to change. Beam weapons are excluded too: their
-        /// WarmupComplete does not call the base method, and they size the beam path from the
-        /// shot count in more than one place.
-        /// </summary>
+        /// <summary>Burst modes need a burst; beam weapons are excluded as they size the beam from the shot count elsewhere.</summary>
         public static bool CanChangeBurst(Verb verb, int baseBurst) =>
             baseBurst > 1 && !(verb is Verb_ShootBeam);
 
@@ -150,19 +121,11 @@ namespace VanillaCombatOverhaul
         }
 
         /// <summary>
-        /// The mode in force for this pawn firing this verb, or Default.
-        ///
-        /// Colonists use their mode only while drafted, so hunting and undrafted self-defence
-        /// fire normally. Everyone else picks by distance when NPC fire modes are on.
-        /// <paramref name="distance"/> lets auto mode answer for a target it has not started
-        /// shooting at yet, which is what a hover tooltip needs.
-        /// <paramref name="baseBurst"/> is passed by the burst patch, which cannot read
-        /// BurstShotCount again without re-entering itself.
+        /// The mode in force for this pawn firing this verb, or Default. <paramref name="distance"/> lets
+        /// Auto answer for a target not yet engaged; <paramref name="baseBurst"/> avoids re-reading BurstShotCount.
         /// </summary>
         public static FireMode ActiveMode(Pawn pawn, Verb verb, float? distance = null, int baseBurst = -1)
         {
-            // The draft and NPC gates come first: they are the cheapest checks and turn away
-            // most calls, since an undrafted colonist never has a mode.
             if (!ModesApplyTo(pawn) || !IsModeVerb(pawn, verb))
             {
                 return FireMode.Default;
@@ -215,10 +178,7 @@ namespace VanillaCombatOverhaul
 
         public static FireModeTuning TuningFor(FireMode mode) => VCOMod.Settings?.TuningFor(mode);
 
-        /// <summary>
-        /// hit^(1/accuracy): shooting as if from distance/accuracy. Accuracy above 1 raises the
-        /// factor and below 1 lowers it; certainty stays certain and vanilla's floor holds.
-        /// </summary>
+        /// <summary>hit^(1/accuracy), shooting as if from distance/accuracy; certainty and vanilla's floor hold.</summary>
         public static float AdjustHitFactor(float factor, float accuracy)
         {
             if (accuracy <= 0f || Mathf.Approximately(accuracy, 1f) || factor >= 1f)
@@ -228,10 +188,7 @@ namespace VanillaCombatOverhaul
             return Mathf.Max(Mathf.Pow(Mathf.Clamp01(factor), 1f / accuracy), MinShooterFactor);
         }
 
-        /// <summary>
-        /// Scales a burst, rounding half up, then limits the change to maxChange shots either
-        /// way. Single shots are left alone.
-        /// </summary>
+        /// <summary>Scales a burst (rounding half up), limited to maxChange shots either way; single shots are unchanged.</summary>
         public static int AdjustBurst(int baseBurst, float factor, int maxChange)
         {
             if (baseBurst <= 1)

@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Patch>
-  <!-- Vanilla Combat Reloaded's coverage and layering pack, settings-gated.
-       WorkerClass swaps and the flanking seeder are omitted: VCO already seeds
-       directional groups and intercepts wounds in C#. -->
+  <!-- Vanilla Combat Reloaded's coverage and layering pack, settings-gated. DLC items are matched by def, so each patch is skipped when its DLC or item is absent. -->
 
   <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
     <setting>ThumpBluntPatch</setting>
@@ -14,27 +12,20 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>AcidHeatPatch</setting>
-      <match Class="PatchOperationReplace">
-        <xpath>Defs/DamageDef[defName="AcidBurn"]/armorCategory</xpath>
-        <value>
-          <armorCategory>Heat</armorCategory>
-        </value>
-      </match>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>AcidHeatPatch</setting>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/DamageDef[defName="AcidBurn"]/armorCategory</xpath>
+      <value>
+        <armorCategory>Heat</armorCategory>
+      </value>
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>HeadsetPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>HeadsetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_IntegratorHeadset"]/apparel</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/ThingDef[defName="Apparel_IntegratorHeadset"]/apparel</xpath>
         <value>
@@ -46,12 +37,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>HeadsetPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>HeadsetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_AirwireHeadset"]/apparel/layers</xpath>
       <match Class="PatchOperationReplace">
         <xpath>Defs/ThingDef[defName="Apparel_AirwireHeadset"]/apparel/layers</xpath>
         <value>
@@ -63,12 +52,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Royalty</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>HeadsetPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>HeadsetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_Gunlink"]/apparel</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/ThingDef[defName="Apparel_Gunlink"]/apparel</xpath>
         <value>
@@ -80,12 +67,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_GasMask"]/apparel/bodyPartGroups</xpath>
       <match Class="PatchOperationReplace">
         <xpath>Defs/ThingDef[defName="Apparel_GasMask"]/apparel/bodyPartGroups</xpath>
         <value>
@@ -98,12 +83,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Ideology</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_VisageMask"]/apparel/bodyPartGroups</xpath>
       <match Class="PatchOperationReplace">
         <xpath>Defs/ThingDef[defName="Apparel_VisageMask"]/apparel/bodyPartGroups</xpath>
         <value>
@@ -116,12 +99,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Ideology</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_VisageMask"]/bodyPartGroupsMatchAny</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_VisageMask"]/bodyPartGroupsMatchAny</xpath>
         <value>
@@ -145,12 +126,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Ideology</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarMask"]/bodyPartGroupsMatchAny</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarMask"]/bodyPartGroupsMatchAny</xpath>
         <value>
@@ -173,12 +152,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Ideology</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarVeil"]/bodyPartGroupsMatchAny</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/PreceptDef/roleApparelRequirements/li/requirement[requiredDefs/li="Apparel_WarVeil"]/bodyPartGroupsMatchAny</xpath>
         <value>
@@ -188,12 +165,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Ideology</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>MaskPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>MaskPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_Broadwrap"]/apparel/bodyPartGroups</xpath>
       <match Class="PatchOperationReplace">
         <xpath>Defs/ThingDef[defName="Apparel_Broadwrap"]/apparel/bodyPartGroups</xpath>
         <value>
@@ -207,12 +182,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>ArrayHeadsetPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>ArrayHeadsetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_ArrayHeadset"]/apparel/bodyPartGroups</xpath>
       <match Class="PatchOperationReplace">
         <xpath>Defs/ThingDef[defName="Apparel_ArrayHeadset"]/apparel/bodyPartGroups</xpath>
         <value>
@@ -224,12 +197,10 @@
     </match>
   </Operation>
 
-  <Operation Class="PatchOperationFindMod">
-    <mods>
-      <li>Biotech</li>
-    </mods>
-    <match Class="VanillaCombatOverhaul.PatchOperationSettingGated">
-      <setting>ArrayHeadsetPatch</setting>
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>ArrayHeadsetPatch</setting>
+    <match Class="PatchOperationConditional">
+      <xpath>Defs/ThingDef[defName="Apparel_ArmorHelmetMechCommander"]/apparel</xpath>
       <match Class="PatchOperationAdd">
         <xpath>Defs/ThingDef[defName="Apparel_ArmorHelmetMechCommander"]/apparel</xpath>
         <value>

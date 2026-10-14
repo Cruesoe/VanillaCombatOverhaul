@@ -2,12 +2,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Dumps the diagnostic counters to the log on an interval, so a session leaves a record
-    /// behind without anyone having to open the settings window at the right moment.
-    ///
-    /// Scaffolding for tuning; goes away with VCODiagnostics.
-    /// </summary>
+    /// <summary>Writes the diagnostic counters to the log on an interval while verbose logging is on.</summary>
     public class DiagnosticsGameComponent : GameComponent
     {
         private int lastDumpTick;
@@ -31,7 +26,7 @@ namespace VanillaCombatOverhaul
             }
             lastDumpTick = now;
 
-            // Nothing happened since the last dump; stay quiet rather than logging an empty table.
+            // Nothing recorded since the last dump.
             if (!VCODiagnostics.HasData)
             {
                 return;

@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -8,6 +8,37 @@ namespace VanillaCombatOverhaul
 {
     public static class WeaponScoreUtility
     {
+        // Every weapon on the map is scored for every colonist; weapon stats only change with condition or quality.
+        private const int StatCacheTicks = 250;
+
+        private static readonly Dictionary<ThingDef, VerbProperties> RangedVerbs = new Dictionary<ThingDef, VerbProperties>();
+        private static StatDef meleePenetrationStat;
+        private static bool meleePenetrationResolved;
+
+        private static StatDef MeleePenetrationStat
+        {
+            get
+            {
+                if (!meleePenetrationResolved)
+                {
+                    meleePenetrationStat = DefDatabase<StatDef>.GetNamedSilentFail("MeleeWeapon_AverageArmorPenetration");
+                    meleePenetrationResolved = true;
+                }
+                return meleePenetrationStat;
+            }
+        }
+
+        /// <summary>The verb a weapon shoots with (its primary projectile verb, else any), or null for melee weapons; cached per def.</summary>
+        public static VerbProperties RangedVerbFor(ThingDef def)
+        {
+            if (!RangedVerbs.TryGetValue(def, out var verb))
+            {
+                verb = def.Verbs?.Find(v => v.isPrimary && v.LaunchesProjectile) ?? def.Verbs?.Find(v => v.LaunchesProjectile);
+                RangedVerbs[def] = verb;
+            }
+            return verb;
+        }
+
         public static float Score(Thing weapon, Pawn pawn)
         {
             if (weapon?.def == null || pawn == null)
@@ -15,8 +46,7 @@ namespace VanillaCombatOverhaul
                 return 0f;
             }
 
-            var rangedVerb = weapon.def.Verbs?.FirstOrDefault(v => v.isPrimary && v.LaunchesProjectile)
-                             ?? weapon.def.Verbs?.FirstOrDefault(v => v.LaunchesProjectile);
+            var rangedVerb = RangedVerbFor(weapon.def);
             var ranged = rangedVerb != null;
             var raw = ranged ? RangedScore(weapon, rangedVerb) : MeleeScore(weapon);
             if (raw <= 0f)
@@ -50,7 +80,7 @@ namespace VanillaCombatOverhaul
             var penetration = Mathf.Max(0f, projectile.GetArmorPenetration(weapon));
             var cycle = Mathf.Max(0.1f,
                 verb.warmupTime + (burst - 1) * verb.ticksBetweenBurstShots / 60f
-                + weapon.GetStatValue(StatDefOf.RangedWeapon_Cooldown));
+                + weapon.GetStatValue(StatDefOf.RangedWeapon_Cooldown, true, StatCacheTicks));
             var accuracy = 0.2f * verb.accuracyShort
                          + 0.45f * verb.accuracyMedium
                          + 0.35f * verb.accuracyLong;
@@ -59,9 +89,9 @@ namespace VanillaCombatOverhaul
 
         public static float MeleeScore(Thing weapon)
         {
-            var dps = weapon.GetStatValue(StatDefOf.MeleeWeapon_AverageDPS);
-            var penetrationDef = DefDatabase<StatDef>.GetNamedSilentFail("MeleeWeapon_AverageArmorPenetration");
-            var penetration = penetrationDef == null ? 0f : weapon.GetStatValue(penetrationDef);
+            var dps = weapon.GetStatValue(StatDefOf.MeleeWeapon_AverageDPS, true, StatCacheTicks);
+            var penetrationDef = MeleePenetrationStat;
+            var penetration = penetrationDef == null ? 0f : weapon.GetStatValue(penetrationDef, true, StatCacheTicks);
             return dps * (1f + Mathf.Max(0f, penetration));
         }
 

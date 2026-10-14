@@ -11,24 +11,17 @@ namespace VanillaCombatOverhaul
     /// </summary>
     public static class DirectionalHitUtility
     {
-        // Built once at startup; see VCODiagnostics.KeyTable for why this is not concatenated
-        // at the call site. This runs on every damage instance in the game.
+        // Built once; see VCODiagnostics.KeyTable.
         private static readonly string[] FacingKeys =
             VCODiagnostics.KeyTable<AttackFacing>("directional.facing.");
 
-        // Scratch for the weighted pick below. Never read outside the call that fills it --
-        // a reused buffer, not shared context, so this does not breach the no-static-state
-        // rule that CombatContext exists to enforce.
+        // Reused buffers for the weighted pick, only read within the call that fills them.
         [ThreadStatic] private static List<BodyPartRecord> pickParts;
         [ThreadStatic] private static List<float> pickWeights;
 
         /// <summary>
-        /// Returns a replacement hit part, or null to keep whatever vanilla chose.
-        ///
-        /// Null only ever means "no opinion". Vanilla Combat Reloaded could return null from a
-        /// success path when no part existed at the requested height; the caller then
-        /// dereferenced it. If the targeted height has no coverage we fall back to any height
-        /// on that side, and if that also fails we leave vanilla's result alone.
+        /// A replacement hit part, or null to keep vanilla's. With no part at the targeted height it
+        /// falls back to any height on that side, then to vanilla's choice.
         /// </summary>
         public static BodyPartRecord TryPickDirectional(DamageInfo dinfo, Pawn pawn)
         {
@@ -112,15 +105,7 @@ namespace VanillaCombatOverhaul
             return null;
         }
 
-        /// <summary>
-        /// Weighted choice of a hit part on the given side and height.
-        ///
-        /// Was a LINQ Where feeding TryRandomElementByWeight. That takes an IEnumerable and
-        /// ships no IList overload, so it cannot know the total weight without consuming the
-        /// sequence: the predicate ran over the whole body more than once per damage instance,
-        /// allocating two display classes and two iterators to do it. RimWorld still owns the
-        /// not-missing, height and depth filtering; only the selection is done by hand.
-        /// </summary>
+        /// <summary>Weighted choice of a hit part on the given side and height, without allocating.</summary>
         public static bool TryPick(Pawn pawn, DamageInfo dinfo, BodyPartGroupDef group,
                                    BodyPartHeight height, out BodyPartRecord result)
         {

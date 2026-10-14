@@ -1,19 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- RimWorld runs on Unity's Mono; net472 is required and not negotiable. -->
+    <!-- RimWorld runs on Unity's Mono, which loads net472 assemblies. -->
     <TargetFramework>net472</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyName>VanillaCombatOverhaul</AssemblyName>
     <RootNamespace>VanillaCombatOverhaul</RootNamespace>
-    <Version>0.1.0</Version>
 
     <!-- Build straight into the mod folder RimWorld loads. -->
     <OutputPath>$(MSBuildProjectDirectory)\..\..\1.6\Assemblies\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
-    <!-- A mod assembly ships alone; never rake dependencies into the output folder. -->
+    <!-- Only the mod assembly goes to the output folder. -->
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>false</GenerateDependencyFile>
     <DebugType>none</DebugType>

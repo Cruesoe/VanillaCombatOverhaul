@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationInsert">
+    <xpath>/Defs/ThinkTreeDef[defName="MainColonistBehaviorCore"]/thinkRoot/subNodes/li/subNodes/li[@Class="JobGiver_Work"]</xpath>
+    <value>
+      <li Class="VanillaCombatOverhaul.JobGiver_Loadout" />
+    </value>
+  </Operation>
+
+  <!-- The column is added at load, so turning loadouts on or off needs a restart to show or hide it. -->
+  <Operation Class="VanillaCombatOverhaul.PatchOperationSettingGated">
+    <setting>Loadouts</setting>
+    <match Class="PatchOperationInsert">
+      <xpath>/Defs/PawnTableDef[defName="Assign"]/columns/li[text()="Outfit"]</xpath>
+      <order>Append</order>
+      <value>
+        <li>GapTiny</li>
+        <li>VCO_Loadout</li>
+      </value>
+    </match>
+  </Operation>
+</Patch>

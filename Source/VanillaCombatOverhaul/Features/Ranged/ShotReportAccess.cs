@@ -3,20 +3,7 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>
-    /// Typed access to ShotReport's private fields.
-    ///
-    /// ShotReport is a struct, and these run on the hottest path the mod touches: once per
-    /// shot fired, and once per frame for every line of the shot tooltip. Traverse was
-    /// measured at roughly 154ns per access here -- it boxes the struct, looks the field up
-    /// by string, and boxes the returned float -- against roughly 1.5ns for a resolved field
-    /// reference, so this uses the same AccessTools.FieldRef pattern as TracerUtility and
-    /// ParryUtility. Writing through the ref also removes the read-modify-copy-back that a
-    /// boxed struct needed.
-    ///
-    /// A renamed field throws at startup rather than silently returning defaults, which is
-    /// the failure mode we want from a hard dependency on private state.
-    /// </summary>
+    /// <summary>Field references to ShotReport's private fields; a renamed field throws at startup.</summary>
     internal static class ShotReportAccess
     {
         private static readonly AccessTools.StructFieldRef<ShotReport, float> EquipmentRef =

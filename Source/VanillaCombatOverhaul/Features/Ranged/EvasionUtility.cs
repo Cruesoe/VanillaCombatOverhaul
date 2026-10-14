@@ -30,9 +30,8 @@ namespace VanillaCombatOverhaul
             var baseFactor = Mathf.Clamp(settings.evasionFactor, 0.01f, 1f);
             var rawMult = Mathf.Pow(baseFactor, excess);
 
-            // The pawn stat caps how much evasion gear/traits can grant, and reflects the
-            // current movement-derived reduction on the Stats tab.
-            var statReduction = target.GetStatValue(VCO_StatDefOf.VCO_Evasion);
+            // The VCO_Evasion stat, which other mods can modify, can raise evasion further; cached for the tick.
+            var statReduction = target.GetStatValue(VCO_StatDefOf.VCO_Evasion, true, 1);
             if (statReduction > 0f)
             {
                 rawMult = Mathf.Min(rawMult, 1f - statReduction);

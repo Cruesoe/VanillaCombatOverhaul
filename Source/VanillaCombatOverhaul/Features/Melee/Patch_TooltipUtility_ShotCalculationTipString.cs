@@ -23,7 +23,9 @@ namespace VanillaCombatOverhaul
 
         public static void Postfix(ref string __result, Thing target)
         {
-            if (!(Find.Selector.SingleSelectedThing is Pawn pawn) || pawn.equipment == null || target == null)
+            // Vanilla's conditions for its ranged readout: not the pawn itself, and player pawns only while drafted.
+            if (!(Find.Selector.SingleSelectedThing is Pawn pawn) || pawn.equipment == null || target == null
+                || target == pawn || (pawn.IsPlayerControlled && !pawn.Drafted))
             {
                 return;
             }
@@ -80,8 +82,8 @@ namespace VanillaCombatOverhaul
                 {
                     var chance = HeightTargetingUtility.ChanceToLand(
                         pawn, hitPawn, side, height, meleeVerb.GetDamageDef(), melee: true);
-                    sb.AppendLine("   " + "VCO_HeightChance".Translate()
-                                  + HeightTargetingUtility.LabelFor(height) + ": " + chance.ToStringPercent());
+                    sb.AppendLine("   " + "VCO_HeightChance".Translate(
+                                  HeightTargetingUtility.LabelFor(height).UncapitalizeFirst(), chance.ToStringPercent()));
                 }
             }
 
