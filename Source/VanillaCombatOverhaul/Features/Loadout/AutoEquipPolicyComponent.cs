@@ -156,11 +156,7 @@ namespace VanillaCombatOverhaul
             }
             foreach (var pawn in PawnsFinder.AllMapsWorldAndTemporary_AliveOrDead)
             {
-                var comp = LoadoutUtility.CompFor(pawn);
-                if (comp != null && comp.HasAssignedLoadout(policy))
-                {
-                    comp.Loadout = null;
-                }
+                LoadoutUtility.CompFor(pawn)?.Notify_LoadoutDeleted(policy);
             }
             loadouts.Remove(policy);
             return AcceptanceReport.WasAccepted;

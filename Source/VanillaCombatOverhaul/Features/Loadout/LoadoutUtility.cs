@@ -81,6 +81,51 @@ namespace VanillaCombatOverhaul
             return best;
         }
 
+        /// <summary>A job picking up a weapon as the sidearm and putting the carried one it replaces down in its place.</summary>
+        public static Job TakeSidearmJob(Pawn pawn, Thing weapon)
+        {
+            var replaced = CarriedSidearm(pawn);
+            var job = JobMaker.MakeJob(VCO_JobDefOf.VCO_TakeSidearm, weapon, replaced != weapon ? replaced : null);
+            job.count = 1;
+            return job;
+        }
+
+        private static readonly List<Thing> KeptWeaponBuffer = new List<Thing>();
+
+        /// <summary>
+        /// The exact weapons the loadout keeps in the pawn's inventory: the sidearm and a swapped-out primary.
+        /// Both unload patches read this, so they always agree. Fills a shared buffer; use it before the next call.
+        /// </summary>
+        private static List<Thing> KeptWeapons(Pawn pawn)
+        {
+            KeptWeaponBuffer.Clear();
+            if (!Enabled || pawn == null || !pawn.IsColonist || pawn.inventory == null)
+            {
+                return KeptWeaponBuffer;
+            }
+            var comp = CompFor(pawn);
+            var loadout = comp?.Loadout;
+            if (loadout == null)
+            {
+                return KeptWeaponBuffer;
+            }
+            var sidearm = SidearmsEnabled && (loadout.carrySidearm || comp.LockedSidearm != null) ? CarriedSidearm(pawn) : null;
+            if (sidearm != null)
+            {
+                KeptWeaponBuffer.Add(sidearm);
+            }
+            var swapped = comp.SwappedPrimary;
+            if (swapped != null && pawn.inventory.innerContainer.Contains(swapped))
+            {
+                KeptWeaponBuffer.Add(swapped);
+            }
+            return KeptWeaponBuffer;
+        }
+
+        /// <summary>How many of this def the pawn's loadout keeps in inventory as an item.</summary>
+        public static int KeptCount(Pawn pawn, ThingDef def) =>
+            Enabled && pawn != null && pawn.IsColonist ? LoadoutFor(pawn)?.CountFor(def) ?? 0 : 0;
+
         /// <summary>Adds what the pawn's loadout keeps in inventory, so unloading leaves it there.</summary>
         public static void AddKeptItems(Pawn pawn, List<ThingDefCount> kept)
         {
@@ -88,8 +133,7 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            var comp = CompFor(pawn);
-            var loadout = comp?.Loadout;
+            var loadout = LoadoutFor(pawn);
             if (loadout == null)
             {
                 return;
@@ -101,15 +145,35 @@ namespace VanillaCombatOverhaul
                     kept.Add(new ThingDefCount(item.thingDef, item.count));
                 }
             }
-            var sidearm = (loadout.carrySidearm || comp.LockedSidearm != null) && SidearmsEnabled ? CarriedSidearm(pawn) : null;
-            if (sidearm != null)
+            // Vanilla matches kept entries by def; AvoidUnloadingKeptWeapon makes sure the exact weapons stay.
+            foreach (var weapon in KeptWeapons(pawn))
             {
-                kept.Add(new ThingDefCount(sidearm.def, 1));
+                kept.Add(new ThingDefCount(weapon.def, 1));
             }
-            var swapped = comp.SwappedPrimary;
-            if (swapped != null && pawn.inventory.innerContainer.Contains(swapped))
+        }
+
+        /// <summary>When unloading picks a kept weapon itself, another weapon of the same def is unloaded instead.</summary>
+        public static void AvoidUnloadingKeptWeapon(Pawn pawn, ref ThingCount result)
+        {
+            var thing = result.Thing;
+            if (thing == null || !thing.def.IsWeapon)
             {
-                kept.Add(new ThingDefCount(swapped.def, 1));
+                return;
+            }
+            var kept = KeptWeapons(pawn);
+            if (!kept.Contains(thing))
+            {
+                return;
+            }
+            var inventory = pawn.inventory.innerContainer;
+            for (var i = 0; i < inventory.Count; i++)
+            {
+                var other = inventory[i];
+                if (other.def == thing.def && !kept.Contains(other))
+                {
+                    result = new ThingCount(other, other.stackCount);
+                    return;
+                }
             }
         }
 
@@ -156,8 +220,24 @@ namespace VanillaCombatOverhaul
             return false;
         }
 
+        /// <summary>True while Swap moves weapons, so the equip hook leaves weapon-matched stock alone.</summary>
+        public static bool Swapping { get; private set; }
+
         /// <summary>Moves the primary into inventory and equips a carried weapon in its place.</summary>
         public static bool Swap(Pawn pawn, ThingWithComps carried)
+        {
+            Swapping = true;
+            try
+            {
+                return SwapInt(pawn, carried);
+            }
+            finally
+            {
+                Swapping = false;
+            }
+        }
+
+        private static bool SwapInt(Pawn pawn, ThingWithComps carried)
         {
             var inventory = pawn.inventory?.innerContainer;
             var equipment = pawn.equipment;

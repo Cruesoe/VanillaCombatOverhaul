@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>VCO_TakeSidearm</defName>
+    <driverClass>VanillaCombatOverhaul.JobDriver_TakeSidearm</driverClass>
+    <reportString>picking up TargetA as a sidearm.</reportString>
+    <casualInterruptible>true</casualInterruptible>
+  </JobDef>
+  <JobDef>
+    <defName>VCO_StowWeapon</defName>
+    <driverClass>VanillaCombatOverhaul.JobDriver_StowInventoryThing</driverClass>
+    <reportString>putting away TargetA.</reportString>
+    <casualInterruptible>true</casualInterruptible>
+  </JobDef>
+</Defs>

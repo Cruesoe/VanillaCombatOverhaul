@@ -234,13 +234,29 @@ namespace VanillaCombatOverhaul
             pawn.equipment.Remove(rifle);
             var bowThing = (ThingWithComps)ThingMaker.MakeThing(bow, GenStuff.DefaultStuffFor(bow));
             pawn.equipment.AddEquipment(bowThing);
-            LoadoutStockUtility.Apply(pawn, policy);
             var withBow = pawn.inventoryStock.GetDesiredThingForGroup(group);
+
+            var withSidearm = withBow;
+            var knife = DefDatabase<ThingDef>.GetNamedSilentFail("MeleeWeapon_Knife");
+            if (knife != null)
+            {
+                var sidearm = (ThingWithComps)ThingMaker.MakeThing(knife, GenStuff.DefaultStuffFor(knife));
+                pawn.inventory.innerContainer.TryAdd(sidearm);
+                LoadoutUtility.Swap(pawn, sidearm);
+                withSidearm = pawn.inventoryStock.GetDesiredThingForGroup(group);
+                LoadoutUtility.Swap(pawn, bowThing);
+                pawn.inventory.innerContainer.Remove(sidearm);
+                sidearm.Destroy();
+            }
             pawn.equipment.DestroyEquipment(bowThing);
             pawn.equipment.AddEquipment(rifle);
+            var rifleAgain = pawn.inventoryStock.GetDesiredThingForGroup(group);
 
-            results.Add(Check("ammunition stock matches the primary weapon",
-                withRifle == ammo && withBow == arrows, $"rifle {withRifle?.defName}, bow {withBow?.defName}"));
+            results.Add(Check("ammunition stock follows the primary weapon when it is equipped",
+                withRifle == ammo && withBow == arrows && rifleAgain == ammo,
+                $"rifle {withRifle?.defName}, bow {withBow?.defName}, rifle again {rifleAgain?.defName}"));
+            results.Add(Check("drawing the sidearm keeps the primary weapon's ammunition",
+                withSidearm == arrows, $"with sidearm {withSidearm?.defName}"));
             results.Add(Check("Progression: Ammunition's ammo column is hidden while loadouts are on",
                 DefDatabase<PawnColumnDef>.GetNamedSilentFail("PA_AmmoCarry")?.Worker.VisibleCurrently == false, "hidden"));
             return results;

@@ -54,5 +54,8 @@ namespace VanillaCombatOverhaul
             }
             return codes;
         }
+
+        public static void Postfix(Pawn_InventoryTracker __instance, ref ThingCount __result) =>
+            LoadoutUtility.AvoidUnloadingKeptWeapon(__instance.pawn, ref __result);
     }
 }
