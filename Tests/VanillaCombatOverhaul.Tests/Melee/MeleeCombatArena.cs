@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -27,7 +28,7 @@ namespace VanillaCombatOverhaul
                 return Abort(result, "arena needs a loaded map");
             }
 
-            var enemyFaction = HostileHumanlikeFaction();
+            var enemyFaction = HostileHumanlikeFaction(out var restoreRelation);
             if (enemyFaction == null)
             {
                 return Abort(result, "no humanlike faction to draw attackers from");
@@ -108,6 +109,7 @@ namespace VanillaCombatOverhaul
                 PointBlankUtility.IgnorePlayerForcedForTesting = false;
                 Cleanup(attackers);
                 Cleanup(defenders);
+                restoreRelation?.Invoke();
                 if (seeded)
                 {
                     Rand.PopState();
@@ -117,9 +119,13 @@ namespace VanillaCombatOverhaul
             return result;
         }
 
-        /// <summary>A humanlike faction for the attackers, chosen by defName and made hostile if needed.</summary>
-        private static Faction HostileHumanlikeFaction()
+        /// <summary>
+        /// A humanlike faction for the attackers, chosen by defName and made hostile if needed; <paramref name="restore"/>
+        /// puts its goodwill or relation back afterwards, or is null when nothing changed.
+        /// </summary>
+        private static Faction HostileHumanlikeFaction(out Action restore)
         {
+            restore = null;
             var player = Faction.OfPlayer;
             var faction = Find.FactionManager.AllFactionsListForReading
                 .Where(f => f != player && !f.IsPlayer && !f.Hidden)
@@ -131,13 +137,22 @@ namespace VanillaCombatOverhaul
                 // Factions with goodwill take their relation from it, and log an error on SetRelationDirect.
                 if (faction.HasGoodwill)
                 {
+                    var goodwill = faction.GoodwillWith(player);
                     faction.TryAffectGoodwillWith(player, -200, false, false);
+                    restore = () => faction.TryAffectGoodwillWith(player, goodwill - faction.GoodwillWith(player), false, false);
                 }
                 else
                 {
+                    var theirs = faction.RelationKindWith(player);
+                    var ours = player.RelationKindWith(faction);
                     // Set on both sides; SetRelationDirect changes only the faction it is called on.
                     faction.SetRelationDirect(player, FactionRelationKind.Hostile, false);
                     player.SetRelationDirect(faction, FactionRelationKind.Hostile, false);
+                    restore = () =>
+                    {
+                        faction.SetRelationDirect(player, theirs, false);
+                        player.SetRelationDirect(faction, ours, false);
+                    };
                 }
             }
 

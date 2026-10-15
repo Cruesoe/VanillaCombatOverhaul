@@ -13,20 +13,21 @@ namespace VanillaCombatOverhaul
         public static IEnumerable<MethodBase> TargetMethods()
         {
             // The base covers every worker that does not override; the subclasses below do.
-            yield return Target(typeof(DamageWorker_AddInjury));
-            yield return Target(typeof(DamageWorker_Bite));
-            yield return Target(typeof(DamageWorker_Blunt));
-            yield return Target(typeof(DamageWorker_Cut));
-            yield return Target(typeof(DamageWorker_Scratch));
-            yield return Target(typeof(DamageWorker_Stab));
+            foreach (var type in new[]
+                     {
+                         typeof(DamageWorker_AddInjury), typeof(DamageWorker_Bite), typeof(DamageWorker_Blunt),
+                         typeof(DamageWorker_Cut), typeof(DamageWorker_Scratch), typeof(DamageWorker_Stab)
+                     })
+            {
+                var method = AccessTools.DeclaredMethod(type, "ChooseHitPart", new[] { typeof(DamageInfo), typeof(Pawn) });
+                if (method == null)
+                {
+                    Log.Error($"[VCO] {type.Name}.ChooseHitPart(DamageInfo, Pawn) not found; directional damage skips that worker.");
+                    continue;
+                }
+                yield return method;
+            }
         }
-
-        private static MethodBase Target(System.Type type) =>
-            AccessTools.DeclaredMethod(type, "ChooseHitPart",
-                new[] { typeof(DamageInfo), typeof(Pawn) })
-            ?? throw new MissingMethodException(
-                $"{type.Name}.ChooseHitPart(DamageInfo, Pawn) not found. " +
-                "Vanilla Combat cannot apply directional damage against this RimWorld build.");
 
         public static void Postfix(ref BodyPartRecord __result, DamageInfo dinfo, Pawn pawn)
         {

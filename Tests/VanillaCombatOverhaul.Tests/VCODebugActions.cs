@@ -8,7 +8,7 @@ namespace VanillaCombatOverhaul
     {
         private const string Category = "Vanilla Combat Overhaul";
 
-        [DebugAction(Category, "Run full combat test", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Run full combat test (changes map)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunFullSuite()
         {
             var facing = MeleeAssertions.FacingSelfTest();
@@ -20,7 +20,7 @@ namespace VanillaCombatOverhaul
                         + "\n" + TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
         }
 
-        [DebugAction(Category, "Run one quick arena", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Run one quick arena (changes map)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunQuickArena()
         {
             var spec = new MeleeArenaSpec { label = "quick", pairs = 12, ticks = 2000 };
@@ -45,7 +45,7 @@ namespace VanillaCombatOverhaul
                 new System.Collections.Generic.List<MeleeArenaResult>(), null, ArmorAssertions.SelfTests()));
         }
 
-        [DebugAction(Category, "Run ranged accuracy test", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Run ranged accuracy test (changes map)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunRangedSuite()
         {
             var self = RangedAssertions.SelfTests();
@@ -68,7 +68,7 @@ namespace VanillaCombatOverhaul
             Log.Message(TestSuite.FormatChecks("automatic weapon checks", AutoEquipAssertions.SelfTests()));
         }
 
-        [DebugAction(Category, "Suppression and loadout checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Suppression and loadout checks (changes map)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunSuppressionAndLoadoutChecks()
         {
             var suppression = SuppressionAssertions.SelfTests();
@@ -77,7 +77,7 @@ namespace VanillaCombatOverhaul
                         + "\n" + TestSuite.FormatChecks("loadout checks", LoadoutAssertions.MapTests(Find.CurrentMap)));
         }
 
-        [DebugAction(Category, "Run and gun checks", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction(Category, "Run and gun checks (changes map)", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void RunRunAndGunChecks() =>
             Log.Message(TestSuite.FormatChecks("run and gun checks", RunAndGunAssertions.MapTests(Find.CurrentMap)));
 

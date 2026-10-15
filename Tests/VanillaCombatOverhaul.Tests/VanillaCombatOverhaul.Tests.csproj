@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The in-game test suite, built as its own mod into Tests\Mod (never shipped); Run-CombatTest.ps1 loads it beside the mod. -->
+  <PropertyGroup>
+    <RootNamespace>VanillaCombatOverhaul</RootNamespace>
+    <AssemblyName>VanillaCombatOverhaul.Tests</AssemblyName>
+    <ModAssemblies>$(MSBuildThisFileDirectory)..\Mod\$(RimWorldGameVersion)\Assemblies\</ModAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\VanillaCombatOverhaul\VanillaCombatOverhaul.csproj" Private="false" />
+  </ItemGroup>
+
+  <!-- As the mod: 1.7's UnityStubs forwards Material to Waylith.dll -->
+  <ItemGroup Condition="'$(RimWorldGameVersion)' == '1.7'">
+    <Reference Include="Waylith">
+      <HintPath>$(RimWorldManaged)\Waylith.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

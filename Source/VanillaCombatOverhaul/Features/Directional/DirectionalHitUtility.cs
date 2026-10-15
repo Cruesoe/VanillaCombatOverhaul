@@ -66,7 +66,7 @@ namespace VanillaCombatOverhaul
             var height = BodyPartHeight.Undefined;
             if (heightActive)
             {
-                height = HeightTargetingUtility.GetTargetHeight(dinfo.Instigator);
+                height = HeightTargetingUtility.GetTargetHeight(dinfo.Instigator, melee);
                 if (height != BodyPartHeight.Undefined)
                 {
                     var land = HeightTargetingUtility.ChanceToLand(

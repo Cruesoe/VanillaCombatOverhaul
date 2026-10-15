@@ -70,7 +70,26 @@ namespace VanillaCombatOverhaul
             return dinfo.Def?.defaultStoppingPower ?? 0f;
         }
 
-        public static bool IsBulletDef(DamageDef def) => def != null && def == DamageDefOf.Bullet;
+        /// <summary>
+        /// Vanilla's Bullet, or any ranged damage that wounds with gunshots through the base injury worker
+        /// (Biotech's toxic needles, Odyssey's trait bullets, modded bullets); cached per def.
+        /// </summary>
+        public static bool IsBulletDef(DamageDef def)
+        {
+            if (def == null)
+            {
+                return false;
+            }
+            if (!BulletDefs.TryGetValue(def, out var bullet))
+            {
+                bullet = def == DamageDefOf.Bullet
+                         || (def.isRanged && def.hediff != null && def.hediff == DamageDefOf.Bullet.hediff && def.workerClass == typeof(DamageWorker_AddInjury));
+                BulletDefs[def] = bullet;
+            }
+            return bullet;
+        }
+
+        private static readonly Dictionary<DamageDef, bool> BulletDefs = new Dictionary<DamageDef, bool>();
 
         public static bool IsArrowDef(DamageDef def)
         {

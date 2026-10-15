@@ -9,7 +9,7 @@ namespace VanillaCombatOverhaul
     [StaticConstructorOnStartup]
     public static class HeightTargetingUtility
     {
-        public const int MinimumShootingSkill = 10;
+        public const int MinimumSkill = 10;
 
         public static readonly BodyPartHeight[] Modes =
         {
@@ -28,44 +28,52 @@ namespace VanillaCombatOverhaul
         private static readonly Texture2D IconTop =
             ContentFinder<Texture2D>.Get("UI/Commands/VCO_AimHead");
 
-        /// <summary>The height band this attacker is aiming for, or Undefined.</summary>
-        public static BodyPartHeight GetTargetHeight(Thing instigator)
+        /// <summary>The height band this attacker is aiming for with a melee or ranged attack, or Undefined.</summary>
+        public static BodyPartHeight GetTargetHeight(Thing instigator, bool melee)
         {
             var comp = instigator?.TryGetComp<CompHeightTarget>();
             if (comp == null || comp.TargetingMode == BodyPartHeight.Undefined)
             {
                 return BodyPartHeight.Undefined;
             }
-            return CanUse(instigator) ? comp.TargetingMode : BodyPartHeight.Undefined;
+            return CanUse(instigator, melee) ? comp.TargetingMode : BodyPartHeight.Undefined;
         }
 
-        public static bool CanUse(Thing instigator)
+        /// <summary>Pawns need the attack's skill at MinimumSkill; ranged attacks also need a non-explosive verb.</summary>
+        public static bool CanUse(Thing instigator, bool melee)
         {
             if (instigator == null || !instigator.def.HasComp(typeof(CompHeightTarget)))
             {
                 return false;
             }
-            if (instigator is Pawn pawn
-                && (!MeetsShootingRequirement(pawn)
-                    || (pawn.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true)))
+            if (!(instigator is Pawn pawn))
+            {
+                return true;
+            }
+            if (!MeetsSkillRequirement(pawn, melee))
             {
                 return false;
             }
-            return true;
+            return melee || !(pawn.CurrentEffectiveVerb?.verbProps.CausesExplosion ?? true);
         }
 
-        public static bool MeetsShootingRequirement(Pawn pawn)
+        /// <summary>Shooting (ranged) or Melee (melee) at MinimumSkill or higher.</summary>
+        public static bool MeetsSkillRequirement(Pawn pawn, bool melee)
         {
-            var shooting = pawn?.skills?.GetSkill(SkillDefOf.Shooting);
-            return shooting != null
-                   && !shooting.TotallyDisabled
-                   && shooting.Level >= MinimumShootingSkill;
+            var skill = pawn?.skills?.GetSkill(melee ? SkillDefOf.Melee : SkillDefOf.Shooting);
+            return skill != null
+                   && !skill.TotallyDisabled
+                   && skill.Level >= MinimumSkill;
         }
+
+        /// <summary>Whether the pawn can aim either kind of attack, for the button and enemies' arrival pick.</summary>
+        public static bool CanAimAny(Pawn pawn) =>
+            MeetsSkillRequirement(pawn, melee: false) || MeetsSkillRequirement(pawn, melee: true);
 
         public static void AssignRandom(Pawn pawn)
         {
             var comp = pawn?.TryGetComp<CompHeightTarget>();
-            if (comp == null || !MeetsShootingRequirement(pawn))
+            if (comp == null || !CanAimAny(pawn))
             {
                 comp?.SetTargetingMode(BodyPartHeight.Undefined);
                 return;

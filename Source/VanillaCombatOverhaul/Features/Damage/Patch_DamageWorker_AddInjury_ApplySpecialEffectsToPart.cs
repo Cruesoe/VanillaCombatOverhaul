@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -6,9 +7,27 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    [HarmonyPatch(typeof(DamageWorker_AddInjury), "ApplySpecialEffectsToPart")]
+    /// <summary>
+    /// Bullet and arrow wounds. Patched on the base worker (bullets, arrows) and on DamageWorker_Stab, which
+    /// replaces the method without calling the base one and handles thrown pila (RangedStab).
+    /// </summary>
+    [HarmonyPatch]
     public static class Patch_DamageWorker_AddInjury_ApplySpecialEffectsToPart
     {
+        public static IEnumerable<MethodBase> TargetMethods()
+        {
+            foreach (var type in new[] { typeof(DamageWorker_AddInjury), typeof(DamageWorker_Stab) })
+            {
+                var method = AccessTools.DeclaredMethod(type, "ApplySpecialEffectsToPart");
+                if (method == null)
+                {
+                    Log.Error($"[VCO] {type.Name}.ApplySpecialEffectsToPart not found; its bullet and arrow wounds are off.");
+                    continue;
+                }
+                yield return method;
+            }
+        }
+
         // 1.6 FinalizeAndAddInjury returns the remaining damage (float), not void.
         private delegate float FinalizeInjury(DamageWorker_AddInjury worker, Pawn pawn,
             float totalDamage, DamageInfo dinfo, DamageWorker.DamageResult result);

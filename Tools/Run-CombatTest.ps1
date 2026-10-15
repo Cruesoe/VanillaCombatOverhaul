@@ -7,6 +7,10 @@
     Player-prev.log on start), so the run passes -NoFileLog and captures the game's console log from
     standard output into the sandbox instead. Your saves and Player.log are left alone.
 
+    The suite itself is a separate dev-only mod, Tests\Mod (cruesoe.vanillacombatoverhaul.tests), built by
+    Deploy-Mod.ps1 from Tests\VanillaCombatOverhaul.Tests and never shipped. For the run it is copied into
+    Mods\Vanilla Combat Overhaul Tests and loaded after the mod; the folder is removed afterwards.
+
     A run fails if any check fails, if the game logs an exception, or if it logs any warning or error
     other than the known engine and other-mod noise listed in $noise.
 
@@ -55,6 +59,22 @@ foreach ($dll in $builds) {
     }
 }
 
+# --- the test suite mod, copied into Mods for the run only -----------------------
+$testMod = Join-Path $repo 'Tests\Mod'
+$testPackageId = ([xml](Get-Content (Join-Path $testMod 'About\About.xml') -Raw)).ModMetaData.packageId
+if (-not (Test-Path (Join-Path $testMod '1.7\Assemblies\VanillaCombatOverhaul.Tests.dll'))) {
+    Write-Error "Test suite not built under $testMod. Deploy with Deploy-Mod.ps1 first, which builds it."
+    exit 2
+}
+$testTarget = Join-Path $RimWorldPath 'Mods\Vanilla Combat Overhaul Tests'
+if (Test-Path $testTarget) {
+    $existing = Join-Path $testTarget 'About\About.xml'
+    if (-not (Test-Path $existing) -or ([xml](Get-Content $existing -Raw)).ModMetaData.packageId -ne $testPackageId) {
+        Write-Error "$testTarget exists and is not the test suite; not touching it."
+        exit 2
+    }
+}
+
 # --- throwaway save-data folder -------------------------------------------------
 $sandbox = Join-Path $env:TEMP "vco-test-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 $configDir = Join-Path $sandbox 'Config'
@@ -68,7 +88,7 @@ foreach ($f in @('Prefs.xml', 'KeyPrefs.xml')) {
 }
 
 # -mod takes a comma-separated list; Core and the DLCs are added automatically.
-$mods = @('brrainz.harmony') + $ExtraMods + @($packageId)
+$mods = @('brrainz.harmony') + $ExtraMods + @($packageId, $testPackageId)
 $modArg = '-mod=' + (($mods | ForEach-Object { $_.ToLowerInvariant() }) -join ',')
 
 # The trigger file is what the mod watches for; its contents are the RNG seed.
@@ -84,6 +104,10 @@ Write-Host 'Launching RimWorld...'
 
 $exitCode = 2
 try {
+    # Mirrored, so a copy left by an interrupted run is brought up to date; robocopy codes below 8 are success.
+    robocopy $testMod $testTarget /MIR /NJH /NJS /NP /NFL /NDL | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "Copying the test suite to $testTarget failed (robocopy $LASTEXITCODE)." }
+
     $proc = Start-Process -FilePath $exe -ArgumentList "-savedatafolder=`"$sandbox`"", $modArg, '-NoFileLog' `
         -WindowStyle Minimized -RedirectStandardOutput $logPath -RedirectStandardError $errPath -PassThru
     if (-not $proc.WaitForExit($TimeoutMinutes * 60 * 1000)) {
@@ -126,6 +150,8 @@ try {
     }
 }
 finally {
+    # The test suite lives in Mods only for the run.
+    if (Test-Path $testTarget) { Remove-Item -LiteralPath $testTarget -Recurse -Force -ErrorAction SilentlyContinue }
     if ($KeepSandbox -or $exitCode -ne 0) {
         Write-Host "Sandbox kept at $sandbox"
     }

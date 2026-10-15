@@ -5,41 +5,6 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>Weapon filter attached to an apparel policy by earlier versions; read only to migrate saves.</summary>
-    public sealed class AutoEquipPolicyRecord : IExposable
-    {
-        public int apparelPolicyId = -1;
-        public ThingFilter filter;
-
-        public void ExposeData()
-        {
-            Scribe_Values.Look(ref apparelPolicyId, "apparelPolicyId", -1);
-            Scribe_Deep.Look(ref filter, "filter");
-        }
-    }
-
-    public sealed class ForcedWeaponRecord : IExposable
-    {
-        public int pawnId = -1;
-        public int weaponId = -1;
-
-        public ForcedWeaponRecord()
-        {
-        }
-
-        public ForcedWeaponRecord(Pawn pawn, Thing weapon)
-        {
-            pawnId = pawn.thingIDNumber;
-            weaponId = weapon.thingIDNumber;
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Values.Look(ref pawnId, "pawnId", -1);
-            Scribe_Values.Look(ref weaponId, "weaponId", -1);
-        }
-    }
-
     /// <summary>The colony's loadouts and manually locked weapons. Class name kept for save compatibility.</summary>
     public sealed class AutoEquipPolicyComponent : GameComponent
     {

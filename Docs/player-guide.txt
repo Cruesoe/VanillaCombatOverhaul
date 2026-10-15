@@ -56,13 +56,14 @@ Drafted colonists holding a gun get a fire mode button:
 [h3]Where hits land[/h3]
 [list]
 [*]Hits land on the side the attack comes from: shoot a raider from their left and you can hit their left arm, eye or lung, but not their right ones. The torso can be hit from any angle. Melee follows the same rule.
-[*]Drafted colonists with Shooting 10 or higher can aim for the head, torso or legs. More skill makes the chosen band land more often; a miss still lands on that side of the body. Enemies with the skill pick a height when they arrive.
+[*]Drafted colonists with Shooting or Melee 10 or higher can aim for the head, torso or legs: shots need Shooting 10 and melee attacks need Melee 10. More skill makes the chosen band land more often; a miss still lands on that side of the body. Enemies with the skill pick a height when they arrive.
 [/list]
 
 [h3]Wounds[/h3]
 [list]
 [*]Bullets wound by stopping power: light rounds fragment into nearby body parts, medium rounds pass through to the parts behind, and heavy rounds mushroom into one deeper wound.
-[*]Arrows either stab inward or slice across a neighboring outer part.
+[*]This covers every kind of bullet, including Biotech's needle gun, Odyssey's unique weapon rounds and most modded guns.
+[*]Arrows and thrown pila either stab inward or slice across a neighboring outer part.
 [*]Armor that already reduced the hit stops these extra effects.
 [/list]
 
@@ -73,7 +74,7 @@ Drafted colonists holding a gun get a fire mode button:
 [*]Armor resists rounds that cannot match it. An assault rifle suppresses a pawn in flak gear about two-thirds as much as an unarmored one, and a marine about a third as much. A charge rifle still suppresses a marine strongly.
 [*]Active shield belts, mechanoids and animals are never suppressed.
 [*]A suppressed pawn aims worse and takes longer to aim. An amber icon stays over their head while it lasts, and their inspect panel shows how close they are to being pinned.
-[*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies crawl to nearby cover first, and your colonists drop where they stand. A pinned pawn that moves crawls at 65% speed; order a pinned colonist to move and they crawl there without being pinned down again on the way. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
+[*]A pinned pawn is hit hardest by both: aiming as if the target were twice as far away, and taking half again as long to aim. A red icon replaces the amber one. Pinned pawns drop prone and hold fire for at least four seconds, until the shooting eases: enemies crawl to nearby cover first, and your colonists drop where they stand. Under fire that never lets up, a pawn gets back up after about 40 seconds on the ground and cannot be pinned again for 10 seconds. A pinned pawn that moves crawls at 65% speed; order a pinned colonist to move and they crawl there without being pinned down again on the way. Lying down makes them much harder to hit from range but easy at point-blank, and a pawn attacked in melee gets up to fight.
 [*]Suppression starts fading half a second after the last nearby round, so it takes concentrated fire. Against a pawn in an average mood, one assault rifle burst falls just short of suppressing them, an LMG burst suppresses them, and pinning takes a minigun or several shooters firing together.
 [*]Being shot at hurts mood while it lasts: -5 under fire, -10 suppressed, -15 pinned.
 [/list]
@@ -106,6 +107,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [h3]Sidearms[/h3]
 [list]
 [*]With "Carry a backup melee weapon" on, colonists with a gun carry the best allowed melee weapon in their inventory.
+[*]When a better sidearm turns up, a colonist picks it up and leaves the old one where the new one lay, usually back in the same stockpile. Any other spare melee weapon they carry is taken to storage. Weapons brought home by a caravan, or carried on another map, are left for the normal unload.
 [*]When an enemy reaches them in a fight they draw it, and put it away once the enemy is gone.
 [*]Strong shooters (Shooting 15 or more, and better at Shooting than Melee) keep their gun up close and fire point-blank instead.
 [*]Any melee weapon in a colonist's inventory can serve as the sidearm. To choose one, select the colonist, right-click a melee weapon and pick "Carry as sidearm". It is kept over better ones, and fetched back if dropped, until you press "Release sidearm".
@@ -115,7 +117,8 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [h3]Supplies[/h3]
 [list]
 [*]The Items tab sets how much medicine each colonist carries (and which kind), replacing the Assign tab's Carry column.
-[*]Add any other item, such as food or drugs, with a count. Colonists fetch more when they run low, and stop before they would be over-encumbered.
+[*]Add any other item, such as food or drugs, with a count. Colonists fetch more when they run low, and stop before they would be over-encumbered. Loadout items are not dropped as unused, even old raw food or drugs the drug policy would not carry; only the amount above the loadout's count is.
+[*]A colonist takes the loadout's carry settings when it is assigned and whenever you change a row in the Items tab. Changes made elsewhere, such as in Dubs Mint Menus' gear menu, stay until then.
 [*]Loadout supplies, the sidearm and a stowed gun stay in the inventory when colonists unload after a caravan.
 [/list]
 
@@ -128,6 +131,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [h2]Other mods[/h2]
 [list]
 [*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
+[*][b]Dubs Mint Menus[/b]: its meal and drug carry settings appear in each loadout's supplies as Meals and Drugs rows.
 [*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is grayed out. Loadouts still handle weapons and supplies.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
 [*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, which control the same systems.
