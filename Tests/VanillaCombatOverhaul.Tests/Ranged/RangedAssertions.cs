@@ -209,22 +209,6 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        private static Thing MockShooter(float skill)
-        {
-            var map = Find.CurrentMap;
-            if (map != null)
-            {
-                return SpawnMockShooter(map, Mathf.RoundToInt(skill));
-            }
-
-            var pawn = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
-            if (pawn?.skills != null)
-            {
-                pawn.skills.GetSkill(SkillDefOf.Shooting).Level = Mathf.RoundToInt(skill);
-            }
-            return pawn;
-        }
-
         private static AssertionResult Check(string name, bool passed, string detail) =>
             new AssertionResult { Name = name, Passed = passed, Detail = detail };
     }

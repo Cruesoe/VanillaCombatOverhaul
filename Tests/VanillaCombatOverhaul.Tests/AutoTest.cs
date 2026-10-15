@@ -124,7 +124,9 @@ namespace VanillaCombatOverhaul
                 var facing = MeleeAssertions.FacingSelfTest();
                 var armor = ArmorAssertions.SelfTests();
                 var wounds = WoundAssertions.SelfTests();
+                wounds.AddRange(WoundAssertions.MapTests(map));
                 var height = HeightAssertions.SelfTests();
+                height.AddRange(HeightAssertions.AimSkillTests());
                 var results = TestSuite.RunMatrix(map, Seed);
 
                 // Any humanlike body will do; some maps have none spawned, so one is generated off-map.
