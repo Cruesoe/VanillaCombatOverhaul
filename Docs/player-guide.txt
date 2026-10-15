@@ -101,7 +101,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [list]
 [*]Choose which weapons a loadout allows. With "Choose primary weapon automatically" on, colonists equip the best allowed weapon they can reach and swap when a clearly better one (10% or more) turns up, judging damage, accuracy, armor penetration, condition and their own skill. Off, they keep what you give them.
 [*]Equipping a weapon by hand locks it until you use the colonist's "Allow weapon upgrades" button.
-[*]New games start with Anything, Ranged with sidearm, Melee and Manual weapons loadouts.
+[*]New games start with three loadouts: Anything (any weapon, with a backup melee weapon when carrying a gun), Ranged with sidearm, and Melee.
 [/list]
 
 [h3]Sidearms[/h3]
@@ -110,7 +110,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*]When a better sidearm turns up, a colonist picks it up and leaves the old one where the new one lay, usually back in the same stockpile. Any other spare melee weapon they carry is taken to storage. Weapons brought home by a caravan, or carried on another map, are left for the normal unload.
 [*]When an enemy reaches them in a fight they draw it, and put it away once the enemy is gone.
 [*]Strong shooters (Shooting 15 or more, and better at Shooting than Melee) keep their gun up close and fire point-blank instead.
-[*]Any melee weapon in a colonist's inventory can serve as the sidearm. To choose one, select the colonist, right-click a melee weapon and pick "Carry as sidearm". It is kept over better ones, and fetched back if dropped, until you press "Release sidearm".
+[*]Any melee weapon in a colonist's inventory can serve as the sidearm. To choose one, select the colonist, right-click a melee weapon and pick the option that names it, such as "Carry steel knife as sidearm". It is kept over better ones, and fetched back if dropped, until you press "Release sidearm".
 [*]Drafted colonists get a button to switch between gun and sidearm by hand; a sidearm drawn this way stays out until you switch back or undraft.
 [/list]
 

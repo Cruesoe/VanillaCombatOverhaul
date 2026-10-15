@@ -161,7 +161,6 @@
   <VCO_Loadout_Anything>Anything</VCO_Loadout_Anything>
   <VCO_Loadout_Ranged>Ranged with sidearm</VCO_Loadout_Ranged>
   <VCO_Loadout_Melee>Melee</VCO_Loadout_Melee>
-  <VCO_Loadout_Manual>Manual weapons</VCO_Loadout_Manual>
   <VCO_Loadout_Disabled>Loadouts off</VCO_Loadout_Disabled>
   <VCO_Loadout_Disabled_Tip>Loadouts are turned off in the Vanilla Combat Overhaul settings. Restart to remove this column.</VCO_Loadout_Disabled_Tip>
   <VCO_Loadout_Switch>Switch to {0}</VCO_Loadout_Switch>
