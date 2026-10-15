@@ -7,8 +7,8 @@
     Player-prev.log on start), so the run passes -NoFileLog and captures the game's console log from
     standard output into the sandbox instead. Your saves and Player.log are left alone.
 
-    A run fails if any check fails, if the game logs an exception, or if a [UnityStubs] warning names
-    this mod's code.
+    A run fails if any check fails, if the game logs an exception, or if it logs any warning or error
+    other than the known engine and other-mod noise listed in $noise.
 
     Exit codes:  0 = all checks passed, no exceptions
                  1 = a check failed or an exception was logged
@@ -110,9 +110,11 @@ try {
     }
     else {
         Write-Host "Game log: $(($logs | ForEach-Object { (Get-Content $_).Count } | Measure-Object -Sum).Sum) lines checked."
-        # Exceptions anywhere, and stub warnings raised from this mod's code.
-        $problems = Select-String -Path $logs -Pattern 'Exception', 'WARN \[UnityStubs\].*VanillaCombatOverhaul' |
-            Where-Object { $_.Line -notmatch 'Duplicate stacktrace' } |
+        # Exceptions anywhere, and every warning or error except known engine and other-mod noise.
+        $noise = '\[Vulkan\]|\[GraphicsDevice\]|\[NativeAllocationRuntime\]|Persistent allocation .* was not freed before shutdown' +
+            '|windows_read_data_files_in_registry|needs to have <downloadUrl> and/or <steamWorkshopUrl> specified'
+        $problems = Select-String -Path $logs -Pattern 'Exception', '^\S+\s+(WARN|ERROR)\s' |
+            Where-Object { $_.Line -notmatch 'Duplicate stacktrace' -and $_.Line -notmatch $noise } |
             ForEach-Object { $_.Line.Trim() } | Group-Object | Sort-Object Count -Descending
         if ($problems) {
             Write-Host ''

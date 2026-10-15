@@ -71,6 +71,9 @@ namespace VanillaCombatOverhaul
                 first = pawn.inventory.FirstUnloadableThing;
                 results.Add(Check("unloading keeps the sidearm and drops other things",
                     first.Thing == steel && first.Count == 10, Describe(first)));
+                // The steel's weight would leave a weak colonist too encumbered for the fetch check below.
+                inventory.Remove(steel);
+                steel.Destroy();
 
                 // Sidearm swap when an enemy reaches a drafted shooter.
                 pawn.drafter.Drafted = true;
@@ -122,6 +125,7 @@ namespace VanillaCombatOverhaul
                           + $"has {pawn.inventory.Count(medicine)} of {policy.CountFor(medicine)}, unload {pawn.inventory.UnloadEverything}, "
                           + $"pile {(pile.Spawned ? pile.Position.ToString() : "gone")} x{pile.stackCount}, reserve {pawn.CanReserve(pile, 10, 1)}, "
                           + $"reach {pawn.CanReach(pile, Verse.AI.PathEndMode.ClosestTouch, Danger.Deadly)}, forbidden {pile.IsForbidden(pawn)}, "
+                          + $"can pick up {MassUtility.CountToPickUpUntilOverEncumbered(pawn, pile)}, "
                           + $"job {pawn.CurJobDef?.defName}"
                         : $"{job.def.defName} {job.targetA.Thing?.def.defName} x{job.count}"));
 

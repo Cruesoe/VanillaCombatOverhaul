@@ -128,9 +128,17 @@ namespace VanillaCombatOverhaul
 
             if (faction != null && !faction.HostileTo(player))
             {
-                // Set on both sides; SetRelationDirect changes only the faction it is called on.
-                faction.SetRelationDirect(player, FactionRelationKind.Hostile, false);
-                player.SetRelationDirect(faction, FactionRelationKind.Hostile, false);
+                // Factions with goodwill take their relation from it, and log an error on SetRelationDirect.
+                if (faction.HasGoodwill)
+                {
+                    faction.TryAffectGoodwillWith(player, -200, false, false);
+                }
+                else
+                {
+                    // Set on both sides; SetRelationDirect changes only the faction it is called on.
+                    faction.SetRelationDirect(player, FactionRelationKind.Hostile, false);
+                    player.SetRelationDirect(faction, FactionRelationKind.Hostile, false);
+                }
             }
 
             if (faction != null && VCODiagnostics.Enabled)

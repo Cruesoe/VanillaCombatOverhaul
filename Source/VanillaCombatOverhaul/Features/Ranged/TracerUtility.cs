@@ -7,6 +7,7 @@ using Verse;
 namespace VanillaCombatOverhaul
 {
     /// <summary>Draws a short glowing streak behind in-flight projectiles, colored by damage type.</summary>
+    [StaticConstructorOnStartup]
     public static class TracerUtility
     {
         // Streak size at tracerScale 1, in cells.
