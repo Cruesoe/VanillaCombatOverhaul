@@ -129,7 +129,9 @@ namespace VanillaCombatOverhaul
 
         private void GenerateStartingLoadouts()
         {
-            MakeNewLoadout().label = "VCO_Loadout_Anything".Translate();
+            var anything = MakeNewLoadout();
+            anything.label = "VCO_Loadout_Anything".Translate();
+            anything.carrySidearm = true;
 
             var ranged = MakeNewLoadout();
             ranged.label = "VCO_Loadout_Ranged".Translate();
@@ -139,10 +141,6 @@ namespace VanillaCombatOverhaul
             var melee = MakeNewLoadout();
             melee.label = "VCO_Loadout_Melee".Translate();
             melee.weaponFilter = LoadoutUtility.NewWeaponFilter(ranged: false, melee: true);
-
-            var manual = MakeNewLoadout();
-            manual.label = "VCO_Loadout_Manual".Translate();
-            manual.autoPrimary = false;
         }
 
         /// <summary>Turns each apparel policy's old weapon filter into a loadout and assigns it.</summary>
