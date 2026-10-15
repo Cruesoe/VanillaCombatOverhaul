@@ -74,14 +74,16 @@ namespace VanillaCombatOverhaul
             if (locked != null && locked.Spawned && locked.Map == pawn.Map && !locked.IsForbidden(pawn)
                 && !MassUtility.WillBeOverEncumberedAfterPickingUp(pawn, locked, 1) && Reachable(pawn, locked, now))
             {
-                var fetch = JobMaker.MakeJob(JobDefOf.TakeCountToInventory, locked);
-                fetch.count = 1;
                 WeaponRetryAfterTick[pawn.thingIDNumber] = now + WeaponRetryTicks;
-                return fetch;
+                return LoadoutUtility.TakeSidearmJob(pawn, locked);
             }
             if (wantSidearm || locked != null)
             {
-                DropSurplusSidearms(pawn);
+                var stow = StowSurplusSidearmJob(pawn);
+                if (stow != null)
+                {
+                    return stow;
+                }
             }
 
             Thing bestPrimary = null;
@@ -145,9 +147,7 @@ namespace VanillaCombatOverhaul
                     }
                     WeaponRetryAfterTick[pawn.thingIDNumber] = now + WeaponRetryTicks;
                     VCODiagnostics.CountFor(pawn, "loadout.sidearm.job");
-                    var job = JobMaker.MakeJob(JobDefOf.TakeCountToInventory, bestSidearm);
-                    job.count = 1;
-                    return job;
+                    return LoadoutUtility.TakeSidearmJob(pawn, bestSidearm);
                 }
             }
             return null;
@@ -190,23 +190,33 @@ namespace VanillaCombatOverhaul
             return null;
         }
 
-        /// <summary>Keeps only the best melee weapon in inventory, besides a swapped-out primary.</summary>
-        private static void DropSurplusSidearms(Pawn pawn)
+        /// <summary>
+        /// A job carrying one melee weapon other than the sidearm and a swapped-out primary to storage. Only on a
+        /// home map with no unload pending, so weapons brought back by a caravan or carried on an away map are left alone.
+        /// </summary>
+        private static Job StowSurplusSidearmJob(Pawn pawn)
         {
+            if (!pawn.Map.IsPlayerHome || pawn.inventory.UnloadEverything)
+            {
+                return null;
+            }
             var keep = LoadoutUtility.CarriedSidearm(pawn);
             if (keep == null)
             {
-                return;
+                return null;
             }
+            var swapped = LoadoutUtility.CompFor(pawn)?.SwappedPrimary;
             var inventory = pawn.inventory.innerContainer;
-            for (var i = inventory.Count - 1; i >= 0; i--)
+            for (var i = 0; i < inventory.Count; i++)
             {
                 var thing = inventory[i];
-                if (thing != keep && LoadoutUtility.IsMelee(thing) && thing != LoadoutUtility.CompFor(pawn).SwappedPrimary)
+                if (thing != keep && thing != swapped && LoadoutUtility.IsMelee(thing))
                 {
-                    inventory.TryDrop(thing, pawn.Position, pawn.Map, ThingPlaceMode.Near, out _);
+                    VCODiagnostics.CountFor(pawn, "loadout.sidearm.stow");
+                    return JobMaker.MakeJob(VCO_JobDefOf.VCO_StowWeapon, thing);
                 }
             }
+            return null;
         }
 
         private static bool Reachable(Pawn pawn, Thing thing, int now)

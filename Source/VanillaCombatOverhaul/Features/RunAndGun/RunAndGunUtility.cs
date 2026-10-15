@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -13,7 +14,7 @@ namespace VanillaCombatOverhaul
     public static class RunAndGunUtility
     {
         public const int CheckInterval = 15;
-        // Run and Gun's defaults: accuracy x0.9; 10% slower with light weapons, 40% with heavy ones.
+        // Run and Gun's defaults: shooter factor x0.9; 10% slower with light weapons, 40% with heavy ones.
         public const float MovingAccuracy = 0.9f;
         public const float LightMoveTicksFactor = 1.1f;
         public const float HeavyMoveTicksFactor = 1.4f;
@@ -134,7 +135,7 @@ namespace VanillaCombatOverhaul
                 return;
             }
             var factor = ShotReportAccess.GetShooterFactor(ref report);
-            ShotReportAccess.SetShooterFactor(ref report, FireModeUtility.AdjustHitFactor(factor, MovingAccuracy));
+            ShotReportAccess.SetShooterFactor(ref report, Mathf.Max(factor * MovingAccuracy, FireModeUtility.MinShooterFactor));
             VCODiagnostics.Count("runAndGun.hit.adjusted");
         }
 

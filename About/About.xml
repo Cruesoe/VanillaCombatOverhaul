@@ -7,6 +7,7 @@
   <url>https://github.com/Cruesoe/VanillaCombatOverhaul</url>
   <supportedVersions>
     <li>1.6</li>
+    <li>1.7</li>
   </supportedVersions>
   <modDependencies>
     <li>

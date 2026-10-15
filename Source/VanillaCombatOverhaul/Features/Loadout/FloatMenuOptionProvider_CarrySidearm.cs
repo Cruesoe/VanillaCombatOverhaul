@@ -55,9 +55,7 @@ namespace VanillaCombatOverhaul
             {
                 LoadoutUtility.CompFor(pawn).LockedSidearm = weapon;
                 weapon.SetForbidden(false);
-                var job = JobMaker.MakeJob(JobDefOf.TakeCountToInventory, weapon);
-                job.count = 1;
-                pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+                pawn.jobs.TryTakeOrderedJob(LoadoutUtility.TakeSidearmJob(pawn, weapon), JobTag.Misc);
             }, MenuOptionPriority.Default), pawn, weapon);
         }
 

@@ -183,13 +183,17 @@ namespace VanillaCombatOverhaul
 
             var thingLabel = entry.matchWeapon
                 ? "VCO_Loadout_MatchWeapon".Translate().ToString()
-                : (entry.thingDef ?? group.DefaultThingDef).LabelCap.ToString();
+                : LoadoutStockUtility.ChosenThing(entry).LabelCap.ToString();
             if (Widgets.ButtonText(thingRect, thingLabel.Truncate(thingRect.width)))
             {
                 var options = new List<FloatMenuOption>();
                 if (LoadoutStockUtility.IsAmmunitionGroup(group))
                 {
-                    options.Add(new FloatMenuOption("VCO_Loadout_MatchWeapon".Translate(), () => entry.matchWeapon = true));
+                    options.Add(new FloatMenuOption("VCO_Loadout_MatchWeapon".Translate(), () =>
+                    {
+                        entry.matchWeapon = true;
+                        LoadoutStockUtility.ApplyToUsers(policy, group);
+                    }));
                 }
                 foreach (var thing in group.thingDefs)
                 {
@@ -198,6 +202,7 @@ namespace VanillaCombatOverhaul
                     {
                         entry.thingDef = captured;
                         entry.matchWeapon = false;
+                        LoadoutStockUtility.ApplyToUsers(policy, group);
                     }, captured));
                 }
                 Find.WindowStack.Add(new FloatMenu(options));
@@ -213,7 +218,11 @@ namespace VanillaCombatOverhaul
                 for (var i = group.min; i <= group.max; i++)
                 {
                     var captured = i;
-                    options.Add(new FloatMenuOption(i.ToString(), () => entry.count = captured));
+                    options.Add(new FloatMenuOption(i.ToString(), () =>
+                    {
+                        entry.count = captured;
+                        LoadoutStockUtility.ApplyToUsers(policy, group);
+                    }));
                 }
                 Find.WindowStack.Add(new FloatMenu(options));
             }

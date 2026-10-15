@@ -71,6 +71,9 @@ namespace VanillaCombatOverhaul
                 first = pawn.inventory.FirstUnloadableThing;
                 results.Add(Check("unloading keeps the sidearm and drops other things",
                     first.Thing == steel && first.Count == 10, Describe(first)));
+                // The steel's weight would leave a weak colonist too encumbered for the fetch check below.
+                inventory.Remove(steel);
+                steel.Destroy();
 
                 // Sidearm swap when an enemy reaches a drafted shooter.
                 pawn.drafter.Drafted = true;
@@ -122,6 +125,7 @@ namespace VanillaCombatOverhaul
                           + $"has {pawn.inventory.Count(medicine)} of {policy.CountFor(medicine)}, unload {pawn.inventory.UnloadEverything}, "
                           + $"pile {(pile.Spawned ? pile.Position.ToString() : "gone")} x{pile.stackCount}, reserve {pawn.CanReserve(pile, 10, 1)}, "
                           + $"reach {pawn.CanReach(pile, Verse.AI.PathEndMode.ClosestTouch, Danger.Deadly)}, forbidden {pile.IsForbidden(pawn)}, "
+                          + $"can pick up {MassUtility.CountToPickUpUntilOverEncumbered(pawn, pile)}, "
                           + $"job {pawn.CurJobDef?.defName}"
                         : $"{job.def.defName} {job.targetA.Thing?.def.defName} x{job.count}"));
 
@@ -234,13 +238,29 @@ namespace VanillaCombatOverhaul
             pawn.equipment.Remove(rifle);
             var bowThing = (ThingWithComps)ThingMaker.MakeThing(bow, GenStuff.DefaultStuffFor(bow));
             pawn.equipment.AddEquipment(bowThing);
-            LoadoutStockUtility.Apply(pawn, policy);
             var withBow = pawn.inventoryStock.GetDesiredThingForGroup(group);
+
+            var withSidearm = withBow;
+            var knife = DefDatabase<ThingDef>.GetNamedSilentFail("MeleeWeapon_Knife");
+            if (knife != null)
+            {
+                var sidearm = (ThingWithComps)ThingMaker.MakeThing(knife, GenStuff.DefaultStuffFor(knife));
+                pawn.inventory.innerContainer.TryAdd(sidearm);
+                LoadoutUtility.Swap(pawn, sidearm);
+                withSidearm = pawn.inventoryStock.GetDesiredThingForGroup(group);
+                LoadoutUtility.Swap(pawn, bowThing);
+                pawn.inventory.innerContainer.Remove(sidearm);
+                sidearm.Destroy();
+            }
             pawn.equipment.DestroyEquipment(bowThing);
             pawn.equipment.AddEquipment(rifle);
+            var rifleAgain = pawn.inventoryStock.GetDesiredThingForGroup(group);
 
-            results.Add(Check("ammunition stock matches the primary weapon",
-                withRifle == ammo && withBow == arrows, $"rifle {withRifle?.defName}, bow {withBow?.defName}"));
+            results.Add(Check("ammunition stock follows the primary weapon when it is equipped",
+                withRifle == ammo && withBow == arrows && rifleAgain == ammo,
+                $"rifle {withRifle?.defName}, bow {withBow?.defName}, rifle again {rifleAgain?.defName}"));
+            results.Add(Check("drawing the sidearm keeps the primary weapon's ammunition",
+                withSidearm == arrows, $"with sidearm {withSidearm?.defName}"));
             results.Add(Check("Progression: Ammunition's ammo column is hidden while loadouts are on",
                 DefDatabase<PawnColumnDef>.GetNamedSilentFail("PA_AmmoCarry")?.Worker.VisibleCurrently == false, "hidden"));
             return results;

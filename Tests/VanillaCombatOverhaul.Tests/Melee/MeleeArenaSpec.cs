@@ -42,8 +42,6 @@ namespace VanillaCombatOverhaul
         /// <summary>Non-zero pins the RNG, making a run reproducible for regression checks.</summary>
         public int seed = 0;
 
-        public MeleeArenaSpec Clone() => (MeleeArenaSpec)MemberwiseClone();
-
         public IEnumerable<KeyValuePair<string, string>> Describe()
         {
             yield return new KeyValuePair<string, string>("label", label);

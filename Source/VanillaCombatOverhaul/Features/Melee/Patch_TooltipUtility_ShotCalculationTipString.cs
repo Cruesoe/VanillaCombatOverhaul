@@ -77,7 +77,7 @@ namespace VanillaCombatOverhaul
                 {
                     sb.AppendLine("   " + "VCO_TargetSide".Translate() + ": " + side.labelShort);
                 }
-                var height = HeightTargetingUtility.GetTargetHeight(pawn);
+                var height = HeightTargetingUtility.GetTargetHeight(pawn, melee: true);
                 if (height != BodyPartHeight.Undefined)
                 {
                     var chance = HeightTargetingUtility.ChanceToLand(

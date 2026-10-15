@@ -65,6 +65,7 @@ namespace VanillaCombatOverhaul
             var prone = Find.TickManager.TicksGame - proneSinceTick;
             if (prone >= MaxProneTicks)
             {
+                SuppressionUtility.CompFor(pawn)?.Notify_MaxProneReached();
                 return true;
             }
             return prone >= MinProneTicks && SuppressionUtility.CompFor(pawn)?.Pinned != true;

@@ -117,11 +117,16 @@ namespace VanillaCombatOverhaul
             {
                 // Taken before any arena runs.
                 var fingerprint = Fingerprint(map);
+                // Generated maps can put walls, rock or water where the arenas spawn pawns.
+                var cleared = TestArenaUtility.PrepareArena(map);
+                Log.Message($"[VCO] Test arena cleared: {cleared} things removed within {TestArenaUtility.ArenaRadius} cells of the map center.");
 
                 var facing = MeleeAssertions.FacingSelfTest();
                 var armor = ArmorAssertions.SelfTests();
                 var wounds = WoundAssertions.SelfTests();
+                wounds.AddRange(WoundAssertions.MapTests(map));
                 var height = HeightAssertions.SelfTests();
+                height.AddRange(HeightAssertions.AimSkillTests());
                 var results = TestSuite.RunMatrix(map, Seed);
 
                 // Any humanlike body will do; some maps have none spawned, so one is generated off-map.

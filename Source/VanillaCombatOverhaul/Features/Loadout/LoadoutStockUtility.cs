@@ -8,30 +8,11 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    /// <summary>A loadout's setting for one vanilla carry group: which item and how many.</summary>
-    public class LoadoutStock : IExposable
-    {
-        public InventoryStockGroupDef group;
-        public ThingDef thingDef;
-        public int count;
-        // Use the refill the primary weapon needs (Progression: Ammunition) instead of thingDef.
-        public bool matchWeapon;
-
-        public LoadoutStock Copy() =>
-            new LoadoutStock { group = group, thingDef = thingDef, count = count, matchWeapon = matchWeapon };
-
-        public void ExposeData()
-        {
-            Scribe_Defs.Look(ref group, "group");
-            Scribe_Defs.Look(ref thingDef, "thingDef");
-            Scribe_Values.Look(ref count, "count", 0);
-            Scribe_Values.Look(ref matchWeapon, "matchWeapon", false);
-        }
-    }
-
     /// <summary>
     /// Drives vanilla's per-pawn carry settings (Pawn_InventoryStockTracker) from the pawn's loadout, so
-    /// vanilla's fetch job and unload rules handle medicine and any mod's carry groups unchanged.
+    /// vanilla's fetch job and unload rules handle medicine and any mod's carry groups unchanged. Applied when
+    /// a colonist's loadout changes, a group is edited, or the primary weapon changes; settings changed
+    /// elsewhere (such as Dubs Mint Menus' gear menu) stay until then.
     /// </summary>
     [StaticConstructorOnStartup]
     public static class LoadoutStockUtility
@@ -56,6 +37,9 @@ namespace VanillaCombatOverhaul
         public static bool IsAmmunitionGroup(InventoryStockGroupDef group) =>
             AmmunitionActive && group.defName == AmmunitionGroupDefName;
 
+        /// <summary>A group with items to choose from; one made in code with none has no default item.</summary>
+        private static bool HasItems(InventoryStockGroupDef group) => !group.thingDefs.NullOrEmpty();
+
         /// <summary>Carry groups shown in loadouts; the ammunition group only while that mod is enabled.</summary>
         public static IEnumerable<InventoryStockGroupDef> Groups
         {
@@ -63,7 +47,7 @@ namespace VanillaCombatOverhaul
             {
                 foreach (var group in DefDatabase<InventoryStockGroupDef>.AllDefs)
                 {
-                    if (!IsAmmunitionGroup(group) || AmmunitionEnabled)
+                    if (HasItems(group) && (!IsAmmunitionGroup(group) || AmmunitionEnabled))
                     {
                         yield return group;
                     }
@@ -76,7 +60,10 @@ namespace VanillaCombatOverhaul
             var stock = new List<LoadoutStock>();
             foreach (var group in DefDatabase<InventoryStockGroupDef>.AllDefs)
             {
-                stock.Add(DefaultEntry(group));
+                if (HasItems(group))
+                {
+                    stock.Add(DefaultEntry(group));
+                }
             }
             return stock;
         }
@@ -143,31 +130,77 @@ namespace VanillaCombatOverhaul
                     return ammo;
                 }
             }
-            return entry.thingDef != null && entry.group.thingDefs.Contains(entry.thingDef)
-                ? entry.thingDef
-                : entry.group.DefaultThingDef;
+            return ChosenThing(entry);
         }
 
-        /// <summary>Writes the loadout's stock into the pawn's vanilla carry settings where they differ.</summary>
+        /// <summary>The entry's chosen item, or the group's default once that item is no longer in the group.</summary>
+        public static ThingDef ChosenThing(LoadoutStock entry) =>
+            entry.thingDef != null && entry.group.thingDefs.Contains(entry.thingDef)
+                ? entry.thingDef
+                : entry.group.DefaultThingDef;
+
+        /// <summary>Writes all of the loadout's stock into the pawn's vanilla carry settings where they differ.</summary>
         public static void Apply(Pawn pawn, LoadoutPolicy loadout)
+        {
+            if (pawn?.inventoryStock == null || loadout == null)
+            {
+                return;
+            }
+            foreach (var group in Groups)
+            {
+                ApplyGroup(pawn, loadout, group);
+            }
+        }
+
+        /// <summary>Writes one group of the loadout's stock into the pawn's carry settings where they differ.</summary>
+        public static void ApplyGroup(Pawn pawn, LoadoutPolicy loadout, InventoryStockGroupDef group)
         {
             var tracker = pawn?.inventoryStock;
             if (tracker == null || loadout == null)
             {
                 return;
             }
+            var entry = loadout.StockFor(group);
+            var thing = ThingFor(entry, pawn);
+            var count = Mathf.Clamp(entry.count, group.min, group.max);
+            if (tracker.GetDesiredThingForGroup(group) != thing)
+            {
+                tracker.SetThingForGroup(group, thing);
+            }
+            if (tracker.GetDesiredCountForGroup(group) != count)
+            {
+                tracker.SetCountForGroup(group, count);
+            }
+        }
+
+        /// <summary>Re-applies the groups set to match the primary weapon, after the weapon changes.</summary>
+        public static void ApplyWeaponMatch(Pawn pawn, LoadoutPolicy loadout)
+        {
+            if (pawn?.inventoryStock == null || loadout?.stock == null)
+            {
+                return;
+            }
             foreach (var group in Groups)
             {
-                var entry = loadout.StockFor(group);
-                var thing = ThingFor(entry, pawn);
-                var count = Mathf.Clamp(entry.count, group.min, group.max);
-                if (tracker.GetDesiredThingForGroup(group) != thing)
+                if (loadout.StockFor(group).matchWeapon)
                 {
-                    tracker.SetThingForGroup(group, thing);
+                    ApplyGroup(pawn, loadout, group);
                 }
-                if (tracker.GetDesiredCountForGroup(group) != count)
+            }
+        }
+
+        /// <summary>Applies one group of a loadout to every colonist using it, after the group is edited.</summary>
+        public static void ApplyToUsers(LoadoutPolicy loadout, InventoryStockGroupDef group)
+        {
+            if (!LoadoutUtility.Enabled)
+            {
+                return;
+            }
+            foreach (var pawn in PawnsFinder.AllMapsCaravansAndTravellingTransporters_Alive_Colonists)
+            {
+                if (LoadoutUtility.LoadoutFor(pawn) == loadout)
                 {
-                    tracker.SetCountForGroup(group, count);
+                    ApplyGroup(pawn, loadout, group);
                 }
             }
         }

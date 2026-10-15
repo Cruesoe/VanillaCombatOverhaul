@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 using Verse.AI;
 
@@ -18,6 +19,8 @@ namespace VanillaCombatOverhaul
         public const int CalmChecksBeforeSwapBack = 4;
 
         private LoadoutPolicy loadout;
+        // The loadout whose stock was last written to the pawn's carry settings.
+        private LoadoutPolicy stockApplied;
         private ThingWithComps swappedPrimary;
         private ThingWithComps lockedSidearm;
         private bool autoSwapped;
@@ -34,6 +37,19 @@ namespace VanillaCombatOverhaul
 
         public bool HasAssignedLoadout(LoadoutPolicy policy) => loadout == policy;
 
+        /// <summary>Drops references to a deleted loadout.</summary>
+        public void Notify_LoadoutDeleted(LoadoutPolicy policy)
+        {
+            if (loadout == policy)
+            {
+                loadout = null;
+            }
+            if (stockApplied == policy)
+            {
+                stockApplied = null;
+            }
+        }
+
         /// <summary>The primary weapon moved to inventory while the sidearm is in hand.</summary>
         public ThingWithComps SwappedPrimary => swappedPrimary;
 
@@ -42,13 +58,34 @@ namespace VanillaCombatOverhaul
         {
             get
             {
-                if (lockedSidearm != null && lockedSidearm.Destroyed)
+                if (lockedSidearm != null && !LockStillHolds(lockedSidearm))
                 {
                     lockedSidearm = null;
                 }
                 return lockedSidearm;
             }
             set => lockedSidearm = value;
+        }
+
+        /// <summary>
+        /// False once the weapon is destroyed, wielded or carried by another pawn (outside a shared caravan),
+        /// or held off-map by something other than a pawn, such as a trader's stock.
+        /// </summary>
+        private bool LockStillHolds(ThingWithComps weapon)
+        {
+            if (weapon.Destroyed)
+            {
+                return false;
+            }
+            var holder = weapon.ParentHolder is Pawn_EquipmentTracker equipment ? equipment.pawn
+                : weapon.ParentHolder is Pawn_InventoryTracker inventory ? inventory.pawn
+                : null;
+            if (holder != null)
+            {
+                return holder == Pawn || (holder.Faction == Faction.OfPlayer && holder.IsCaravanMember()
+                                          && holder.GetCaravan() == Pawn?.GetCaravan());
+            }
+            return weapon.MapHeld != null;
         }
 
         public override void CompTickInterval(int delta)
@@ -58,9 +95,12 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (LoadoutUtility.Enabled && pawn.IsColonist && parent.IsHashIntervalTick(StockIntervalTicks, delta))
+            // Stock is written once per loadout assigned (including the default for new colonists), not repeatedly.
+            if (LoadoutUtility.Enabled && pawn.IsColonist && parent.IsHashIntervalTick(StockIntervalTicks, delta)
+                && stockApplied != Loadout)
             {
                 LoadoutStockUtility.Apply(pawn, Loadout);
+                stockApplied = Loadout;
             }
             if (!parent.IsHashIntervalTick(CheckIntervalTicks, delta))
             {
@@ -221,9 +261,11 @@ namespace VanillaCombatOverhaul
         {
             base.PostExposeData();
             Scribe_References.Look(ref loadout, "vcoLoadout");
+            Scribe_References.Look(ref stockApplied, "vcoStockApplied");
             Scribe_References.Look(ref swappedPrimary, "vcoSwappedPrimary");
             Scribe_References.Look(ref lockedSidearm, "vcoLockedSidearm");
             Scribe_Values.Look(ref autoSwapped, "vcoAutoSwapped", false);
+            Scribe_Values.Look(ref calmChecks, "vcoCalmChecks", 0);
         }
     }
 }

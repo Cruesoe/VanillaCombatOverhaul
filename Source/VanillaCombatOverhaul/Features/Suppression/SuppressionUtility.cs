@@ -273,7 +273,7 @@ namespace VanillaCombatOverhaul
             var minZ = Mathf.Min(origin.z, end.z) - FlybyRadius;
             var maxZ = Mathf.Max(origin.z, end.z) + FlybyRadius;
             var source = launcher.Position;
-            var pawns = map.mapPawns.AllPawnsSpawned;
+            var pawns = map.mapPawns.AllHumanlikeSpawned;
             for (var i = 0; i < pawns.Count; i++)
             {
                 var pawn = pawns[i];

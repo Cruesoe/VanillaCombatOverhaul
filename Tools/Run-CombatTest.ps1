@@ -1,11 +1,18 @@
 <#
-    Runs the in-game combat test suite headlessly against the deployed mod and reports pass/fail.
+    Runs the in-game combat test suite against the deployed mod on RimWorld 1.7 and reports pass/fail.
 
-    RimWorld starts with -savedatafolder and -logFile pointing at a throwaway folder, so the run has
-    its own config, mod list and log. Your real ModsConfig.xml, saves and Player.log are not touched,
-    so it is safe to run while you are playing.
+    RimWorld starts with -savedatafolder pointing at a throwaway folder, so the run has its own config
+    and saves, and with -mod naming the mods to load, so your real ModsConfig.xml is not touched.
+    1.7 always writes Player.log to the real LocalLow\...\Logs folder (and renames the previous one to
+    Player-prev.log on start), so the run passes -NoFileLog and captures the game's console log from
+    standard output into the sandbox instead. Your saves and Player.log are left alone.
 
-    A run fails if any check fails or if the game logs an exception.
+    The suite itself is a separate dev-only mod, Tests\Mod (cruesoe.vanillacombatoverhaul.tests), built by
+    Deploy-Mod.ps1 from Tests\VanillaCombatOverhaul.Tests and never shipped. For the run it is copied into
+    Mods\Vanilla Combat Overhaul Tests and loaded after the mod; the folder is removed afterwards.
+
+    A run fails if any check fails, if the game logs an exception, or if it logs any warning or error
+    other than the known engine and other-mod noise listed in $noise.
 
     Exit codes:  0 = all checks passed, no exceptions
                  1 = a check failed or an exception was logged
@@ -14,7 +21,7 @@
     Usage:
         .\Run-CombatTest.ps1                  # unseeded
         .\Run-CombatTest.ps1 -Seed 12345      # pinned seed, for regression checks
-        .\Run-CombatTest.ps1 -KeepSandbox     # keep the folder with Player.log and results
+        .\Run-CombatTest.ps1 -KeepSandbox     # keep the folder with the log and results
         .\Run-CombatTest.ps1 -ExtraMods ferny.ProgressionAmmunition   # also load other installed mods by package ID
 #>
 [CmdletBinding()]
@@ -28,13 +35,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$exe = Join-Path $RimWorldPath 'RimWorldWin64.exe'
-if (-not (Test-Path $exe)) { Write-Error "RimWorld not found at $exe"; exit 2 }
+$exe = Join-Path $RimWorldPath 'RimWorld.exe'
+if (-not (Test-Path $exe)) { Write-Error "RimWorld 1.7 not found at $exe"; exit 2 }
 
 # --- the deployed copy must be the build in this repo -------------------------
 $repo = Split-Path $PSScriptRoot -Parent
-$dll = Join-Path $repo '1.6\Assemblies\VanillaCombatOverhaul.dll'
-if (-not (Test-Path $dll)) { Write-Error "Mod assembly not built: $dll"; exit 2 }
+$dllName = 'VanillaCombatOverhaul.dll'
+# Each version folder with a built assembly must match its deployed copy; 1.7 loads the 1.6 build until the mod has its own.
+$builds = @('1.6', '1.7') | ForEach-Object { Join-Path $repo "$_\Assemblies\$dllName" } | Where-Object { Test-Path $_ }
+if (-not $builds) { Write-Error "Mod assembly not built under $repo\1.6 or 1.7"; exit 2 }
 
 $packageId = ([xml](Get-Content (Join-Path $repo 'About\About.xml') -Raw)).ModMetaData.packageId
 $deployed = Get-ChildItem (Join-Path $RimWorldPath 'Mods') -Directory | Where-Object {
@@ -42,10 +51,28 @@ $deployed = Get-ChildItem (Join-Path $RimWorldPath 'Mods') -Directory | Where-Ob
     (Test-Path $about) -and ([xml](Get-Content $about -Raw)).ModMetaData.packageId -eq $packageId
 } | Select-Object -First 1
 if (-not $deployed) { Write-Error "No deployed copy of $packageId. Deploy with Deploy-Mod.ps1 first."; exit 2 }
-$deployedDll = Join-Path $deployed.FullName '1.6\Assemblies\VanillaCombatOverhaul.dll'
-if (-not (Test-Path $deployedDll) -or (Get-FileHash $dll).Hash -ne (Get-FileHash $deployedDll).Hash) {
-    Write-Error "The deployed assembly differs from the repo build. Deploy with Deploy-Mod.ps1 first."
+foreach ($dll in $builds) {
+    $deployedDll = Join-Path $deployed.FullName $dll.Substring($repo.Length + 1)
+    if (-not (Test-Path $deployedDll) -or (Get-FileHash $dll).Hash -ne (Get-FileHash $deployedDll).Hash) {
+        Write-Error "The deployed $($dll.Substring($repo.Length + 1)) differs from the repo build. Deploy with Deploy-Mod.ps1 first."
+        exit 2
+    }
+}
+
+# --- the test suite mod, copied into Mods for the run only -----------------------
+$testMod = Join-Path $repo 'Tests\Mod'
+$testPackageId = ([xml](Get-Content (Join-Path $testMod 'About\About.xml') -Raw)).ModMetaData.packageId
+if (-not (Test-Path (Join-Path $testMod '1.7\Assemblies\VanillaCombatOverhaul.Tests.dll'))) {
+    Write-Error "Test suite not built under $testMod. Deploy with Deploy-Mod.ps1 first, which builds it."
     exit 2
+}
+$testTarget = Join-Path $RimWorldPath 'Mods\Vanilla Combat Overhaul Tests'
+if (Test-Path $testTarget) {
+    $existing = Join-Path $testTarget 'About\About.xml'
+    if (-not (Test-Path $existing) -or ([xml](Get-Content $existing -Raw)).ModMetaData.packageId -ne $testPackageId) {
+        Write-Error "$testTarget exists and is not the test suite; not touching it."
+        exit 2
+    }
 }
 
 # --- throwaway save-data folder -------------------------------------------------
@@ -53,35 +80,36 @@ $sandbox = Join-Path $env:TEMP "vco-test-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 $configDir = Join-Path $sandbox 'Config'
 New-Item -ItemType Directory -Path $configDir -Force | Out-Null
 
-# Prefs from the real install avoid first-launch prompts; the game version is read from the real mod list.
+# Prefs from the real install avoid first-launch prompts.
 $realConfig = Join-Path $env:USERPROFILE 'AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\Config'
 foreach ($f in @('Prefs.xml', 'KeyPrefs.xml')) {
     $src = Join-Path $realConfig $f
     if (Test-Path $src) { Copy-Item $src (Join-Path $configDir $f) -Force }
 }
-$version = '1.6'
-$realMods = Join-Path $realConfig 'ModsConfig.xml'
-if (Test-Path $realMods) { $version = ([xml](Get-Content $realMods -Raw)).ModsConfigData.version }
 
-$mods = @('brrainz.harmony', 'ludeon.rimworld', 'ludeon.rimworld.royalty', 'ludeon.rimworld.ideology',
-          'ludeon.rimworld.biotech', 'ludeon.rimworld.anomaly', 'ludeon.rimworld.odyssey') + ($ExtraMods | ForEach-Object { $_.ToLowerInvariant() }) + @($packageId.ToLowerInvariant())
-$modsXml = "<?xml version=`"1.0`" encoding=`"utf-8`"?>`r`n<ModsConfigData>`r`n  <version>$version</version>`r`n  <activeMods>`r`n"
-foreach ($m in $mods) { $modsXml += "    <li>$m</li>`r`n" }
-$modsXml += "  </activeMods>`r`n</ModsConfigData>`r`n"
-[System.IO.File]::WriteAllText((Join-Path $configDir 'ModsConfig.xml'), $modsXml)
+# -mod takes a comma-separated list; Core and the DLCs are added automatically.
+$mods = @('brrainz.harmony') + $ExtraMods + @($packageId, $testPackageId)
+$modArg = '-mod=' + (($mods | ForEach-Object { $_.ToLowerInvariant() }) -join ',')
 
 # The trigger file is what the mod watches for; its contents are the RNG seed.
 [System.IO.File]::WriteAllText((Join-Path $configDir 'vco_autotest.trigger'), "$Seed")
 $resultPath = Join-Path $configDir 'vco_autotest_results.txt'
-$logPath = Join-Path $sandbox 'Player.log'
+$logPath = Join-Path $sandbox 'game.log'
+$errPath = Join-Path $sandbox 'game-stderr.log'
 
 Write-Host "Sandbox : $sandbox"
 Write-Host "Seed    : $(if ($Seed -eq 0) { 'unseeded' } else { $Seed })"
+Write-Host "Mods    : $($mods -join ', ')"
 Write-Host 'Launching RimWorld...'
 
 $exitCode = 2
 try {
-    $proc = Start-Process -FilePath $exe -ArgumentList "-savedatafolder=`"$sandbox`"", '-logFile', "`"$logPath`"" -WindowStyle Minimized -PassThru
+    # Mirrored, so a copy left by an interrupted run is brought up to date; robocopy codes below 8 are success.
+    robocopy $testMod $testTarget /MIR /NJH /NJS /NP /NFL /NDL | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "Copying the test suite to $testTarget failed (robocopy $LASTEXITCODE)." }
+
+    $proc = Start-Process -FilePath $exe -ArgumentList "-savedatafolder=`"$sandbox`"", $modArg, '-NoFileLog' `
+        -WindowStyle Minimized -RedirectStandardOutput $logPath -RedirectStandardError $errPath -PassThru
     if (-not $proc.WaitForExit($TimeoutMinutes * 60 * 1000)) {
         Write-Warning "Timed out after $TimeoutMinutes minutes; terminating."
         try { $proc.Kill() } catch { }
@@ -99,25 +127,31 @@ try {
         Write-Warning "No results file - the run crashed or never reached the map."
     }
 
-    if (-not (Test-Path $logPath)) {
-        Write-Warning "No Player.log at $logPath, so exceptions could not be checked."
+    $logs = @($logPath, $errPath) | Where-Object { (Test-Path $_) -and (Get-Item $_).Length -gt 0 }
+    if (-not $logs) {
+        Write-Warning "The game wrote no console log to $logPath, so exceptions could not be checked."
         $exitCode = 2
     }
     else {
-        Write-Host "Player.log: $((Get-Content $logPath).Count) lines checked for exceptions."
-        $exceptions = Select-String -Path $logPath -Pattern 'Exception' |
-            Where-Object { $_.Line -notmatch 'Duplicate stacktrace' } |
+        Write-Host "Game log: $(($logs | ForEach-Object { (Get-Content $_).Count } | Measure-Object -Sum).Sum) lines checked."
+        # Exceptions anywhere, and every warning or error except known engine and other-mod noise.
+        $noise = '\[Vulkan\]|\[GraphicsDevice\]|\[NativeAllocationRuntime\]|Persistent allocation .* was not freed before shutdown' +
+            '|windows_read_data_files_in_registry|needs to have <downloadUrl> and/or <steamWorkshopUrl> specified'
+        $problems = Select-String -Path $logs -Pattern 'Exception', '^\S+\s+(WARN|ERROR)\s' |
+            Where-Object { $_.Line -notmatch 'Duplicate stacktrace' -and $_.Line -notmatch $noise } |
             ForEach-Object { $_.Line.Trim() } | Group-Object | Sort-Object Count -Descending
-        if ($exceptions) {
+        if ($problems) {
             Write-Host ''
-            Write-Host 'Exceptions logged during the run:'
-            $exceptions | ForEach-Object { Write-Host ("  {0,4} x {1}" -f $_.Count, $_.Name) }
+            Write-Host 'Problems logged during the run:'
+            $problems | ForEach-Object { Write-Host ("  {0,4} x {1}" -f $_.Count, $_.Name) }
             if ($exitCode -eq 0) { $exitCode = 1 }
         }
-        if ($exitCode -eq 2) { Write-Host '--- tail of Player.log ---'; Get-Content $logPath -Tail 40 }
+        if ($exitCode -eq 2) { Write-Host '--- tail of the game log ---'; Get-Content $logPath -Tail 40 }
     }
 }
 finally {
+    # The test suite lives in Mods only for the run.
+    if (Test-Path $testTarget) { Remove-Item -LiteralPath $testTarget -Recurse -Force -ErrorAction SilentlyContinue }
     if ($KeepSandbox -or $exitCode -ne 0) {
         Write-Host "Sandbox kept at $sandbox"
     }

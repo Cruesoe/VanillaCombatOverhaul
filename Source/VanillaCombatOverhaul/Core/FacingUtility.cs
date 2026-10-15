@@ -57,8 +57,5 @@ namespace VanillaCombatOverhaul
                     return AttackFacing.Rear;
             }
         }
-
-        public static bool IsFlank(this AttackFacing facing) =>
-            facing == AttackFacing.Left || facing == AttackFacing.Right;
     }
 }

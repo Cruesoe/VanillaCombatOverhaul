@@ -15,6 +15,8 @@ namespace VanillaCombatOverhaul
     {
         public const float CoverSearchRadius = 5.9f;
         public const int PinCooldownTicks = 60;
+        // After the longest prone stretch, the pawn gets this long on its feet before it can be pinned again.
+        public const int UnpinnedAfterMaxProneTicks = 600;
 
         private float level;
         private int lastSuppressedTick = -99999;
@@ -115,6 +117,12 @@ namespace VanillaCombatOverhaul
             }
             pawn.jobs.StartJob(job, JobCondition.InterruptForced);
             VCODiagnostics.CountFor(pawn, "suppression.pinned");
+        }
+
+        /// <summary>Called when the pawn gets up after the longest prone stretch while still pinned.</summary>
+        public void Notify_MaxProneReached()
+        {
+            nextPinTick = Find.TickManager.TicksGame + UnpinnedAfterMaxProneTicks;
         }
 
         // A burst in progress finishes before the pawn goes down.
