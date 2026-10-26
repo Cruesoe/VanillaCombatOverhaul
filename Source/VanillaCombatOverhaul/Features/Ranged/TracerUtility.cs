@@ -21,7 +21,8 @@ namespace VanillaCombatOverhaul
             {
                 return;
             }
-            if (projectile.def.projectile.explosionRadius > 0.2f || IsShotgun(projectile))
+            // Sparks thrown by fires (vanilla and VE Tribals' large fire) are projectiles too.
+            if (projectile is Spark || projectile.def.projectile.explosionRadius > 0.2f || IsShotgun(projectile))
             {
                 return;
             }
