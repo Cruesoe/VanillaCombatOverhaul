@@ -16,7 +16,7 @@ Every system below can be switched on or off in the mod settings (Options > Mod 
 
 [h3]Counter-attacks[/h3]
 [list]
-[*]After a successful parry, the defender strikes back at once with a free attack.
+[*]After a successful parry, the defender strikes back at once, even if they were still recovering from their last swing.
 [/list]
 
 [h3]Point-blank shots[/h3]
@@ -82,7 +82,7 @@ Drafted colonists holding a gun get a fire mode button:
 [h2]Armor[/h2]
 [list]
 [*]In vanilla, armor that beats a weapon's penetration usually turns the hit into a bruise. Here, armor with 100% to spare stops it outright. Armor that only matches the weapon still does nothing, so a charge rifle still goes through a flak vest.
-[*]Weapons show double their vanilla armor penetration to keep the same weapons beating the same armor.
+[*]Weapons, melee included, have and show double their vanilla armor penetration. Armor rated above three times a weapon's vanilla penetration does better than in vanilla, and weaker armor does worse. A slider in the Armor settings sets this multiplier from x1 to x3.
 [/list]
 
 [h2]Clothing and coverage[/h2]
@@ -101,6 +101,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [list]
 [*]Choose which weapons a loadout allows. With "Choose primary weapon automatically" on, colonists equip the best allowed weapon they can reach and swap when a clearly better one (10% or more) turns up, judging damage, accuracy, armor penetration, condition and their own skill. Off, they keep what you give them.
 [*]Equipping a weapon by hand locks it until you use the colonist's "Allow weapon upgrades" button.
+[*]To stop this for every colonist at once, turn off "Colonists choose their primary weapon" in the settings.
 [*]New games start with three loadouts: Anything (any weapon, with a backup melee weapon when carrying a gun), Ranged with sidearm, and Melee.
 [/list]
 
@@ -133,8 +134,9 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
 [*][b]Dubs Mint Menus[/b]: its meal and drug carry settings appear in each loadout's supplies as Meals and Drugs rows.
 [*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is grayed out. Loadouts still handle weapons and supplies.
+[*][b]Rules of Engagement[/b]: it handles walk-firing and loadouts, so Run and gun and Loadouts turn off automatically and are grayed out in the settings. Your settings for them return if you remove it.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
-[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, which control the same systems.
+[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks, IMPACT - Combat Overhaul or Run and Gun, which control the same systems.
 [/list]
 
 [h2]Feedback[/h2]

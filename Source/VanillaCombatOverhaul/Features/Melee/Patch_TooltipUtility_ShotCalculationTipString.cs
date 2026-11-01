@@ -4,6 +4,7 @@ using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace VanillaCombatOverhaul
 {
@@ -31,7 +32,9 @@ namespace VanillaCombatOverhaul
             }
 
             var meleeVerb = pawn.equipment.PrimaryEq?.AllVerbs.OfType<Verb_MeleeAttack>().FirstOrDefault();
-            if (meleeVerb == null)
+            // Shooters only see melee odds for a target they could swing at.
+            if (meleeVerb == null
+                || (!pawn.equipment.Primary.def.IsMeleeWeapon && !pawn.CanReachImmediate(target, PathEndMode.Touch)))
             {
                 return;
             }
@@ -69,10 +72,10 @@ namespace VanillaCombatOverhaul
                 sb.AppendLine("   " + "VCO_TargetParryChance".Translate(parry.ToStringPercent()));
             }
 
-            if (settings != null && (settings.enableMeleeFlanking || settings.enableHeightTargeting)
+            if (settings != null && (DirectionalHitUtility.SideActive(settings, melee: true) || settings.enableHeightTargeting)
                 && target is Pawn hitPawn)
             {
-                var side = DirectionalHitUtility.GroupFor(facing);
+                var side = DirectionalHitUtility.SideActive(settings, melee: true) ? DirectionalHitUtility.GroupFor(facing) : null;
                 if (side != null)
                 {
                     sb.AppendLine("   " + "VCO_TargetSide".Translate() + ": " + side.labelShort);

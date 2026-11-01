@@ -9,7 +9,6 @@ namespace VanillaCombatOverhaul
     public class VCOMod : Mod
     {
         public static VCOSettings Settings { get; private set; }
-        public static VCOMod Instance { get; private set; }
 
         private Vector2 scrollPosition;
         private SettingsTab drawnTab = SettingsTab.Combat;
@@ -29,7 +28,6 @@ namespace VanillaCombatOverhaul
 
         public VCOMod(ModContentPack content) : base(content)
         {
-            Instance = this;
             // Mod constructors run before def loading, so XML PatchOperations can read this.
             Settings = GetSettings<VCOSettings>();
         }
@@ -113,6 +111,10 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Armor"))
             {
                 Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
+                DependentOptions(s.enableAdvancedArmor, "VCO_RequiresAdvancedArmor", () =>
+                {
+                    s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 3f, 0.25f, "0.00");
+                });
             }
 
             if (Section(l, "VCO_Section_Damage"))
@@ -141,9 +143,10 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_Evasion", ref s.enableEvasion);
                 Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
-                Toggle(l, "VCO_RunAndGun", ref s.enableRunAndGun);
+                var otherMod = RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null;
+                Toggle(l, "VCO_RunAndGun", ref s.enableRunAndGun, requirementKey: otherMod);
                 Toggle(l, "VCO_RunAndGunNpcs", ref s.runAndGunForNpcs,
-                       requirementKey: s.enableRunAndGun ? null : "VCO_RequiresRunAndGun");
+                       requirementKey: otherMod ?? (s.enableRunAndGun ? null : "VCO_RequiresRunAndGun"));
             }
 
             if (Section(l, "VCO_Section_Suppression"))
@@ -209,7 +212,11 @@ namespace VanillaCombatOverhaul
             {
                 l.Label("VCO_AutoEquip_Intro".Translate());
                 l.Gap(6f);
-                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true);
+                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true,
+                       requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null);
+                Toggle(l, "VCO_AutoPrimary", ref s.enableAutoPrimary,
+                       requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement"
+                           : s.enableAutoEquip ? null : "VCO_RequiresLoadouts");
             }
 
             if (Section(l, "VCO_Section_Apparel"))

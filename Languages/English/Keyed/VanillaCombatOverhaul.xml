@@ -31,7 +31,10 @@
 
   <!-- Armor -->
   <VCO_AdvancedArmor>Good leftover armor stops hits</VCO_AdvancedArmor>
-  <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nThe gun's shown armor penetration is raised to keep weapons that already beat a plate beating it.</VCO_AdvancedArmor_Tip>
+  <VCO_AdvancedArmor_Tip>Vanilla armor rarely says no. Even a suit that beats the gun's penetration usually turns the hit into a bruise instead of stopping it. You only always bounce a hit when leftover armor (armor minus penetration) reaches 200%.\n\nWith this on, leftover 100% actually stops the hit. Armor that only matches the gun still does nothing, so a charge rifle still dumps a flak vest. The half-damage bruise still happens when leftover is lower than the stop point.\n\nWeapon armor penetration is also raised, by the setting below.</VCO_AdvancedArmor_Tip>
+  <VCO_PenetrationScale>Weapon armor penetration: ×{0}</VCO_PenetrationScale>
+  <VCO_PenetrationScale_Tip>Multiplies the armor penetration of every weapon, melee included, and the number shown on it. ×1 is vanilla's penetration. Default 2.\n\nAt ×2, armor rated above three times a weapon's vanilla penetration does better than in vanilla, and weaker armor does worse. A weapon with 20% vanilla penetration goes straight through 40% armor, where vanilla leaves 20% leftover.</VCO_PenetrationScale_Tip>
+  <VCO_RequiresAdvancedArmor>Requires "Good leftover armor stops hits" to be on.</VCO_RequiresAdvancedArmor>
 
   <!-- Damage / hit location -->
   <VCO_DirectionalDamage>Where you get hit depends on the angle</VCO_DirectionalDamage>
@@ -64,14 +67,15 @@
   <VCO_FiringArc_Tip>Normally a missed shot lands somewhere near the target no matter how far away the shooter is. With this on, misses spread out in a cone, so shots from far away go much wider.\n\nThis makes long range shooting less reliable and closing the distance more worthwhile.</VCO_FiringArc_Tip>
 
   <VCO_VisibleTracers>Show vibrant tracers on shots</VCO_VisibleTracers>
-  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColor follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.\n\nCombat Extended's Vibrant Tracers does the same job by swapping ammo textures. This is that idea for vanilla, without needing CE calibers.</VCO_VisibleTracers_Tip>
+  <VCO_VisibleTracers_Tip>Vanilla bullets are a one-pixel speck. This draws a short glowing streak behind each projectile so you can see the shot.\n\nColor follows the damage: bullets yellow, arrows orange, fire red, stun cyan. Shells, grenades and shotgun blasts are left alone.</VCO_VisibleTracers_Tip>
 
-  <!-- Fire modes -->
+  <!-- Run and gun, and option requirements -->
   <VCO_RunAndGun>Run and gun</VCO_RunAndGun>
   <VCO_RunAndGun_Tip>Drafted colonists with Fire at Will on shoot at enemies while walking to where you sent them, instead of stopping or holding fire.\n\nShooting on the move costs 10% accuracy, and the shooter walks 10% slower while aiming and firing, or 40% with a heavy weapon of 5 kg or more (LMG, minigun). Suppressed pawns and explosive or one-use weapons don't run and gun. Turn off Fire at Will to move a colonist without shooting.</VCO_RunAndGun_Tip>
   <VCO_RunAndGunNpcs>Enemies and allies run and gun too</VCO_RunAndGunNpcs>
   <VCO_RunAndGunNpcs_Tip>Non-player pawns shoot at their current target while moving to a firing position.</VCO_RunAndGunNpcs_Tip>
   <VCO_RequiresRunAndGun>Requires "Run and gun" to be on.</VCO_RequiresRunAndGun>
+  <VCO_HandledByRulesOfEngagement>Off while Rules of Engagement is active, which has its own version of this. Your choice here returns if you remove that mod.</VCO_HandledByRulesOfEngagement>
   <VCO_RequiresParry>Requires "Pawns can parry melee attacks" to be on.</VCO_RequiresParry>
   <VCO_RequiresDirectionalDamage>Requires "Where you get hit depends on the angle" to be on.</VCO_RequiresDirectionalDamage>
   <VCO_RequiresSuppression>Requires "Incoming fire suppresses" to be on.</VCO_RequiresSuppression>
@@ -92,6 +96,7 @@
   <VCO_StatPart_Crawling>Crawling under fire</VCO_StatPart_Crawling>
   <VCO_StatPart_SuppressionThreshold>From mood and nerves, suppressed at {0} suppression and pinned at {1}</VCO_StatPart_SuppressionThreshold>
 
+  <!-- Fire modes -->
   <VCO_Section_FireModes>Fire modes</VCO_Section_FireModes>
   <VCO_FireModes>Drafted pawns can choose a fire mode</VCO_FireModes>
   <VCO_FireModes_Tip>Drafted colonists with a gun get a fire mode button.\n\nPrecision: better aim, slower to aim, smaller bursts.\nShort Burst: a few extra rounds, slightly worse aim, quicker to fire.\nSuppression: many more rounds, much worse aim, fast to aim but slow to recover.\nAuto: picks one of those by distance to the target.\n\nThe mode only applies while drafted, so hunting and undrafted self-defense fire normally. Explosives, one-use launchers and abilities are never affected, and single-shot and beam weapons only offer Default and Precision.</VCO_FireModes_Tip>
@@ -129,6 +134,10 @@
   <VCO_AutoEquip_Intro>Each colonist follows a loadout, chosen in the Loadout column of the Assign tab. A loadout sets which weapons the colonist may use, whether it carries a backup melee weapon, and which items it keeps in its inventory.</VCO_AutoEquip_Intro>
   <VCO_AutoEquip>Loadouts</VCO_AutoEquip>
   <VCO_AutoEquip_Tip>Colonists equip and upgrade their primary weapon, carry a melee sidearm and stock items as their loadout says. Selection considers damage, accuracy, armor penetration, condition, and the colonist's shooting or melee skill. Drafted colonists are never sent to fetch gear.\n\nManually equipping a weapon locks that choice until you use the colonist's Allow weapon upgrades command.\n\nTurn this off to use another mod's loadout or sidearm system. The Assign tab column needs a restart to appear or disappear.</VCO_AutoEquip_Tip>
+  <VCO_AutoPrimary>Colonists choose their primary weapon</VCO_AutoPrimary>
+  <VCO_AutoPrimary_Tip>Off: no colonist equips or upgrades a primary weapon on their own, whatever their loadout says. They keep the weapon you give them. Sidearms and carried items still follow the loadout.</VCO_AutoPrimary_Tip>
+  <VCO_RequiresLoadouts>Requires "Loadouts" to be on.</VCO_RequiresLoadouts>
+  <VCO_Loadout_AutoPrimaryOff>Off for every loadout: "Colonists choose their primary weapon" is off in the Vanilla Combat Overhaul settings.</VCO_Loadout_AutoPrimaryOff>
   <VCO_AutoEquip_Unlock>Allow weapon upgrades</VCO_AutoEquip_Unlock>
   <VCO_AutoEquip_Unlock_Tip>This weapon was equipped manually. Remove that lock and allow automatic upgrades again.</VCO_AutoEquip_Unlock_Tip>
 

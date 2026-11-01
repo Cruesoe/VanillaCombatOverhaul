@@ -4,13 +4,6 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    public enum BulletWoundKind
-    {
-        Fragment,
-        PassThrough,
-        Mushroom
-    }
-
     /// <summary>
     /// Vanilla Combat Reloaded's bullet and arrow wounds, applied by intercepting
     /// <see cref="DamageWorker_AddInjury"/>. Armor that reduced the hit cancels them.

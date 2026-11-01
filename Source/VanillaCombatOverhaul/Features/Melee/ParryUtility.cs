@@ -230,8 +230,16 @@ namespace VanillaCombatOverhaul
             resolvingCounter = true;
             try
             {
-                VCODiagnostics.CountFor(defender, "parry.counterAttack");
-                defender.meleeVerbs.TryMeleeAttack(attacker);
+                // TryMeleeAttack refuses a pawn on cooldown, so a melee cooldown ends here.
+                if (defender.stances.curStance is Stance_Cooldown cooldown && cooldown.verb?.verbProps.IsMeleeAttack == true
+                    && !defender.stances.stunner.Stunned)
+                {
+                    defender.stances.CancelBusyStanceHard();
+                }
+                if (defender.meleeVerbs.TryMeleeAttack(attacker))
+                {
+                    VCODiagnostics.CountFor(defender, "parry.counterAttack");
+                }
             }
             finally
             {

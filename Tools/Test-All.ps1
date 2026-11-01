@@ -4,6 +4,7 @@
     - Every translation key the code uses exists in the English keyed file, and every key in it is used.
     - XML patches gate optional content by def or package ID, never by mod display name.
     - Every texture the code loads with ContentFinder or MaterialPool exists.
+    - No code uses GameFont.Tiny.
 
     The in-game combat suite is slower and separate: Tools\Run-CombatTest.ps1.
 #>
@@ -62,6 +63,9 @@ Get-ChildItem (Join-Path $repo 'Common') -Recurse -Filter *.xml | ForEach-Object
     }
 }
 
+# --- fonts ----------------------------------------------------------------------
+if ($allCode -match 'GameFont\.Tiny') { $failures.Add('GameFont.Tiny is used') }
+
 # --- textures -------------------------------------------------------------------
 $textureRoots = @('Textures', 'Common\Textures') | ForEach-Object { Join-Path $repo $_ } | Where-Object { Test-Path $_ }
 foreach ($m in [regex]::Matches($allCode, '(?:ContentFinder<Texture2D>\.Get|MaterialPool\.MatFrom)\("([^"]+)"')) {
@@ -76,5 +80,5 @@ if ($failures.Count -gt 0) {
     Write-Host "$($failures.Count) check(s) failed."
     exit 1
 }
-Write-Host "Static checks passed: $($used.Count) translation keys, XML gating, textures."
+Write-Host "Static checks passed: $($used.Count) translation keys, XML gating, fonts, textures."
 exit 0

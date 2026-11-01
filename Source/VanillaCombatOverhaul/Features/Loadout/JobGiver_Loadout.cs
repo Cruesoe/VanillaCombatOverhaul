@@ -66,8 +66,9 @@ namespace VanillaCombatOverhaul
         {
             var settings = VCOMod.Settings;
             var current = pawn.equipment.Primary;
-            var autoPrimary = policy.autoPrimary
-                              && !(current != null && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(pawn) == true);
+            var autoPrimary = settings.enableAutoPrimary && policy.autoPrimary
+                              && !(current != null && (EquipmentUtility.IsBondedTo(current, pawn)
+                                                       || AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(pawn) == true));
             var locked = LoadoutUtility.SidearmsEnabled ? LoadoutUtility.CompFor(pawn)?.LockedSidearm : null;
             // A locked sidearm replaces automatic choice; fetch it back if it is lying on this map.
             var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled && locked == null;
@@ -239,12 +240,14 @@ namespace VanillaCombatOverhaul
                    && !pawn.InMentalState
                    && pawn.carryTracker?.CarriedThing == null
                    && pawn.equipment != null
-                   && pawn.inventory != null;
+                   && pawn.inventory != null
+                   && pawn.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation);
         }
 
         private static bool CanUseAsPrimary(Thing candidate, Pawn pawn, ThingFilter filter)
         {
-            if (!LoadoutUtility.CanTake(candidate, pawn, filter))
+            if (!LoadoutUtility.CanTake(candidate, pawn, filter)
+                || (pawn.IsQuestLodger() && !EquipmentUtility.QuestLodgerCanEquip(candidate, pawn)))
             {
                 return false;
             }
@@ -253,7 +256,7 @@ namespace VanillaCombatOverhaul
             {
                 return true;
             }
-            if (pawn.story?.traits?.HasTrait(TraitDefOf.Brawler) == true)
+            if (pawn.WorkTagIsDisabled(WorkTags.Shooting) || pawn.story?.traits?.HasTrait(TraitDefOf.Brawler) == true)
             {
                 return false;
             }
