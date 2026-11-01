@@ -12,7 +12,7 @@ namespace VanillaCombatOverhaul
         private static ThingFilter weaponParentFilter;
         private static ThingFilter meleeParentFilter;
 
-        public static bool Enabled => VCOMod.Settings?.enableAutoEquip ?? false;
+        public static bool Enabled => (VCOMod.Settings?.enableAutoEquip ?? false) && !RulesOfEngagementCompat.Active;
 
         public const string SimpleSidearmsPackageId = "PeteTimesSix.SimpleSidearms";
 

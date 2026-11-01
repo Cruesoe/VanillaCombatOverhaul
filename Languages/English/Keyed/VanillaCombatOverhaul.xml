@@ -72,6 +72,7 @@
   <VCO_RunAndGunNpcs>Enemies and allies run and gun too</VCO_RunAndGunNpcs>
   <VCO_RunAndGunNpcs_Tip>Non-player pawns shoot at their current target while moving to a firing position.</VCO_RunAndGunNpcs_Tip>
   <VCO_RequiresRunAndGun>Requires "Run and gun" to be on.</VCO_RequiresRunAndGun>
+  <VCO_HandledByRulesOfEngagement>Off while Rules of Engagement is active, which has its own version of this. Your choice here returns if you remove that mod.</VCO_HandledByRulesOfEngagement>
   <VCO_RequiresParry>Requires "Pawns can parry melee attacks" to be on.</VCO_RequiresParry>
   <VCO_RequiresDirectionalDamage>Requires "Where you get hit depends on the angle" to be on.</VCO_RequiresDirectionalDamage>
   <VCO_RequiresSuppression>Requires "Incoming fire suppresses" to be on.</VCO_RequiresSuppression>

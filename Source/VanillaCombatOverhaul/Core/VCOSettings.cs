@@ -211,7 +211,7 @@ namespace VanillaCombatOverhaul
             {
                 yield return "DirectionalDamage";
             }
-            if (enableAutoEquip)
+            if (enableAutoEquip && !RulesOfEngagementCompat.Active)
             {
                 yield return "Loadouts";
             }

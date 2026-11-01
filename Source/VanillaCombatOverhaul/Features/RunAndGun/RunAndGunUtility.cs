@@ -34,7 +34,8 @@ namespace VanillaCombatOverhaul
         public static void TryShoot(Pawn pawn)
         {
             var settings = VCOMod.Settings;
-            if (settings == null || !settings.enableRunAndGun || pawn.Faction == null || pawn.CurJobDef != JobDefOf.Goto)
+            if (settings == null || !settings.enableRunAndGun || RulesOfEngagementCompat.Active
+                || pawn.Faction == null || pawn.CurJobDef != JobDefOf.Goto)
             {
                 return;
             }

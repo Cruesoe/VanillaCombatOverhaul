@@ -141,9 +141,10 @@ namespace VanillaCombatOverhaul
                 Toggle(l, "VCO_Evasion", ref s.enableEvasion);
                 Toggle(l, "VCO_FiringArc", ref s.enableFiringArc);
                 Toggle(l, "VCO_VisibleTracers", ref s.enableVisibleTracers);
-                Toggle(l, "VCO_RunAndGun", ref s.enableRunAndGun);
+                var otherMod = RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null;
+                Toggle(l, "VCO_RunAndGun", ref s.enableRunAndGun, requirementKey: otherMod);
                 Toggle(l, "VCO_RunAndGunNpcs", ref s.runAndGunForNpcs,
-                       requirementKey: s.enableRunAndGun ? null : "VCO_RequiresRunAndGun");
+                       requirementKey: otherMod ?? (s.enableRunAndGun ? null : "VCO_RequiresRunAndGun"));
             }
 
             if (Section(l, "VCO_Section_Suppression"))
@@ -209,7 +210,8 @@ namespace VanillaCombatOverhaul
             {
                 l.Label("VCO_AutoEquip_Intro".Translate());
                 l.Gap(6f);
-                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true);
+                Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true,
+                       requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null);
             }
 
             if (Section(l, "VCO_Section_Apparel"))

@@ -46,7 +46,7 @@ Every system can be switched on or off individually, so you keep only the parts 
 [/list]
 
 [h2]Compatibility[/h2]
-Works with vanilla-style weapon, apparel and race mods without patches. With [b]Progression: Ammunition[/b], loadouts carry the refills each colonist's weapon needs. With [b]Dubs Mint Menus[/b], its meal and drug carry settings appear in each loadout's supplies. With [b]Simple Sidearms[/b], it handles backup weapons and loadouts handle the rest; with another loadout mod, turn Loadouts off.
+Works with vanilla-style weapon, apparel and race mods without patches. With [b]Progression: Ammunition[/b], loadouts carry the refills each colonist's weapon needs. With [b]Dubs Mint Menus[/b], its meal and drug carry settings appear in each loadout's supplies. With [b]Simple Sidearms[/b], it handles backup weapons and loadouts handle the rest. With [b]Rules of Engagement[/b], it handles walk-firing and loadouts, and Run and gun and Loadouts turn off automatically. With another loadout mod, turn Loadouts off.
 Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, because they control the same systems.
 Safe to add to an existing save: old weapon policies become loadouts and colonists keep their medicine settings. A new game is still recommended, as a colony armed and armored for vanilla combat will feel the change.
 

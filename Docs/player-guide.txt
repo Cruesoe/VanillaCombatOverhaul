@@ -133,6 +133,7 @@ Loadouts replace the weapon tab of apparel policies. Assign one to each colonist
 [*][b]Progression: Ammunition[/b]: an Ammunition row joins each loadout's supplies, set by default to "Match primary weapon": bows carry arrow refills, guns ammo refills, and charge weapons charge refills, following the weapon when it changes. Its ammo column in the Assign tab is folded into loadouts.
 [*][b]Dubs Mint Menus[/b]: its meal and drug carry settings appear in each loadout's supplies as Meals and Drugs rows.
 [*][b]Simple Sidearms[/b]: it handles backup weapons, and the loadout's sidearm option is grayed out. Loadouts still handle weapons and supplies.
+[*][b]Rules of Engagement[/b]: it handles walk-firing and loadouts, so Run and gun and Loadouts turn off automatically and are grayed out in the settings. Your settings for them return if you remove it.
 [*]Another loadout mod: turn Loadouts off in the settings and restart.
 [*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, which control the same systems.
 [/list]
