@@ -86,8 +86,9 @@ namespace VanillaCombatOverhaul
         private void DoWeapons(Rect rect, LoadoutPolicy policy)
         {
             var check = new Rect(rect.x, rect.y, rect.width, CheckboxHeight);
-            Widgets.CheckboxLabeled(check, "VCO_Loadout_AutoPrimary".Translate(), ref policy.autoPrimary);
-            TooltipHandler.TipRegion(check, "VCO_Loadout_AutoPrimary_Tip".Translate());
+            var offForAll = !VCOMod.Settings.enableAutoPrimary;
+            Widgets.CheckboxLabeled(check, "VCO_Loadout_AutoPrimary".Translate(), ref policy.autoPrimary, offForAll);
+            TooltipHandler.TipRegion(check, (offForAll ? "VCO_Loadout_AutoPrimaryOff" : "VCO_Loadout_AutoPrimary_Tip").Translate());
             rect.yMin += CheckboxHeight + 4f;
             ThingFilterUI.DoThingFilterConfigWindow(rect, weaponFilterState, policy.weaponFilter,
                 LoadoutUtility.WeaponParentFilter, 16);

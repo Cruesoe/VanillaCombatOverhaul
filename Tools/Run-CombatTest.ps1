@@ -41,7 +41,7 @@ if (-not (Test-Path $exe)) { Write-Error "RimWorld 1.7 not found at $exe"; exit 
 # --- the deployed copy must be the build in this repo -------------------------
 $repo = Split-Path $PSScriptRoot -Parent
 $dllName = 'VanillaCombatOverhaul.dll'
-# Each version folder with a built assembly must match its deployed copy; 1.7 loads the 1.6 build until the mod has its own.
+# Each version folder's built assembly must match its deployed copy.
 $builds = @('1.6', '1.7') | ForEach-Object { Join-Path $repo "$_\Assemblies\$dllName" } | Where-Object { Test-Path $_ }
 if (-not $builds) { Write-Error "Mod assembly not built under $repo\1.6 or 1.7"; exit 2 }
 

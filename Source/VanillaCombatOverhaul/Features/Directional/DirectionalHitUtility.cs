@@ -19,6 +19,10 @@ namespace VanillaCombatOverhaul
         [ThreadStatic] private static List<BodyPartRecord> pickParts;
         [ThreadStatic] private static List<float> pickWeights;
 
+        /// <summary>Whether the side an attack arrives from limits where it can land.</summary>
+        public static bool SideActive(VCOSettings settings, bool melee) =>
+            settings.enableDirectionalDamage && (!melee || settings.enableMeleeFlanking);
+
         /// <summary>
         /// A replacement hit part, or null to keep vanilla's. With no part at the targeted height it
         /// falls back to any height on that side, then to vanilla's choice.
@@ -32,7 +36,7 @@ namespace VanillaCombatOverhaul
             }
 
             var melee = IsMeleeDamage(dinfo);
-            var sideActive = settings.enableDirectionalDamage && (!melee || settings.enableMeleeFlanking);
+            var sideActive = SideActive(settings, melee);
             var heightActive = settings.enableHeightTargeting;
             if (!sideActive && !heightActive)
             {

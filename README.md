@@ -14,7 +14,7 @@ game's familiar systems and broad mod compatibility.
 - Run and gun: shooters fire on the move instead of stopping.
 - Suppression: incoming fire makes pawns aim worse and slower, and pins them flat in cover.
 - Distinct bullet and arrow wounds.
-- Armor that can reduce damage even when it does not stop a hit completely.
+- Armor that stops weak hits outright, with weapon armor penetration raised to match.
 - Improved coverage for gloves, boots, masks, helmets, glasses, and similar apparel.
 - Loadouts in the Assign tab: allowed weapons, a backup melee weapon swapped in when enemies close in, medicine and items to carry, and Progression: Ammunition refills matched to each colonist's weapon.
 
@@ -33,6 +33,7 @@ Not compatible with:
 - Vanilla Fire Modes
 - Suppression (Continued)
 - Misstall's Combat Tweaks
+- IMPACT - Combat Overhaul
 - Run and Gun
 
 Vanilla Combat Reloaded inspired several combat systems, Vanilla Fire Modes inspired selectable

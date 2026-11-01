@@ -29,6 +29,7 @@ The depth of Combat Extended without its ammo, calibers or compatibility patches
 [h2]Armor and gear[/h2]
 [list]
 [*]Good armor stops weak hits outright instead of turning them into bruises.
+[*]Weapon armor penetration is doubled, melee included, so light armor does less than in vanilla and heavy armor does more. A slider in the settings changes this.
 [*]Gloves, boots, masks, helmets and glasses protect the parts they cover and layer sensibly.
 [*]Loadouts in the Assign tab set each colonist's weapons, a backup melee weapon, medicine and other supplies.
 [*]Colonists upgrade their weapons by skill and draw their sidearm when an enemy reaches them.
@@ -42,12 +43,14 @@ Every system can be switched on or off individually, so you keep only the parts 
 [*][b]Ranged[/b]: skill-based accuracy, evasion, miss spread, tracers and run and gun, which can be limited to your colonists.
 [*][b]Suppression[/b]: pinning, the mood penalty and overall strength.
 [*][b]Fire modes[/b]: whether other factions use them, the Auto distances, and each mode's accuracy, aiming time, recovery and burst size.
-[*][b]Armor[/b], [b]Projectile wounds[/b], [b]Apparel and coverage[/b] and [b]Loadouts[/b] can each be turned off as a whole.
+[*][b]Armor[/b]: the armor rules and how far weapon armor penetration is raised.
+[*][b]Loadouts[/b]: loadouts as a whole, and whether colonists choose their own primary weapon.
+[*][b]Projectile wounds[/b] and [b]Apparel and coverage[/b] can each be turned off as a whole.
 [/list]
 
 [h2]Compatibility[/h2]
 Works with vanilla-style weapon, apparel and race mods without patches. With [b]Progression: Ammunition[/b], loadouts carry the refills each colonist's weapon needs. With [b]Dubs Mint Menus[/b], its meal and drug carry settings appear in each loadout's supplies. With [b]Simple Sidearms[/b], it handles backup weapons and loadouts handle the rest. With [b]Rules of Engagement[/b], it handles walk-firing and loadouts, and Run and gun and Loadouts turn off automatically. With another loadout mod, turn Loadouts off.
-Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks or Run and Gun, because they control the same systems.
+Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks, IMPACT - Combat Overhaul or Run and Gun, because they control the same systems.
 Safe to add to an existing save: old weapon policies become loadouts and colonists keep their medicine settings. A new game is still recommended, as a colony armed and armored for vanilla combat will feel the change.
 
 [h2]Credits[/h2]

@@ -31,6 +31,7 @@
     <li>CETeam.CombatExtended</li>
     <li>Mlie.YayosCombat3</li>
     <li>Donald.VCR</li>
+    <li>astryl.Impact</li>
     <!-- Both mods would otherwise issue competing automatic equip jobs. -->
     <li>Snues.AutoArm</li>
     <!-- Both mods would change burst size, aim time and hit chance for the same shot. -->
@@ -45,10 +46,10 @@
   <description>Adds depth to RimWorld's combat without replacing it.
 
 MELEE
-- Pawns can parry incoming attacks, and a good parry opens a counter-attack.
-- Hits from the side or behind do more damage.
-- Being outnumbered makes you easier to hit.
-- Attacks aim where the attacker can reach - a short pawn is not swinging at a tall one's head.
+- Armed pawns can parry incoming attacks, and a successful parry earns a counter-attack.
+- Attacks from behind cannot be parried, and a surrounded defender is soon overwhelmed.
+- Skilled shooters caught in melee sometimes fire point-blank instead of swinging.
+- Hits land on the side the attack came from, and skilled fighters and shooters can aim for the head, torso or legs.
 
 RANGED
 - Shooting skill matters more, and the gap between a good shot and a bad one is wider.
@@ -61,8 +62,8 @@ RANGED
 - Incoming fire suppresses: pawns under sustained fire aim worse and slower, and pinned pawns hit the dirt and crawl. Bullets flying past count, armor resists weak rounds, and being under fire hurts mood.
 
 ARMOR
-- Armor that fails to stop a hit still reduces it, instead of the all-or-nothing vanilla roll.
-- Weapon armor penetration is shown on the weapon.
+- Good armor stops weak hits outright instead of turning them into bruises.
+- Weapon armor penetration is doubled, melee included, so light armor does less than in vanilla and heavy armor does more. A slider in the settings changes this.
 
 EQUIPMENT
 - Loadouts, set in the Assign tab, choose each colonist's weapons, a backup melee weapon (or one you pick by right-clicking), medicine, and other items to carry. With Progression: Ammunition, colonists carry the refills their gun needs.
@@ -74,5 +75,5 @@ CLOTHING
 
 Combat and equipment systems can be configured individually in the mod settings.
 
-Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Suppression (Continued), Misstall's Combat Tweaks, or Run and Gun. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.</description>
+Not compatible with Auto Arm, Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Suppression (Continued), Misstall's Combat Tweaks, IMPACT - Combat Overhaul, or Run and Gun. With Simple Sidearms active, Simple Sidearms handles backup weapons and loadouts handle the rest. With another loadout mod, turn Loadouts off in the settings.</description>
 </ModMetaData>

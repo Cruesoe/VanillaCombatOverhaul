@@ -3,12 +3,6 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    public enum SettingsTab
-    {
-        Combat,
-        Equipment
-    }
-
     /// <summary>Mod settings. Values without a settings control keep their defaults unless edited in the settings file.</summary>
     public class VCOSettings : ModSettings
     {
@@ -86,6 +80,8 @@ namespace VanillaCombatOverhaul
         public bool enableAutoEquip = Shipped;
         // A replacement must score this many times the allowed current weapon.
         public float autoEquipUpgradeThreshold = 1.10f;
+        // Off: no loadout chooses a primary weapon, whatever its own option says.
+        public bool enableAutoPrimary = Shipped;
 
         // ---- Apparel coverage -------------------------------------------------
         public bool enableHandFeetPatch = Shipped;
@@ -163,6 +159,7 @@ namespace VanillaCombatOverhaul
 
             Scribe_Values.Look(ref enableAutoEquip, nameof(enableAutoEquip), Shipped);
             Scribe_Values.Look(ref autoEquipUpgradeThreshold, nameof(autoEquipUpgradeThreshold), 1.10f);
+            Scribe_Values.Look(ref enableAutoPrimary, nameof(enableAutoPrimary), Shipped);
 
             Scribe_Values.Look(ref enableHandFeetPatch, nameof(enableHandFeetPatch), Shipped);
             Scribe_Values.Look(ref enableAcidHeatPatch, nameof(enableAcidHeatPatch), Shipped);

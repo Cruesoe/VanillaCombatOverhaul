@@ -3,14 +3,6 @@ using Verse;
 
 namespace VanillaCombatOverhaul
 {
-    public enum AttackFacing
-    {
-        Front,
-        Left,
-        Right,
-        Rear
-    }
-
     /// <summary>Which side of a target an attack arrives from, shared by parrying and directional damage.</summary>
     public static class FacingUtility
     {

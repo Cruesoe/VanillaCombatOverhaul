@@ -273,10 +273,15 @@ namespace VanillaCombatOverhaul
             var minZ = Mathf.Min(origin.z, end.z) - FlybyRadius;
             var maxZ = Mathf.Max(origin.z, end.z) + FlybyRadius;
             var source = launcher.Position;
-            var pawns = map.mapPawns.AllHumanlikeSpawned;
+            // AllHumanlikeSpawned rebuilds its list on every read, so this filters the full list instead.
+            var pawns = map.mapPawns.AllPawnsSpawned;
             for (var i = 0; i < pawns.Count; i++)
             {
                 var pawn = pawns[i];
+                if (!pawn.RaceProps.Humanlike)
+                {
+                    continue;
+                }
                 var pos = pawn.DrawPos;
                 if (pos.x < minX || pos.x > maxX || pos.z < minZ || pos.z > maxZ || HitThisImpact.Contains(pawn))
                 {

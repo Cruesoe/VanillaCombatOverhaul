@@ -14,6 +14,9 @@ namespace VanillaCombatOverhaul
 
         private readonly LoadoutPolicy policy;
         private readonly QuickSearchWidget search = new QuickSearchWidget();
+        // The items matching shownFilter, rebuilt when the search text changes; null until first drawn.
+        private readonly List<ThingDef> shown = new List<ThingDef>();
+        private string shownFilter;
         private Vector2 scroll;
 
         public override Vector2 InitialSize => new Vector2(420f, 560f);
@@ -72,12 +75,16 @@ namespace VanillaCombatOverhaul
             search.OnGUI(new Rect(inRect.x, inRect.y + 36f, inRect.width, 24f));
 
             var outRect = new Rect(inRect.x, inRect.y + 66f, inRect.width, inRect.height - 66f - CloseButSize.y - 10f);
-            var shown = new List<ThingDef>();
-            foreach (var def in Carryable)
+            if (search.filter.Text != shownFilter)
             {
-                if (search.filter.Matches(def.label) && policy.CountFor(def) == 0)
+                shownFilter = search.filter.Text;
+                shown.Clear();
+                foreach (var def in Carryable)
                 {
-                    shown.Add(def);
+                    if (search.filter.Matches(def.label) && policy.CountFor(def) == 0)
+                    {
+                        shown.Add(def);
+                    }
                 }
             }
             var view = new Rect(0f, 0f, outRect.width - 16f, shown.Count * RowHeight);

@@ -7,10 +7,10 @@ namespace VanillaCombatOverhaul
     /// <summary>Skilled shooters partly overcome weapon, weather and evasion penalties (Vanilla Combat Reloaded's statBump curve).</summary>
     public static class PenaltyMitigationUtility
     {
-        /// <summary>Raises a penalty factor toward 1 by shooter skill; skill factor 1 leaves it unchanged.</summary>
         // Shot reports are built many times a tick while AI picks targets; skill changes far more slowly.
         private const int SkillCacheTicks = 60;
 
+        /// <summary>Raises a penalty factor toward 1 by shooter skill; skill factor 1 leaves it unchanged.</summary>
         public static float MitigatePenalty(float factor, Thing shooter, float scale)
         {
             if (factor >= 1f || shooter == null || scale <= 0f)
