@@ -15,6 +15,7 @@ game's familiar systems and broad mod compatibility.
 - Suppression: incoming fire makes pawns aim worse and slower, and pins them flat in cover.
 - Distinct bullet and arrow wounds.
 - Armor that stops weak hits outright, with weapon armor penetration raised to match.
+- Damaged armor protects less, so sustained fire wears down heavily armored enemies.
 - Improved coverage for gloves, boots, masks, helmets, glasses, and similar apparel.
 - Loadouts in the Assign tab: allowed weapons, a backup melee weapon swapped in when enemies close in, medicine and items to carry, and Progression: Ammunition refills matched to each colonist's weapon.
 

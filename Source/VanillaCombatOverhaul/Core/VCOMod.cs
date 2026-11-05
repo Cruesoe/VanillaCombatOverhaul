@@ -115,6 +115,7 @@ namespace VanillaCombatOverhaul
                 {
                     s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 3f, 0.25f, "0.00");
                 });
+                Toggle(l, "VCO_ArmorDurability", ref s.enableArmorDurability);
             }
 
             if (Section(l, "VCO_Section_Damage"))

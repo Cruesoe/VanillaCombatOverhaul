@@ -64,6 +64,7 @@ RANGED
 ARMOR
 - Good armor stops weak hits outright instead of turning them into bruises.
 - Weapon armor penetration is doubled, melee included, so light armor does less than in vanilla and heavy armor does more. A slider in the settings changes this.
+- Damaged armor protects less: below half its hit points it loses armor, down to half at 0, so sustained fire wears down heavily armored enemies.
 
 EQUIPMENT
 - Loadouts, set in the Assign tab, choose each colonist's weapons, a backup melee weapon (or one you pick by right-clicking), medicine, and other items to carry. With Progression: Ammunition, colonists carry the refills their gun needs.

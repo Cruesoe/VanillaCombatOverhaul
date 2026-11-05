@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- Armor durability: damaged apparel loses armor; the stat part reads the setting, so it is inert while off -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/StatDef[defName="ArmorRating_Sharp" or defName="ArmorRating_Blunt" or defName="ArmorRating_Heat"]/parts</xpath>
+    <value>
+      <li Class="VanillaCombatOverhaul.StatPart_ArmorDurability" />
+    </value>
+  </Operation>
+</Patch>

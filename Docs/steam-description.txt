@@ -30,6 +30,7 @@ The depth of Combat Extended without its ammo, calibers or compatibility patches
 [list]
 [*]Good armor stops weak hits outright instead of turning them into bruises.
 [*]Weapon armor penetration is doubled, melee included, so light armor does less than in vanilla and heavy armor does more. A slider in the settings changes this.
+[*]Damaged armor protects less: below half its hit points it loses armor, down to half at 0, so sustained fire wears down heavily armored enemies.
 [*]Gloves, boots, masks, helmets and glasses protect the parts they cover and layer sensibly.
 [*]Loadouts in the Assign tab set each colonist's weapons, a backup melee weapon, medicine and other supplies.
 [*]Colonists upgrade their weapons by skill and draw their sidearm when an enemy reaches them.
@@ -43,7 +44,7 @@ Every system can be switched on or off individually, so you keep only the parts 
 [*][b]Ranged[/b]: skill-based accuracy, evasion, miss spread, tracers and run and gun, which can be limited to your colonists.
 [*][b]Suppression[/b]: pinning, the mood penalty and overall strength.
 [*][b]Fire modes[/b]: whether other factions use them, the Auto distances, and each mode's accuracy, aiming time, recovery and burst size.
-[*][b]Armor[/b]: the armor rules and how far weapon armor penetration is raised.
+[*][b]Armor[/b]: the armor rules, how far weapon armor penetration is raised, and armor durability.
 [*][b]Loadouts[/b]: loadouts as a whole, and whether colonists choose their own primary weapon.
 [*][b]Projectile wounds[/b] and [b]Apparel and coverage[/b] can each be turned off as a whole.
 [/list]
