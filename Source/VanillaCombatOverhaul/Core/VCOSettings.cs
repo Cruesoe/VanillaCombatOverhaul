@@ -74,6 +74,7 @@ namespace VanillaCombatOverhaul
         public bool enableAdvancedArmor = Shipped;
         public float armorScale = 2f;
         public float penetrationScale = 2f;
+        public bool enableArmorDurability = Shipped;
 
         // ---- Loadouts ----------------------------------------------------------
         // Saved under its original name so existing settings files keep their choice.
@@ -156,6 +157,7 @@ namespace VanillaCombatOverhaul
             Scribe_Values.Look(ref enableAdvancedArmor, nameof(enableAdvancedArmor), Shipped);
             Scribe_Values.Look(ref armorScale, nameof(armorScale), 2f);
             Scribe_Values.Look(ref penetrationScale, nameof(penetrationScale), 2f);
+            Scribe_Values.Look(ref enableArmorDurability, nameof(enableArmorDurability), Shipped);
 
             Scribe_Values.Look(ref enableAutoEquip, nameof(enableAutoEquip), Shipped);
             Scribe_Values.Look(ref autoEquipUpgradeThreshold, nameof(autoEquipUpgradeThreshold), 1.10f);

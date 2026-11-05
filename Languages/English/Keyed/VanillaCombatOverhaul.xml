@@ -35,6 +35,8 @@
   <VCO_PenetrationScale>Weapon armor penetration: ×{0}</VCO_PenetrationScale>
   <VCO_PenetrationScale_Tip>Multiplies the armor penetration of every weapon, melee included, and the number shown on it. ×1 is vanilla's penetration. Default 2.\n\nAt ×2, armor rated above three times a weapon's vanilla penetration does better than in vanilla, and weaker armor does worse. A weapon with 20% vanilla penetration goes straight through 40% armor, where vanilla leaves 20% leftover.</VCO_PenetrationScale_Tip>
   <VCO_RequiresAdvancedArmor>Requires "Good leftover armor stops hits" to be on.</VCO_RequiresAdvancedArmor>
+  <VCO_ArmorDurability>Damaged armor protects less</VCO_ArmorDurability>
+  <VCO_ArmorDurability_Tip>Every hit wears armor down, even one it stops. Normally armor protects fully until it falls apart.\n\nWith this on, armor below half its hit points loses protection, down to half its armor rating at 0 hit points. Sustained fire wears down heavily armored enemies, and damaged gear is worth repairing or replacing.</VCO_ArmorDurability_Tip>
 
   <!-- Damage / hit location -->
   <VCO_DirectionalDamage>Where you get hit depends on the angle</VCO_DirectionalDamage>
@@ -193,6 +195,7 @@
   <VCO_StatPart_Moving>While moving</VCO_StatPart_Moving>
   <VCO_StatPart_Lighting>Lighting</VCO_StatPart_Lighting>
   <VCO_StatPart_FireMode>Fire mode ({0})</VCO_StatPart_FireMode>
+  <VCO_StatPart_ArmorWear>Wear ({0} / {1} hit points)</VCO_StatPart_ArmorWear>
 
   <!-- In-world text -->
   <VCO_Mote_Parried>Parried!</VCO_Mote_Parried>
