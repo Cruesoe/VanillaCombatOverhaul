@@ -25,7 +25,7 @@ namespace VanillaCombatOverhaul
 
         /// <summary>
         /// A replacement hit part, or null to keep vanilla's. With no part at the targeted height it
-        /// falls back to any height on that side, then to vanilla's choice.
+        /// falls back to the damage's own height on that side, then to vanilla's choice.
         /// </summary>
         public static BodyPartRecord TryPickDirectional(DamageInfo dinfo, Pawn pawn)
         {
@@ -67,27 +67,29 @@ namespace VanillaCombatOverhaul
                 }
             }
 
-            var height = BodyPartHeight.Undefined;
+            // The damage's own height (Top for a roof collapse, Bottom for terrain) unless an aimed height lands.
+            var baseHeight = dinfo.Height;
+            var height = baseHeight;
             if (heightActive)
             {
-                height = HeightTargetingUtility.GetTargetHeight(dinfo.Instigator, melee);
-                if (height != BodyPartHeight.Undefined)
+                var aimed = HeightTargetingUtility.GetTargetHeight(dinfo.Instigator, melee);
+                if (aimed != BodyPartHeight.Undefined)
                 {
                     var land = HeightTargetingUtility.ChanceToLand(
-                        dinfo.Instigator, pawn, group, height, dinfo.Def, melee);
+                        dinfo.Instigator, pawn, group, aimed, dinfo.Def, melee);
                     if (!Rand.Chance(land))
                     {
                         VCODiagnostics.CountFor(pawn, "directional.height.missedBand");
-                        height = BodyPartHeight.Undefined;
                     }
                     else
                     {
                         VCODiagnostics.CountFor(pawn, "directional.height.applied");
+                        height = aimed;
                     }
                 }
             }
 
-            if (group == null && height == BodyPartHeight.Undefined)
+            if (group == null && height == baseHeight)
             {
                 return null;
             }
@@ -98,8 +100,8 @@ namespace VanillaCombatOverhaul
                 return result;
             }
 
-            if (height != BodyPartHeight.Undefined
-                && TryPick(pawn, dinfo, group, BodyPartHeight.Undefined, out result))
+            if (height != baseHeight
+                && TryPick(pawn, dinfo, group, baseHeight, out result))
             {
                 VCODiagnostics.CountFor(pawn, "directional.height.fallback");
                 return result;

@@ -188,7 +188,15 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            var record = forcedWeapons.Find(r => r.pawnId == pawn.thingIDNumber);
+            ForcedWeaponRecord record = null;
+            for (var i = 0; i < forcedWeapons.Count; i++)
+            {
+                if (forcedWeapons[i].pawnId == pawn.thingIDNumber)
+                {
+                    record = forcedWeapons[i];
+                    break;
+                }
+            }
             if (record == null)
             {
                 return false;

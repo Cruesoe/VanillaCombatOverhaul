@@ -28,7 +28,7 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        // 1.6 FinalizeAndAddInjury returns the remaining damage (float), not void.
+        // FinalizeAndAddInjury returns the remaining damage (float), not void.
         private delegate float FinalizeInjury(DamageWorker_AddInjury worker, Pawn pawn,
             float totalDamage, DamageInfo dinfo, DamageWorker.DamageResult result);
 

@@ -46,7 +46,7 @@
   <VCO_MeleeFlanking_Tip>Melee attacks also hit the side they come from, not just guns and bows.</VCO_MeleeFlanking_Tip>
 
   <VCO_HeightTargeting>Skilled drafted pawns can aim high or low</VCO_HeightTargeting>
-  <VCO_HeightTargeting_Tip>Drafted colonists with Shooting or Melee 10 or higher get a button to aim at the head, torso or legs. Shots need Shooting 10 and melee attacks need Melee 10. Greater skill raises the chance of actually landing there; a miss still hits that side of the body, just not the band you asked for.\n\nEnemies with Shooting or Melee 10 or higher pick a random height when they spawn. Explosives ignore this.</VCO_HeightTargeting_Tip>
+  <VCO_HeightTargeting_Tip>Drafted colonists with Shooting or Melee 10 or higher get a button to aim at the head, torso or legs. Shots need Shooting 10 and melee attacks need Melee 10. Greater skill raises the chance of actually landing there; a miss still hits that side of the body, just not the band you asked for.\n\nOther pawns with Shooting or Melee 10 or higher, including allies and visitors, pick a random height when they spawn. Explosives ignore this.</VCO_HeightTargeting_Tip>
   <VCO_Height_None>None</VCO_Height_None>
   <VCO_Height_Bottom>Legs</VCO_Height_Bottom>
   <VCO_Height_Middle>Torso</VCO_Height_Middle>
@@ -89,7 +89,7 @@
   <VCO_SuppressionPinning_Tip>A pinned pawn stops what it is doing, drops prone and holds fire until the shooting eases, staying down for at least four seconds. Enemies and allies crawl to nearby cover first; your colonists drop where they stand.\n\nA pinned pawn that moves crawls, at 65% speed. Order a pinned colonist to move and they crawl there without being pinned down again on the way.\n\nLying down makes a pawn much harder to hit from 4.5 cells or more, but point-blank shots hit far more easily, and a pawn attacked in melee gets up to fight.\n\nWith this off, pinned pawns only aim worse.</VCO_SuppressionPinning_Tip>
   <VCO_SuppressionMood>Being under fire hurts mood</VCO_SuppressionMood>
   <VCO_SuppressionMood_Tip>Pawns being shot at get a mood penalty while it lasts: -5 under fire, -10 suppressed, -15 pinned.</VCO_SuppressionMood_Tip>
-  <VCO_SuppressionStrength>Suppression strength: x{0}</VCO_SuppressionStrength>
+  <VCO_SuppressionStrength>Suppression strength: ×{0}</VCO_SuppressionStrength>
   <VCO_SuppressionStrength_Tip>Multiplies how much suppression each shot causes. Higher pins pawns sooner.</VCO_SuppressionStrength_Tip>
   <VCO_Suppression_SuppressedInspect>Suppressed ({0})</VCO_Suppression_SuppressedInspect>
   <VCO_Suppression_PinnedInspect>Pinned by incoming fire</VCO_Suppression_PinnedInspect>

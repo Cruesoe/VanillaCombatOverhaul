@@ -15,12 +15,43 @@ namespace VanillaCombatOverhaul
 
         private static readonly Dictionary<int, int> WeaponRetryAfterTick = new Dictionary<int, int>();
         private static readonly Dictionary<int, int> NextItemCheckTick = new Dictionary<int, int>();
+        private static readonly List<int> ExpiredKeys = new List<int>();
+        private static int nextPruneTick;
 
         /// <summary>Forgets retry times, which are ticks of the game they were set in.</summary>
         public static void ResetState()
         {
             WeaponRetryAfterTick.Clear();
             NextItemCheckTick.Clear();
+            nextPruneTick = 0;
+        }
+
+        /// <summary>Drops passed retry times, which act the same as none, so pawns no longer around are forgotten.</summary>
+        private static void Prune(int now)
+        {
+            if (now < nextPruneTick)
+            {
+                return;
+            }
+            nextPruneTick = now + ItemCheckTicks;
+            PruneExpired(WeaponRetryAfterTick, now);
+            PruneExpired(NextItemCheckTick, now);
+        }
+
+        private static void PruneExpired(Dictionary<int, int> ticks, int now)
+        {
+            ExpiredKeys.Clear();
+            foreach (var pair in ticks)
+            {
+                if (now >= pair.Value)
+                {
+                    ExpiredKeys.Add(pair.Key);
+                }
+            }
+            for (var i = 0; i < ExpiredKeys.Count; i++)
+            {
+                ticks.Remove(ExpiredKeys[i]);
+            }
         }
 
         /// <summary>Priority under the colonist priority sorter: above scheduled work (9), below urgent food (9.5).</summary>
@@ -40,6 +71,7 @@ namespace VanillaCombatOverhaul
                 return null;
             }
             var now = Find.TickManager.TicksGame;
+            Prune(now);
             if (!pawn.WorkTagIsDisabled(WorkTags.Violent)
                 && (!WeaponRetryAfterTick.TryGetValue(pawn.thingIDNumber, out var retry) || now >= retry))
             {
@@ -72,6 +104,10 @@ namespace VanillaCombatOverhaul
             var locked = LoadoutUtility.SidearmsEnabled ? LoadoutUtility.CompFor(pawn)?.LockedSidearm : null;
             // A locked sidearm replaces automatic choice; fetch it back if it is lying on this map.
             var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled && locked == null;
+            if (locked != null && pawn.IsQuestLodger() && !EquipmentUtility.QuestLodgerCanEquip(locked, pawn))
+            {
+                locked = null;
+            }
             if (locked != null && locked.Spawned && locked.Map == pawn.Map && !locked.IsForbidden(pawn)
                 && !MassUtility.WillBeOverEncumberedAfterPickingUp(pawn, locked, 1) && Reachable(pawn, locked, now))
             {
@@ -246,8 +282,7 @@ namespace VanillaCombatOverhaul
 
         private static bool CanUseAsPrimary(Thing candidate, Pawn pawn, ThingFilter filter)
         {
-            if (!LoadoutUtility.CanTake(candidate, pawn, filter)
-                || (pawn.IsQuestLodger() && !EquipmentUtility.QuestLodgerCanEquip(candidate, pawn)))
+            if (!LoadoutUtility.CanTake(candidate, pawn, filter))
             {
                 return false;
             }

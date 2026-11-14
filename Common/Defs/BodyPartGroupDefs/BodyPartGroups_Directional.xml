@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <!-- Added to every BodyDef by Patches/DirectionalBodyParts.xml. -->
+  <!-- Added to every BodyDef by Common/Patches/DirectionalBodyParts.xml. -->
 
   <BodyPartGroupDef>
     <defName>VCO_Left</defName>

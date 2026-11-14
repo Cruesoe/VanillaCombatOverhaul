@@ -29,7 +29,7 @@ $keyedPath = Join-Path $repo 'Languages\English\Keyed\VanillaCombatOverhaul.xml'
 $keyed = [xml][System.IO.File]::ReadAllText($keyedPath)
 $defined = @{}
 foreach ($node in $keyed.LanguageData.ChildNodes) {
-    if ($node.NodeType -eq 'Element') { $defined[$node.Name] = $true }
+    if ($node.NodeType -eq 'Element') { $defined[$node.get_Name()] = $true }
 }
 
 $used = @{}
