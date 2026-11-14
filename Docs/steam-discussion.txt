@@ -1,0 +1,78 @@
+Feature guide
+
+A closer look at what Vanilla Combat Overhaul changes. Every system can be switched on or off in the mod settings (Options > Mod settings > Vanilla Combat Overhaul), and the numbers below are the defaults.
+
+[h2]Melee[/h2]
+[list]
+[*]Parrying: a pawn holding a weapon can turn a blow aside and take no damage. The chance pits the defender's melee ability against the attacker's: a skilled fighter parries most blows from a novice, and two masters parry each other about half the time.
+[*]Attacks from behind can never be parried, and attacks from the side are harder to parry. A pawn parries at most two blows a second, so a surrounded defender is soon overwhelmed. Darkness counts against a parry.
+[*]A successful parry earns an instant counter-attack, even mid-recovery.
+[*]Point-blank shots: a pawn with Shooting 10 or higher caught in melee with a gun sometimes fires it instead (5% at Shooting 10, 17% at 15, 50% at 20), with no aiming time. Social fights, duels, finishing blows and melee attacks you order stay melee.
+[/list]
+
+[h2]Shooting[/h2]
+[list]
+[*]Good shooters partly overcome a weapon's poor accuracy at range and bad weather. Cover, smoke and target size are unchanged.
+[*]A pawn running at speed is harder to hit, and better shooters are less put off by it.
+[*]Missed shots spread in a cone, so long-range misses go wider.
+[*]Glowing tracers show where fire is coming from: yellow bullets, orange arrows, red fire, cyan stun.
+[*]Run and gun: drafted colonists with Fire at Will on shoot while walking, at 10% worse accuracy and 10% slower walking (40% with a weapon of 5 kg or more). Turn off Fire at Will to move without shooting.
+[/list]
+
+[h3]Fire modes[/h3]
+Drafted colonists holding a gun get a fire mode button:
+[table]
+[tr][th]Mode[/th][th]Aim[/th][th]Aiming time[/th][th]Burst[/th][th]Recovery[/th][/tr]
+[tr][td]Precision[/td][td]Better[/td][td]30% longer[/td][td]A third fewer rounds[/td][td]Normal[/td][/tr]
+[tr][td]Short Burst[/td][td]Slightly worse[/td][td]20% shorter[/td][td]Half again as many (up to 3 more)[/td][td]10% quicker[/td][/tr]
+[tr][td]Suppression[/td][td]Much worse[/td][td]Half[/td][td]Double (up to 10 more)[/td][td]20% slower[/td][/tr]
+[/table]
+[list]
+[*]Auto picks by distance: Suppression under 12 cells, Short Burst from 12, Precision from 25. Raiders, visitors and allies choose the same way.
+[*]Modes apply only while drafted. Single-shot and beam weapons offer only Default and Precision.
+[/list]
+
+[h3]Where hits land[/h3]
+[list]
+[*]Hits land on the side the attack comes from: shoot a raider from their left and you can hit their left arm, eye or lung, but not their right ones. Melee follows the same rule.
+[*]Drafted colonists with Shooting or Melee 10 or higher can aim for the head, torso or legs. More skill lands the chosen band more often. Other pawns with the skill pick a height when they arrive.
+[*]Light rounds fragment into nearby parts, medium rounds pass through to the parts behind, and heavy rounds mushroom into one deeper wound. Arrows and pila stab inward or slice across a neighboring part.
+[/list]
+
+[h2]Suppression[/h2]
+[list]
+[*]Bullets landing near a pawn, or flying within three cells of them, build suppression; explosions build twice as much. Shots from a pawn's own side never suppress them.
+[*]How much a pawn can take depends on how far their mood is above their break threshold: steady nerves and a good mood hold out longer. Armor resists rounds that cannot match it.
+[*]Suppressed pawns (amber icon) aim worse and slower. Pinned pawns (red icon) are hit hardest, drop prone and hold fire until the shooting eases; enemies crawl to cover first.
+[*]Concentrated fire is what counts: one assault rifle burst falls just short of suppressing an average pawn, an LMG burst suppresses them, and pinning takes a minigun or several shooters.
+[*]Being shot at hurts mood: -5 under fire, -10 suppressed, -15 pinned.
+[*]Shield belts, mechanoids and animals are never suppressed.
+[/list]
+
+[h2]Armor and clothing[/h2]
+[list]
+[*]Armor with 100% to spare over a weapon's penetration stops the hit outright instead of turning it into a bruise.
+[*]Weapons, melee included, have double their vanilla armor penetration, so light armor does less and heavy armor more. A slider sets this from ×1 to ×3.
+[*]Below half its hit points, armor protects less, down to half at 0.
+[*]Gloves protect the hands and boots the feet. Masks cover the face, and glasses and headsets can be worn with a helmet. Changing coverage needs a restart.
+[/list]
+
+[h2]Loadouts[/h2]
+Assign a loadout to each colonist in the Assign tab; "Manage loadouts" opens the editor.
+[list]
+[*]Weapons: colonists equip the best allowed weapon they can reach and swap when one at least 10% better turns up. A weapon you equip by hand stays until you press "Allow weapon upgrades".
+[*]Sidearms: colonists with a gun carry the best allowed melee weapon and draw it when an enemy reaches them. Strong shooters keep the gun up close instead. Right-click a melee weapon to choose a sidearm, and use the draft button to switch by hand.
+[*]Supplies: the Items tab sets each colonist's medicine and any other items to carry. Colonists fetch more when they run low and never drop loadout items as unused.
+[/list]
+
+[h2]Other mods[/h2]
+[list]
+[*][b]Progression: Ammunition[/b]: loadouts carry the refills each colonist's weapon needs.
+[*][b]Dubs Mint Menus[/b]: its meal and drug carry settings appear in loadout supplies.
+[*][b]Simple Sidearms[/b]: it handles backup weapons; loadouts handle the rest.
+[*][b]Rules of Engagement[/b]: Run and gun and Loadouts turn off automatically.
+[*][b]Grievous Wounds[/b]: turn off its Hardened Armor and Sharp Shots modules, which stack with this mod's armor and accuracy.
+[*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks, IMPACT - Combat Overhaul or Run and Gun.
+[/list]
+
+Safe to add to an existing save, though a new game is recommended. Found a bug or a fight that feels off? Leave a comment on the mod page with what happened.
