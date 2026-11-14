@@ -279,7 +279,8 @@ namespace VanillaCombatOverhaul
             {
                 return false;
             }
-            return EquipmentUtility.CanEquip(weapon, pawn, out _, false)
+            return (!pawn.IsQuestLodger() || EquipmentUtility.QuestLodgerCanEquip(weapon, pawn))
+                   && EquipmentUtility.CanEquip(weapon, pawn, out _, false)
                    && EquipmentUtility.GetPersonaWeaponConfirmationText(weapon, pawn).NullOrEmpty();
         }
     }

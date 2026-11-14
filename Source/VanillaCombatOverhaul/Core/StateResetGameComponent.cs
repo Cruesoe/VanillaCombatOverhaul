@@ -7,6 +7,12 @@ namespace VanillaCombatOverhaul
     {
         public StateResetGameComponent(Game game)
         {
+            ResetAll();
+        }
+
+        /// <summary>Clears every feature's static per-game state.</summary>
+        public static void ResetAll()
+        {
             CombatContext.Reset();
             JobGiver_Loadout.ResetState();
             ParryUtility.ResetState();

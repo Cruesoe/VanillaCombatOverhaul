@@ -26,6 +26,15 @@ namespace VanillaCombatOverhaul
         // Requirement key for the options being drawn, while their parent switch is off; null otherwise.
         private static string requirement;
 
+        // Text drawn every frame, built on first draw and cleared when the settings window closes.
+        private static List<TabRecord> tabs;
+        private static readonly Dictionary<string, string> TranslatedText = new Dictionary<string, string>();
+        private static readonly Dictionary<(string key, bool restart, string requirement), (string label, string tip)> ToggleText =
+            new Dictionary<(string, bool, string), (string, string)>();
+        private static readonly Dictionary<(string key, float value), string> SliderLabels = new Dictionary<(string, float), string>();
+        private static readonly Dictionary<(string key, string requirement), string> SliderTips = new Dictionary<(string, string), string>();
+        private static readonly Dictionary<FireMode, string> TuningHeadings = new Dictionary<FireMode, string>();
+
         public VCOMod(ModContentPack content) : base(content)
         {
             // Mod constructors run before def loading, so XML PatchOperations can read this.
@@ -38,6 +47,28 @@ namespace VanillaCombatOverhaul
         {
             base.WriteSettings();
             PatchOperationSettingGated.InvalidateSnapshot();
+            ClearTextCache();
+        }
+
+        private static void ClearTextCache()
+        {
+            tabs = null;
+            TranslatedText.Clear();
+            ToggleText.Clear();
+            SliderLabels.Clear();
+            SliderTips.Clear();
+            TuningHeadings.Clear();
+        }
+
+        /// <summary>A keyed translation, looked up once while the settings window is open.</summary>
+        private static string Translated(string key)
+        {
+            if (!TranslatedText.TryGetValue(key, out var text))
+            {
+                text = key.Translate();
+                TranslatedText[key] = text;
+            }
+            return text;
         }
 
         public override void DoSettingsWindowContents(Rect inRect)
@@ -49,11 +80,12 @@ namespace VanillaCombatOverhaul
                                 inRect.height - TabDrawer.TabHeight);
             Widgets.DrawMenuSection(body);
 
-            TabDrawer.DrawTabs(tabAnchor, new List<TabRecord>
+            tabs ??= new List<TabRecord>
             {
                 Tab("VCO_Tab_Combat", SettingsTab.Combat),
                 Tab("VCO_Tab_Equipment", SettingsTab.Equipment)
-            });
+            };
+            TabDrawer.DrawTabs(tabAnchor, tabs);
 
             if (s.CurrentTab != drawnTab)
             {
@@ -94,7 +126,7 @@ namespace VanillaCombatOverhaul
         }
 
         private static TabRecord Tab(string key, SettingsTab tab) =>
-            new TabRecord(key.Translate(), () => Settings.CurrentTab = tab, Settings.CurrentTab == tab);
+            new TabRecord(key.Translate(), () => Settings.CurrentTab = tab, () => Settings.CurrentTab == tab);
 
         // ------------------------------------------------------------------ tabs
 
@@ -111,10 +143,9 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Armor"))
             {
                 Toggle(l, "VCO_AdvancedArmor", ref s.enableAdvancedArmor);
-                DependentOptions(s.enableAdvancedArmor, "VCO_RequiresAdvancedArmor", () =>
-                {
-                    s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 3f, 0.25f, "0.00");
-                });
+                var previous = BeginDependent(s.enableAdvancedArmor, "VCO_RequiresAdvancedArmor");
+                s.penetrationScale = Slider(l, "VCO_PenetrationScale", s.penetrationScale, 1f, 3f, 0.25f, "0.00");
+                requirement = previous;
                 Toggle(l, "VCO_ArmorDurability", ref s.enableArmorDurability);
             }
 
@@ -153,19 +184,20 @@ namespace VanillaCombatOverhaul
             if (Section(l, "VCO_Section_Suppression"))
             {
                 Toggle(l, "VCO_Suppression", ref s.enableSuppression);
-                DependentOptions(s.enableSuppression, "VCO_RequiresSuppression", () =>
-                {
-                    Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
-                    Toggle(l, "VCO_SuppressionMood", ref s.enableSuppressionMood);
-                    s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
-                                                   0.25f, 3f, 0.05f, "0.00");
-                });
+                var previous = BeginDependent(s.enableSuppression, "VCO_RequiresSuppression");
+                Toggle(l, "VCO_SuppressionPinning", ref s.enableSuppressionPinning);
+                Toggle(l, "VCO_SuppressionMood", ref s.enableSuppressionMood);
+                s.suppressionStrength = Slider(l, "VCO_SuppressionStrength", s.suppressionStrength,
+                                               0.25f, 3f, 0.05f, "0.00");
+                requirement = previous;
             }
 
             if (Section(l, "VCO_Section_FireModes"))
             {
                 Toggle(l, "VCO_FireModes", ref s.enableFireModes);
-                DependentOptions(s.enableFireModes, "VCO_RequiresFireModes", () => DrawFireModes(l, s));
+                var previous = BeginDependent(s.enableFireModes, "VCO_RequiresFireModes");
+                DrawFireModes(l, s);
+                requirement = previous;
             }
         }
 
@@ -188,7 +220,7 @@ namespace VanillaCombatOverhaul
             l.Gap(6f);
             var wasEnabled = GUI.enabled;
             GUI.enabled = requirement == null;
-            if (l.ButtonText("VCO_FireModeReset".Translate()) && requirement == null)
+            if (l.ButtonText(Translated("VCO_FireModeReset")) && requirement == null)
             {
                 s.ResetFireModes();
             }
@@ -198,7 +230,12 @@ namespace VanillaCombatOverhaul
         private static void DrawTuning(Listing_Standard l, FireMode mode, FireModeTuning t)
         {
             l.Gap(8f);
-            l.Label(FireModeUtility.LabelFor(mode).Colorize(ColoredText.SubtleGrayColor));
+            if (!TuningHeadings.TryGetValue(mode, out var heading))
+            {
+                heading = FireModeUtility.LabelFor(mode).Colorize(ColoredText.SubtleGrayColor);
+                TuningHeadings[mode] = heading;
+            }
+            l.Label(heading);
             t.accuracy = Slider(l, "VCO_FireModeAccuracy", t.accuracy, 0.25f, 3f, 0.05f, "0.00");
             t.aimTime = Slider(l, "VCO_FireModeAimTime", t.aimTime, 0.25f, 3f, 0.05f, "0.00");
             t.cooldown = Slider(l, "VCO_FireModeCooldown", t.cooldown, 0.25f, 3f, 0.05f, "0.00");
@@ -211,7 +248,7 @@ namespace VanillaCombatOverhaul
         {
             if (Section(l, "VCO_Section_AutoEquip"))
             {
-                l.Label("VCO_AutoEquip_Intro".Translate());
+                l.Label(Translated("VCO_AutoEquip_Intro"));
                 l.Gap(6f);
                 Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true,
                        requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null);
@@ -271,8 +308,7 @@ namespace VanillaCombatOverhaul
 
             var previous = Text.Font;
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(rect.x + 28f, rect.y, rect.width - 28f, rect.height),
-                          key.Translate());
+            Widgets.Label(new Rect(rect.x + 28f, rect.y, rect.width - 28f, rect.height), Translated(key));
             Text.Font = previous;
 
             l.GapLine(4f);
@@ -283,25 +319,32 @@ namespace VanillaCombatOverhaul
         private static void Toggle(Listing_Standard l, string key, ref bool value,
                                    bool restartRequired = false, string requirementKey = null)
         {
-            var label = key.Translate().ToString();
-            var tip = (key + "_Tip").Translate().ToString();
-
-            if (restartRequired)
-            {
-                label += "  " + "VCO_RestartTag".Translate();
-                tip += "\n\n" + "VCO_RestartTag_Tip".Translate();
-            }
-
             // A requirement grays the option out and makes it inert.
             requirementKey ??= requirement;
+            if (!ToggleText.TryGetValue((key, restartRequired, requirementKey), out var text))
+            {
+                var label = key.Translate().ToString();
+                var tip = (key + "_Tip").Translate().ToString();
+                if (restartRequired)
+                {
+                    label += "  " + "VCO_RestartTag".Translate();
+                    tip += "\n\n" + "VCO_RestartTag_Tip".Translate();
+                }
+                if (requirementKey != null)
+                {
+                    tip += "\n\n" + requirementKey.Translate();
+                }
+                text = (label, tip);
+                ToggleText[(key, restartRequired, requirementKey)] = text;
+            }
+
             var wasEnabled = GUI.enabled;
             if (requirementKey != null)
             {
-                tip += "\n\n" + requirementKey.Translate();
                 GUI.enabled = false;
             }
             var before = value;
-            l.CheckboxLabeled(label, ref value, tip);
+            l.CheckboxLabeled(text.label, ref value, text.tip);
             GUI.enabled = wasEnabled;
             if (requirementKey != null)
             {
@@ -317,12 +360,23 @@ namespace VanillaCombatOverhaul
         private static float Slider(Listing_Standard l, string key, float value, float min, float max,
                                     float step, string format)
         {
-            var label = key.Translate(value.ToString(format)).ToString();
-            var tip = (key + "_Tip").Translate().ToString();
+            if (!SliderLabels.TryGetValue((key, value), out var label))
+            {
+                label = key.Translate(value.ToString(format)).ToString();
+                SliderLabels[(key, value)] = label;
+            }
+            if (!SliderTips.TryGetValue((key, requirement), out var tip))
+            {
+                tip = (key + "_Tip").Translate().ToString();
+                if (requirement != null)
+                {
+                    tip += "\n\n" + requirement.Translate();
+                }
+                SliderTips[(key, requirement)] = tip;
+            }
             var wasEnabled = GUI.enabled;
             if (requirement != null)
             {
-                tip += "\n\n" + requirement.Translate();
                 GUI.enabled = false;
             }
             var result = l.SliderLabeled(label, value, min, max, 0.6f, tip);
@@ -330,19 +384,12 @@ namespace VanillaCombatOverhaul
             return requirement != null ? value : Mathf.Clamp(GenMath.RoundTo(result, step), min, max);
         }
 
-        /// <summary>Draws options that depend on a switch, grayed out and inert with the requirement in their tooltip while it is off.</summary>
-        private static void DependentOptions(bool available, string requirementKey, Action draw)
+        /// <summary>Starts options that depend on a switch, grayed out and inert with the requirement in their tooltip while it is off; returns the requirement to restore after them.</summary>
+        private static string BeginDependent(bool available, string requirementKey)
         {
             var previous = requirement;
             requirement = available ? previous : requirementKey;
-            try
-            {
-                draw();
-            }
-            finally
-            {
-                requirement = previous;
-            }
+            return previous;
         }
 
     }

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 using HarmonyLib;
 using RimWorld;
@@ -31,7 +30,7 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
-            var meleeVerb = pawn.equipment.PrimaryEq?.AllVerbs.OfType<Verb_MeleeAttack>().FirstOrDefault();
+            var meleeVerb = FirstMeleeVerb(pawn.equipment.PrimaryEq);
             // Shooters only see melee odds for a target they could swing at.
             if (meleeVerb == null
                 || (!pawn.equipment.Primary.def.IsMeleeWeapon && !pawn.CanReachImmediate(target, PathEndMode.Touch)))
@@ -91,6 +90,23 @@ namespace VanillaCombatOverhaul
             }
 
             __result = sb.ToString();
+        }
+
+        private static Verb_MeleeAttack FirstMeleeVerb(CompEquippable equippable)
+        {
+            var verbs = equippable?.AllVerbs;
+            if (verbs == null)
+            {
+                return null;
+            }
+            for (var i = 0; i < verbs.Count; i++)
+            {
+                if (verbs[i] is Verb_MeleeAttack melee)
+                {
+                    return melee;
+                }
+            }
+            return null;
         }
     }
 }

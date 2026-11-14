@@ -197,7 +197,6 @@ namespace VanillaCombatOverhaul
             return results;
         }
 
-        /// <summary>An unarmed hostile pawn, so it cannot fire back while the test ticks the game.</summary>
         /// <summary>Armor factor for real apparel sets against real bullets, reported for tuning against Combat Extended.</summary>
         private static List<AssertionResult> ArmorTests(Map map, IntVec3 cell, List<Pawn> spawned)
         {
@@ -269,6 +268,7 @@ namespace VanillaCombatOverhaul
             return SuppressionUtility.OverallSharpArmor(pawn);
         }
 
+        /// <summary>An unarmed hostile pawn, so it cannot fire back while the test ticks the game.</summary>
         private static Pawn SpawnHostile(Map map, IntVec3 cell, Faction faction)
         {
             var kind = faction.def.basicMemberKind ?? PawnKindDefOf.Villager;

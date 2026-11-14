@@ -25,7 +25,6 @@ namespace VanillaCombatOverhaul
             return results;
         }
 
-        /// <summary>CoveragePair must match the two-pass Coverage on real bodies, which relies on vanilla's height filter.</summary>
         /// <summary>Aiming needs Shooting 10 for shots and Melee 10 for melee attacks; needs a game for pawn generation.</summary>
         public static List<AssertionResult> AimSkillTests()
         {
@@ -68,6 +67,7 @@ namespace VanillaCombatOverhaul
             return results;
         }
 
+        /// <summary>CoveragePair must match the two-pass Coverage on real bodies, which relies on vanilla's height filter.</summary>
         public static IEnumerable<AssertionResult> CoverageFusionTests(Pawn pawn)
         {
             if (pawn?.health?.hediffSet == null)

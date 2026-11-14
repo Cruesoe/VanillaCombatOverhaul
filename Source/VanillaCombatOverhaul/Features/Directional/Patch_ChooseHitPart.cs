@@ -29,14 +29,25 @@ namespace VanillaCombatOverhaul
             }
         }
 
-        public static void Postfix(ref BodyPartRecord __result, DamageInfo dinfo, Pawn pawn)
+        public static void Postfix(DamageWorker __instance, ref BodyPartRecord __result, DamageInfo dinfo, Pawn pawn)
         {
             var directional = DirectionalHitUtility.TryPickDirectional(dinfo, pawn);
-            if (directional != null)
+            if (directional == null)
             {
-                __result = directional;
+                return;   // Keeps vanilla's choice.
             }
-            // Null keeps vanilla's choice.
+            // Stabs keep vanilla's chance of going straight through to an inner part of the chosen one.
+            if (__instance is DamageWorker_Stab && directional.depth != BodyPartDepth.Inside
+                && Rand.Chance(__instance.def.stabChanceOfForcedInternal))
+            {
+                var inner = pawn.health.hediffSet.GetRandomNotMissingPart(
+                    dinfo.Def, BodyPartHeight.Undefined, BodyPartDepth.Inside, directional);
+                if (inner != null)
+                {
+                    directional = inner;
+                }
+            }
+            __result = directional;
         }
     }
 }

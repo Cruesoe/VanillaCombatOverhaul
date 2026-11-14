@@ -39,6 +39,10 @@ namespace VanillaCombatOverhaul
             {
                 return Disabled(label, "IsIncapableOfViolenceLower".Translate(pawn.LabelShort, pawn));
             }
+            if (pawn.IsQuestLodger() && !EquipmentUtility.QuestLodgerCanEquip(weapon, pawn))
+            {
+                return Disabled(label, "QuestRelated".Translate().CapitalizeFirst());
+            }
             if (!pawn.CanReach(weapon, PathEndMode.ClosestTouch, Danger.Deadly))
             {
                 return Disabled(label, "NoPath".Translate().CapitalizeFirst());
