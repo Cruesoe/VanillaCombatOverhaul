@@ -227,6 +227,14 @@ namespace VanillaCombatOverhaul
                 return;
             }
 
+            // In a social fight the counter uses a body verb, as vanilla does, never the weapon.
+            Verb counterVerb = null;
+            if (defender.MentalStateDef == MentalStateDefOf.SocialFighting
+                && !SocialInteractionUtility.TryGetRandomVerbForSocialFight(defender, out counterVerb))
+            {
+                return;
+            }
+
             resolvingCounter = true;
             try
             {
@@ -236,7 +244,7 @@ namespace VanillaCombatOverhaul
                 {
                     defender.stances.CancelBusyStanceHard();
                 }
-                if (defender.meleeVerbs.TryMeleeAttack(attacker))
+                if (defender.meleeVerbs.TryMeleeAttack(attacker, counterVerb))
                 {
                     VCODiagnostics.CountFor(defender, "parry.counterAttack");
                 }
