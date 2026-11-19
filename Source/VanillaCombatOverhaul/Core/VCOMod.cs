@@ -107,7 +107,8 @@ namespace VanillaCombatOverhaul
             var viewRect = new Rect(0f, 0f, outRect.width - 20f, Mathf.Max(contentHeight, outRect.height));
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
-            var l = new Listing_Standard();
+            // One column: overflow would otherwise wrap off-screen and the measured height would never grow.
+            var l = new Listing_Standard { maxOneColumn = true };
             l.Begin(viewRect);
 
             switch (s.CurrentTab)
