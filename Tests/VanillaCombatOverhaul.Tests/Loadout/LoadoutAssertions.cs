@@ -28,6 +28,7 @@ namespace VanillaCombatOverhaul
             var guard = PatchGuard.All.FirstOrDefault(g => g.Id == "Loadout.KeepInventory");
             results.Add(Check("inventory keep patch applied", guard?.Satisfied == true,
                 guard == null ? "guard missing" : $"{guard.Actual} of {guard.Expected}"));
+            results.AddRange(KeepInventorySpliceAssertions.Tests());
 
             var wasEnabled = settings.enableAutoEquip;
             settings.enableAutoEquip = true;
