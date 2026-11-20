@@ -253,9 +253,15 @@ namespace VanillaCombatOverhaul
                 l.Gap(6f);
                 Toggle(l, "VCO_AutoEquip", ref s.enableAutoEquip, restartRequired: true,
                        requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement" : null);
-                Toggle(l, "VCO_AutoPrimary", ref s.enableAutoPrimary,
-                       requirementKey: RulesOfEngagementCompat.Active ? "VCO_HandledByRulesOfEngagement"
-                           : s.enableAutoEquip ? null : "VCO_RequiresLoadouts");
+                if (RulesOfEngagementCompat.Active)
+                {
+                    Toggle(l, "VCO_AutoPrimaryRulesOfEngagement", ref s.enableAutoPrimary);
+                }
+                else
+                {
+                    Toggle(l, "VCO_AutoPrimary", ref s.enableAutoPrimary,
+                           requirementKey: s.enableAutoEquip ? null : "VCO_RequiresLoadouts");
+                }
             }
 
             if (Section(l, "VCO_Section_Apparel"))

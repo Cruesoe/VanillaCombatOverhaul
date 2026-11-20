@@ -56,10 +56,14 @@ namespace VanillaCombatOverhaul
 
         /// <summary>Priority under the colonist priority sorter: above scheduled work (9), below urgent food (9.5).</summary>
         public override float GetPriority(Pawn pawn) =>
-            LoadoutUtility.Enabled && CanConsider(pawn) ? 9.25f : 0f;
+            (LoadoutUtility.Enabled || LoadoutUtility.PrimaryOnly) && CanConsider(pawn) ? 9.25f : 0f;
 
         protected override Job TryGiveJob(Pawn pawn)
         {
+            if (LoadoutUtility.PrimaryOnly)
+            {
+                return PrimaryOnlyJob(pawn);
+            }
             if (!LoadoutUtility.Enabled || !CanConsider(pawn))
             {
                 return null;
@@ -94,16 +98,40 @@ namespace VanillaCombatOverhaul
             return null;
         }
 
+        /// <summary>With Rules of Engagement: only the primary weapon, from any weapon, unless it is managing the pawn's weapons.</summary>
+        private static Job PrimaryOnlyJob(Pawn pawn)
+        {
+            if (!CanConsider(pawn) || pawn.WorkTagIsDisabled(WorkTags.Violent)
+                || RulesOfEngagementCompat.HandlesWeapons(pawn))
+            {
+                return null;
+            }
+            var now = Find.TickManager.TicksGame;
+            Prune(now);
+            if (WeaponRetryAfterTick.TryGetValue(pawn.thingIDNumber, out var retry) && now < retry)
+            {
+                return null;
+            }
+            var weaponJob = WeaponJob(pawn, null, now);
+            if (weaponJob == null)
+            {
+                WeaponRetryAfterTick[pawn.thingIDNumber] = now + UnreachableRetryTicks;
+            }
+            return weaponJob;
+        }
+
+        /// <summary>The next primary weapon or sidearm job; a null policy means primary-only, from any weapon.</summary>
         private static Job WeaponJob(Pawn pawn, LoadoutPolicy policy, int now)
         {
             var settings = VCOMod.Settings;
             var current = pawn.equipment.Primary;
-            var autoPrimary = settings.enableAutoPrimary && policy.autoPrimary
+            var weaponFilter = policy?.weaponFilter ?? LoadoutUtility.AnyWeaponFilter;
+            var autoPrimary = settings.enableAutoPrimary && (policy?.autoPrimary ?? true)
                               && !(current != null && (EquipmentUtility.IsBondedTo(current, pawn)
                                                        || AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(pawn) == true));
-            var locked = LoadoutUtility.SidearmsEnabled ? LoadoutUtility.CompFor(pawn)?.LockedSidearm : null;
+            var locked = policy != null && LoadoutUtility.SidearmsEnabled ? LoadoutUtility.CompFor(pawn)?.LockedSidearm : null;
             // A locked sidearm replaces automatic choice; fetch it back if it is lying on this map.
-            var wantSidearm = policy.carrySidearm && LoadoutUtility.SidearmsEnabled && locked == null;
+            var wantSidearm = policy != null && policy.carrySidearm && LoadoutUtility.SidearmsEnabled && locked == null;
             if (locked != null && pawn.IsQuestLodger() && !EquipmentUtility.QuestLodgerCanEquip(locked, pawn))
             {
                 locked = null;
@@ -131,7 +159,7 @@ namespace VanillaCombatOverhaul
             for (var i = 0; i < weapons.Count; i++)
             {
                 var candidate = weapons[i];
-                if (autoPrimary && CanUseAsPrimary(candidate, pawn, policy.weaponFilter))
+                if (autoPrimary && CanUseAsPrimary(candidate, pawn, weaponFilter))
                 {
                     var score = WeaponScoreUtility.Score(candidate, pawn);
                     if (score > bestPrimaryScore)
@@ -154,7 +182,7 @@ namespace VanillaCombatOverhaul
 
             if (bestPrimary != null)
             {
-                var currentAllowed = current != null && policy.weaponFilter.Allows(current);
+                var currentAllowed = current != null && weaponFilter.Allows(current);
                 var currentScore = current == null ? 0f : WeaponScoreUtility.Score(current, pawn);
                 if (WeaponScoreUtility.IsUpgrade(currentScore, bestPrimaryScore, settings.autoEquipUpgradeThreshold,
                         currentAllowed))

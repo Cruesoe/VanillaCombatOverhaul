@@ -70,7 +70,7 @@ Assign a loadout to each colonist in the Assign tab; "Manage loadouts" opens the
 [*][b]Progression: Ammunition[/b]: loadouts carry the refills each colonist's weapon needs.
 [*][b]Dubs Mint Menus[/b]: its meal and drug carry settings appear in loadout supplies.
 [*][b]Simple Sidearms[/b]: it handles backup weapons; loadouts handle the rest.
-[*][b]Rules of Engagement[/b]: Run and gun and Loadouts turn off automatically.
+[*][b]Rules of Engagement[/b]: Run and gun and Loadouts turn off automatically; colonists still choose their primary weapon unless its loadout sets one.
 [*][b]Grievous Wounds[/b]: turn off its Hardened Armor and Sharp Shots modules, which stack with this mod's armor and accuracy.
 [*]Not compatible with Combat Extended, Yayo's Combat, Vanilla Combat Reloaded, Vanilla Fire Modes, Auto Arm, Suppression (Continued), Misstall's Combat Tweaks, IMPACT - Combat Overhaul or Run and Gun.
 [/list]

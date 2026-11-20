@@ -15,7 +15,7 @@ namespace VanillaCombatOverhaul
             }
             // Shown only once the forced weapon is in hand, not while the equip job is still walking to it
             var primary = __instance.equipment?.Primary;
-            if (LoadoutUtility.Enabled
+            if ((LoadoutUtility.Enabled || LoadoutUtility.PrimaryOnly)
                 && primary != null
                 && __instance.IsColonistPlayerControlled
                 && AutoEquipPolicyComponent.Current?.HasForcedCurrentWeapon(__instance) == true)
