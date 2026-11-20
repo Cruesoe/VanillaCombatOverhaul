@@ -14,6 +14,14 @@ namespace VanillaCombatOverhaul
 
         public static bool Enabled => (VCOMod.Settings?.enableAutoEquip ?? false) && !RulesOfEngagementCompat.Active;
 
+        /// <summary>Rules of Engagement replaces loadouts, but colonists still choose their primary weapon from any weapon.</summary>
+        public static bool PrimaryOnly => RulesOfEngagementCompat.Active && (VCOMod.Settings?.enableAutoPrimary ?? false);
+
+        private static ThingFilter anyWeaponFilter;
+
+        /// <summary>Every weapon, used for the primary weapon when there are no loadouts. Built once per session.</summary>
+        public static ThingFilter AnyWeaponFilter => anyWeaponFilter ??= NewWeaponFilter(ranged: true, melee: true);
+
         public const string SimpleSidearmsPackageId = "PeteTimesSix.SimpleSidearms";
 
         /// <summary>Simple Sidearms carries and swaps weapons itself, so loadout sidearms stay off.</summary>
